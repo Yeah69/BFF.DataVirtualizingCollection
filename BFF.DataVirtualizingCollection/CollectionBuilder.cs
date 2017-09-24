@@ -81,6 +81,10 @@ namespace BFF.DataVirtualizingCollection
     /// <inheritdoc />
     public class CollectionBuilder<T> : ICollectionBuilder<T>
     {
+        /// <summary>
+        /// This factory method creates an instance of a <see cref="ICollectionBuilder{T}"/>.
+        /// </summary>
+        /// <returns>An instance of a <see cref="ICollectionBuilder{T}"/>.</returns>
         public static ICollectionBuilder<T> CreateBuilder() => new CollectionBuilder<T>();
 
         /// <inheritdoc />

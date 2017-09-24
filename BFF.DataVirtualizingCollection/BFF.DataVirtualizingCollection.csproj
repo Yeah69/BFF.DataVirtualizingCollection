@@ -2,10 +2,22 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.4</TargetFramework>
+    <PackageId>BFF.DataVirtualizingCollection</PackageId>
+    <PackageVersion>1.0.0</PackageVersion>
+    <Authors>Dimitri Enns</Authors>
+    <Description>This is an approach to data virtualizing collections intended to be used in WPF projects.</Description>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>First release</PackageReleaseNotes>
+    <Copyright>Copyright 2017 (c) Dimitri Enns. All rights reserved.</Copyright>
+    <PackageTags>data-virtualization wpf csharp</PackageTags>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\netstandard1.4\BFF.DataVirtualizingCollection.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Reactive" Version="4.0.0-preview00001" />
+    <PackageReference Include="System.Reactive" Version="3.1.1" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
 

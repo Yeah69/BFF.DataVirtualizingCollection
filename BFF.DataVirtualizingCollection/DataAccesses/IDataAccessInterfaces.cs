@@ -26,7 +26,7 @@ namespace BFF.DataVirtualizingCollection.DataAccesses
     public interface IPageFetcher<out T>
     {
         /// <summary>
-        /// Fetches a page of <see cref="pageSize"/> starting at the <see cref="offSet"/>.
+        /// Fetches a page of given page-size starting at the starting at the given offset.
         /// </summary>
         /// <param name="offSet">Where the fetched page should start.</param>
         /// <param name="pageSize">Number of item of the fetched page.</param>
