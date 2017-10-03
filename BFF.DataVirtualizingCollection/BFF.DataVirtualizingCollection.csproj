@@ -3,13 +3,20 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.4</TargetFramework>
     <PackageId>BFF.DataVirtualizingCollection</PackageId>
-    <PackageVersion>1.0.0</PackageVersion>
+    <PackageVersion>1.0.1</PackageVersion>
     <Authors>Dimitri Enns</Authors>
     <Description>This is an approach to data virtualizing collections intended to be used in WPF projects.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes>First release</PackageReleaseNotes>
+    <PackageReleaseNotes>Minor change</PackageReleaseNotes>
     <Copyright>Copyright 2017 (c) Dimitri Enns. All rights reserved.</Copyright>
     <PackageTags>data-virtualization wpf csharp</PackageTags>
+    <Version>1.0.1</Version>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <FileVersion>1.0.1.0</FileVersion>
+    <PackageProjectUrl>https://github.com/Yeah69/BFF.DataVirtualizingCollection</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Yeah69/BFF.DataVirtualizingCollection.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

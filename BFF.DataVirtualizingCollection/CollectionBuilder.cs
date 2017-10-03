@@ -61,7 +61,7 @@ namespace BFF.DataVirtualizingCollection
         /// This parameter allows adjusting to specific requirements.</param>
         /// <returns>The requested data virtualizing collection.</returns>
         IDataVirtualizingCollection<T> BuildAHoardingSyncCollection(
-            IBasicAsyncDataAccess<T> dataAccess,
+            IBasicSyncDataAccess<T> dataAccess,
             int pageSize = 100);
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace BFF.DataVirtualizingCollection
         /// This parameter allows adjusting to specific requirements.</param>
         /// <returns>The requested data virtualizing collection.</returns>
         IDataVirtualizingCollection<T> BuildAHoardingPreloadingSyncCollection(
-            IBasicAsyncDataAccess<T> dataAccess,
+            IBasicSyncDataAccess<T> dataAccess,
             int pageSize = 100);
     }
 
@@ -136,7 +136,7 @@ namespace BFF.DataVirtualizingCollection
         }
 
         /// <inheritdoc />
-        public IDataVirtualizingCollection<T> BuildAHoardingSyncCollection(IBasicAsyncDataAccess<T> dataAccess, int pageSize = 100)
+        public IDataVirtualizingCollection<T> BuildAHoardingSyncCollection(IBasicSyncDataAccess<T> dataAccess, int pageSize = 100)
         {
             var hoardingPageStore = HoardingSyncPageStore<T>
                 .CreateBuilder()
@@ -152,7 +152,7 @@ namespace BFF.DataVirtualizingCollection
         }
 
         /// <inheritdoc />
-        public IDataVirtualizingCollection<T> BuildAHoardingPreloadingSyncCollection(IBasicAsyncDataAccess<T> dataAccess, int pageSize = 100)
+        public IDataVirtualizingCollection<T> BuildAHoardingPreloadingSyncCollection(IBasicSyncDataAccess<T> dataAccess, int pageSize = 100)
         {
             var hoardingPageStore = HoardingPreloadingSyncPageStore<T>
                 .CreateBuilder()
