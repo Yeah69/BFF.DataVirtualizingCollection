@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using BFF.DataVirtualizingCollection.DataAccesses;
 
@@ -15,9 +13,8 @@ namespace BFF.DataVirtualizingCollection.PageStores
     public interface IHoardingPreloadingSyncPageStore<T> : ISyncPageStore<T>
     {
     }
-
-    /// <inheritdoc />
-    internal class HoardingPreloadingSyncPageStore<T> : IHoardingPreloadingSyncPageStore<T>
+    
+    internal class HoardingPreloadingSyncPageStore<T> : SyncPageStoreBase<T>, IHoardingPreloadingSyncPageStore<T>
     {
         internal static IBuilderRequired<T> CreateBuilder() => new Builder<T>();
 
@@ -54,61 +51,46 @@ namespace BFF.DataVirtualizingCollection.PageStores
             {
                 return new HoardingPreloadingSyncPageStore<TItem>(_dataAccess)
                 {
-                    _pageSize = _pageSize
+                    PageSize = _pageSize
                 };
             }
         }
 
         private readonly IPageFetcher<T> _pageFetcher;
-        private int _pageSize = 100;
 
         private readonly IDictionary<int, Task<T[]>> _preloadingTasks = new Dictionary<int, Task<T[]>>();
-        
-        
-        private readonly IDictionary<int, T[]> _pageStore = new Dictionary<int, T[]>();
 
         private HoardingPreloadingSyncPageStore(IPageFetcher<T> pageFetcher)
         {
             _pageFetcher = pageFetcher;
         }
 
-        public T Fetch(int index)
+        protected override void OnPageContained(int pageKey, int pageIndex)
         {
-            int pageKey = index / _pageSize;
-            int pageIndex = index % _pageSize;
-
-            if (!_pageStore.ContainsKey(pageKey))
+            if (_preloadingTasks.ContainsKey(pageKey))
             {
-                if (_preloadingTasks.ContainsKey(pageKey))
-                {
-                    _preloadingTasks[pageKey].Wait();
-                    if(_preloadingTasks[pageKey].IsFaulted || _preloadingTasks[pageKey].IsCanceled)
-                        _pageStore[pageKey] = _pageFetcher.PageFetch(pageKey * _pageSize, _pageSize);
-                    _preloadingTasks.Remove(pageKey);
-                }
-                else
-                    _pageStore[pageKey] = _pageFetcher.PageFetch(pageKey * _pageSize, _pageSize);
+                _preloadingTasks[pageKey].Wait();
+                if (_preloadingTasks[pageKey].IsFaulted || _preloadingTasks[pageKey].IsCanceled)
+                    PageStore[pageKey] = _pageFetcher.PageFetch(pageKey * PageSize, PageSize);
+                _preloadingTasks.Remove(pageKey);
             }
-
-            int nextPageKey = pageKey + 1;
-            if (!_pageStore.ContainsKey(nextPageKey) && !_preloadingTasks.ContainsKey(nextPageKey))
-                _preloadingTasks[nextPageKey] = Task.Run(() => 
-                    _pageStore[nextPageKey] = _pageFetcher.PageFetch(nextPageKey * _pageSize, _pageSize));
-
-            int previousPageKey = pageKey - 1;
-            if (previousPageKey >= 0 && !_pageStore.ContainsKey(previousPageKey) && !_preloadingTasks.ContainsKey(previousPageKey))
-                _preloadingTasks[previousPageKey] = Task.Run(() =>
-                    _pageStore[previousPageKey] = _pageFetcher.PageFetch(previousPageKey * _pageSize, _pageSize));
-
-            return _pageStore[pageKey][pageIndex];
+            else
+                PageStore[pageKey] = _pageFetcher.PageFetch(pageKey * PageSize, PageSize);
         }
 
-        public void Dispose()
+        protected override T OnPageNotContained(int pageKey, int pageIndex)
         {
-            foreach (var disposable in _pageStore.SelectMany(ps => ps.Value).OfType<IDisposable>())
-            {
-                disposable.Dispose();
-            }
+            int nextPageKey = pageKey + 1;
+            if (!PageStore.ContainsKey(nextPageKey) && !_preloadingTasks.ContainsKey(nextPageKey))
+                _preloadingTasks[nextPageKey] = Task.Run(() =>
+                    PageStore[nextPageKey] = _pageFetcher.PageFetch(nextPageKey * PageSize, PageSize));
+
+            int previousPageKey = pageKey - 1;
+            if (previousPageKey >= 0 && !PageStore.ContainsKey(previousPageKey) && !_preloadingTasks.ContainsKey(previousPageKey))
+                _preloadingTasks[previousPageKey] = Task.Run(() =>
+                    PageStore[previousPageKey] = _pageFetcher.PageFetch(previousPageKey * PageSize, PageSize));
+
+            return PageStore[pageKey][pageIndex];
         }
     }
 }

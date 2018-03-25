@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using BFF.DataVirtualizingCollection.DataAccesses;
 using BFF.DataVirtualizingCollection.PageStores;
 
 namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
 {
-    internal class AsyncDataVirtualizingCollection<T> : DataVirtualizingCollectionBase<T>
+    internal class TaskBasedAsyncDataVirtualizingCollection<T> : DataVirtualizingCollectionBase<T>
     {
         internal static IBuilderRequired<T> CreateBuilder() => new Builder<T>();
 
@@ -14,7 +15,7 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
         {
             IBuilderOptional<TItem> WithPageStore(
                 IAsyncPageStore<TItem> pageStore,
-                ICountFetcher countFetcher,
+                ITaskBasedCountFetcher countFetcher,
                 IScheduler subscribeScheduler,
                 IScheduler observeScheduler);
         }
@@ -27,13 +28,13 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
         {
             private IAsyncPageStore<TItem> _pageStore;
             private IScheduler _observeScheduler;
-            private ICountFetcher _countFetcher;
+            private ITaskBasedCountFetcher _countFetcher;
 
             
 
             public IDataVirtualizingCollection<TItem> Build()
             {
-                return new AsyncDataVirtualizingCollection<TItem>(
+                return new TaskBasedAsyncDataVirtualizingCollection<TItem>(
                     _pageStore, 
                     _countFetcher, 
                     _observeScheduler);
@@ -41,7 +42,7 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
 
             public IBuilderOptional<TItem> WithPageStore(
                 IAsyncPageStore<TItem> pageStore,
-                ICountFetcher countFetcher,
+                ITaskBasedCountFetcher countFetcher,
                 IScheduler subscribeScheduler,
                 IScheduler observeScheduler)
             {
@@ -54,14 +55,18 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
 
         private readonly IAsyncPageStore<T> _pageStore;
 
-        private AsyncDataVirtualizingCollection(
+        private readonly Task<int> _countTask;
+        private int _count;
+
+        private TaskBasedAsyncDataVirtualizingCollection(
             IAsyncPageStore<T> pageStore, 
-            ICountFetcher countFetcher, 
+            ITaskBasedCountFetcher countFetcher, 
             IScheduler observeScheduler)
         {
             _pageStore = pageStore;
-
-            Count = countFetcher.CountFetch();
+            _countTask = countFetcher
+                .CountFetchAsync()
+                .ContinueWith(t => _count = t.Result);
 
             var disposable = _pageStore.OnCollectionChangedReplace
                 .ObserveOn(observeScheduler)
@@ -70,7 +75,14 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
             CompositeDisposable.Add(_pageStore);
         }
 
-        protected override int Count { get; }
+        protected override int Count
+        {
+            get
+            {
+                _countTask.Wait();
+                return _count;
+            }
+        }
 
         protected override T GetItemInner(int index)
         {

@@ -6,19 +6,13 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Runtime.CompilerServices;
-using BFF.DataVirtualizingCollection.DataAccesses;
 
 namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
 {
     internal abstract class DataVirtualizingCollectionBase<T> : IDataVirtualizingCollection<T>
     {
-        protected int Count;
+        protected abstract int Count { get; }
         protected readonly CompositeDisposable CompositeDisposable = new CompositeDisposable();
-
-        protected DataVirtualizingCollectionBase(ICountFetcher countFetcher)
-        {
-            Count = countFetcher.CountFetch();
-        }
 
         int ICollection<T>.Count => GetCountInner();
         int ICollection.Count => GetCountInner();

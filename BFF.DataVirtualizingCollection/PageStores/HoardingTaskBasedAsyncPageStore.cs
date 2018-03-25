@@ -7,16 +7,16 @@ using BFF.DataVirtualizingCollection.DataAccesses;
 namespace BFF.DataVirtualizingCollection.PageStores
 {
     /// <summary>
-    /// Operates in async way, which means that it doesn't block the current thread and in case the element isn't available a placeholder is provided.
+    /// Operates in async and task-based way, which means that it doesn't block the current thread and in case the element isn't available a placeholder is provided.
     /// Additionally, it keeps all already fetched pages in memory until it is garbage collected.
     /// On Dispose all stored disposable elements are disposed before this store disposes itself.
     /// </summary>
     /// <typeparam name="T">The type of the stored elements.</typeparam>
-    public interface IHoardingAsyncPageStore<T> : IAsyncPageStore<T>
+    public interface IHoardingTaskBasedAsyncPageStore<T> : IAsyncPageStore<T>
     {
     }
     
-    internal class HoardingAsyncPageStore<T> : AsyncPageStoreBase<T>, IHoardingAsyncPageStore<T>
+    internal class HoardingTaskBasedAsyncPageStore<T> : AsyncPageStoreBase<T>, IHoardingTaskBasedAsyncPageStore<T>
     {
         internal static IBuilderRequired<T> CreateBuilder() => new Builder<T>();
 
@@ -24,21 +24,21 @@ namespace BFF.DataVirtualizingCollection.PageStores
         {
             IBuilderOptional<TItem> WithPageSize(int pageSize);
 
-            IHoardingAsyncPageStore<TItem> Build();
+            IHoardingTaskBasedAsyncPageStore<TItem> Build();
         }
 
         internal interface IBuilderRequired<TItem>
         {
-            IBuilderOptional<TItem> With(IBasicAsyncDataAccess<TItem> dataAccess, IScheduler subscribeScheduler);
+            IBuilderOptional<TItem> With(IBasicTaskBasedAsyncDataAccess<TItem> dataAccess, IScheduler subscribeScheduler);
         }
 
         internal class Builder<TItem> : IBuilderRequired<TItem>, IBuilderOptional<TItem>
         {
-            private IBasicAsyncDataAccess<TItem> _dataAccess;
+            private IBasicTaskBasedAsyncDataAccess<TItem> _dataAccess;
             private int _pageSize = 100;
             private IScheduler _subscribeScheduler;
 
-            public IBuilderOptional<TItem> With(IBasicAsyncDataAccess<TItem> dataAccess, IScheduler subscribeScheduler)
+            public IBuilderOptional<TItem> With(IBasicTaskBasedAsyncDataAccess<TItem> dataAccess, IScheduler subscribeScheduler)
             {
                 _dataAccess = dataAccess;
                 _subscribeScheduler = subscribeScheduler;
@@ -51,9 +51,9 @@ namespace BFF.DataVirtualizingCollection.PageStores
                 return this;
             }
 
-            public IHoardingAsyncPageStore<TItem> Build()
+            public IHoardingTaskBasedAsyncPageStore<TItem> Build()
             {
-                return new HoardingAsyncPageStore<TItem>(_dataAccess, _dataAccess, _subscribeScheduler)
+                return new HoardingTaskBasedAsyncPageStore<TItem>(_dataAccess, _dataAccess, _subscribeScheduler)
                 {
                     PageSize = _pageSize
                 };
@@ -62,8 +62,8 @@ namespace BFF.DataVirtualizingCollection.PageStores
 
         private readonly Subject<int> _pageRequests = new Subject<int>();
 
-        private HoardingAsyncPageStore(
-            IPageFetcher<T> pageFetcher,
+        private HoardingTaskBasedAsyncPageStore(
+            ITaskBasedPageFetcher<T> pageFetcher,
             IPlaceholderFactory<T> placeholderFactory,
             IScheduler subscribeScheduler) 
             : base(placeholderFactory, subscribeScheduler)
@@ -73,21 +73,20 @@ namespace BFF.DataVirtualizingCollection.PageStores
             _pageRequests
                 .ObserveOn(subscribeScheduler)
                 .Distinct()
-                .Subscribe(pageKey =>
+                .SelectMany(async pageKey => (PageKey: pageKey, Page: await pageFetcher.PageFetchAsync(pageKey * PageSize, PageSize)))
+                .Subscribe(e =>
                 {
-                    int offset = pageKey * PageSize;
-                    T[] page = pageFetcher.PageFetch(offset, PageSize);
-                    PageStore[pageKey] = page;
-                    if (DeferredRequests.ContainsKey(pageKey))
+                    PageStore[e.PageKey] = e.Page;
+                    if (DeferredRequests.ContainsKey(e.PageKey))
                     {
-                        var disposable = DeferredRequests[pageKey]
+                        var disposable = DeferredRequests[e.PageKey]
                             .ObserveOn(subscribeScheduler)
                             .Distinct()
                             .Subscribe(tuple =>
                             {
                                 OnCollectionChangedReplaceSubject.OnNext(
-                                    (page[tuple.Item1], tuple.Item2, pageKey * PageSize + tuple.Item1));
-                            }, () => DeferredRequests.Remove(pageKey));
+                                    (e.Page[tuple.Item1], tuple.Item2, e.PageKey * PageSize + tuple.Item1));
+                            }, () => DeferredRequests.Remove(e.PageKey));
                         CompositeDisposable.Add(disposable);
                     }
                 });

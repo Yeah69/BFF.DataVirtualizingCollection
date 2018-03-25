@@ -26,6 +26,44 @@ namespace BFF.DataVirtualizingCollection
         /// A lesser page size will consequently mean more frequent page fetches and a greater page size mean a bigger chunk of data is fetched at once.
         /// This parameter allows adjusting to specific requirements.</param>
         /// <returns>The requested data virtualizing collection.</returns>
+        IDataVirtualizingCollection<T> BuildAHoardingTaskBasedAsyncCollection(
+            IBasicTaskBasedAsyncDataAccess<T> dataAccess,
+            IScheduler subscribeScheduler,
+            IScheduler observeScheduler,
+            int pageSize = 100);
+
+        /// <summary>
+        /// Build a similar data virtualizing collection to the <see cref="BuildAHoardingAsyncCollection"/> function. 
+        /// However, this collection preloads consequtive pages in the background.
+        /// </summary>
+        /// <param name="dataAccess">Provides access to the data, see <see cref="IBasicAsyncDataAccess{T}"/></param>
+        /// <param name="subscribeScheduler">Is used to schedule task, which should be done in the background. 
+        /// Basically, it is everything besides the notifications, like fetching the pages.
+        /// It is advised to used the ThreadPoolScheduler in order to do the heavy lifting in the background.</param>
+        /// <param name="observeScheduler">Is used to schedule the notification. For GUI applications it is mandatory to use the DispatcherScheduler. </param>
+        /// <param name="pageSize">Optionally, the page size can be configured, whereas a page size of 100 elements is considered as universal enough to be the default.
+        /// A lesser page size will consequently mean more frequent page fetches and a greater page size mean a bigger chunk of data is fetched at once.
+        /// This parameter allows adjusting to specific requirements.</param>
+        /// <returns>The requested data virtualizing collection.</returns>
+        IDataVirtualizingCollection<T> BuildAHoardingPreloadingTaskBasedAsyncCollection(
+            IBasicTaskBasedAsyncDataAccess<T> dataAccess,
+            IScheduler subscribeScheduler,
+            IScheduler observeScheduler,
+            int pageSize = 100);
+
+        /// <summary>
+        /// Builds a data virtualizing collection which operates async (i.e. placeholders are returned if element is not available yet)
+        /// and hoards the fetched pages (i.e. the once fetched pages of data are kept in memory for the life time of the collection).
+        /// </summary>
+        /// <param name="dataAccess">Provides access to the data, see <see cref="IBasicAsyncDataAccess{T}"/></param>
+        /// <param name="subscribeScheduler">Is used to schedule task, which should be done in the background. 
+        /// Basically, it is everything besides the notifications, like fetching the pages.
+        /// It is advised to used the ThreadPoolScheduler in order to do the heavy lifting in the background.</param>
+        /// <param name="observeScheduler">Is used to schedule the notification. For GUI applications it is mandatory to use the DispatcherScheduler. </param>
+        /// <param name="pageSize">Optionally, the page size can be configured, whereas a page size of 100 elements is considered as universal enough to be the default.
+        /// A lesser page size will consequently mean more frequent page fetches and a greater page size mean a bigger chunk of data is fetched at once.
+        /// This parameter allows adjusting to specific requirements.</param>
+        /// <returns>The requested data virtualizing collection.</returns>
         IDataVirtualizingCollection<T> BuildAHoardingAsyncCollection(
             IBasicAsyncDataAccess<T> dataAccess,
             IScheduler subscribeScheduler,
@@ -86,6 +124,54 @@ namespace BFF.DataVirtualizingCollection
         /// </summary>
         /// <returns>An instance of a <see cref="ICollectionBuilder{T}"/>.</returns>
         public static ICollectionBuilder<T> CreateBuilder() => new CollectionBuilder<T>();
+
+        /// <inheritdoc />
+        public IDataVirtualizingCollection<T> BuildAHoardingTaskBasedAsyncCollection(
+            IBasicTaskBasedAsyncDataAccess<T> dataAccess,
+            IScheduler subscribeScheduler,
+            IScheduler observeScheduler,
+            int pageSize = 100)
+        {
+            var hoardingPageStore = HoardingTaskBasedAsyncPageStore<T>
+                .CreateBuilder()
+                .With(
+                    dataAccess,
+                    subscribeScheduler)
+                .WithPageSize(pageSize)
+                .Build();
+            return TaskBasedAsyncDataVirtualizingCollection<T>
+                .CreateBuilder()
+                .WithPageStore(
+                    hoardingPageStore,
+                    dataAccess,
+                    subscribeScheduler,
+                    observeScheduler)
+                .Build();
+        }
+
+        /// <inheritdoc />
+        public IDataVirtualizingCollection<T> BuildAHoardingPreloadingTaskBasedAsyncCollection(
+            IBasicTaskBasedAsyncDataAccess<T> dataAccess,
+            IScheduler subscribeScheduler,
+            IScheduler observeScheduler, 
+            int pageSize = 100)
+        {
+            var hoardingPageStore = HoardingPreloadingTaskBasedAsyncPageStore<T>
+                .CreateBuilder()
+                .With(
+                    dataAccess,
+                    subscribeScheduler)
+                .WithPageSize(pageSize)
+                .Build();
+            return TaskBasedAsyncDataVirtualizingCollection<T>
+                .CreateBuilder()
+                .WithPageStore(
+                    hoardingPageStore,
+                    dataAccess,
+                    subscribeScheduler,
+                    observeScheduler)
+                .Build();
+        }
 
         /// <inheritdoc />
         public IDataVirtualizingCollection<T> BuildAHoardingAsyncCollection(

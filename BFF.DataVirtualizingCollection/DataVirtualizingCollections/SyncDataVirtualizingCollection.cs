@@ -46,13 +46,16 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
 
         private SyncDataVirtualizingCollection(
             ISyncPageStore<T> pageStore,
-            ICountFetcher countFetcher) 
-            : base(countFetcher)
+            ICountFetcher countFetcher)
         {
             _pageStore = pageStore;
+
+            Count = countFetcher.CountFetch();
             
             CompositeDisposable.Add(_pageStore);
         }
+
+        protected override int Count { get; }
 
         protected override T GetItemInner(int index)
         {
