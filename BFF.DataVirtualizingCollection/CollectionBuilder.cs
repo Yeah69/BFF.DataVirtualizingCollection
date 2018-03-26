@@ -90,6 +90,32 @@ namespace BFF.DataVirtualizingCollection
             int pageSize = 100);
 
         /// <summary>
+        /// Builds a data virtualizing collection which operates synchronous with task-based data access (i.e. it waits until the page fetch is completed if page is not available yet)
+        /// and hoards the fetched pages (i.e. the once fetched pages of data are kept in memory for the life time of the collection).
+        /// </summary>
+        /// <param name="dataAccess">Provides access to the data, see <see cref="IBasicTaskBasedSyncDataAccess{T}"/></param>
+        /// <param name="pageSize">Optionally, the page size can be configured, whereas a page size of 100 elements is considered as universal enough to be the default.
+        /// A lesser page size will consequently mean more frequent page fetches and a greater page size mean a bigger chunk of data is fetched at once.
+        /// This parameter allows adjusting to specific requirements.</param>
+        /// <returns>The requested data virtualizing collection.</returns>
+        IDataVirtualizingCollection<T> BuildAHoardingTaskBasedSyncCollection(
+            IBasicTaskBasedSyncDataAccess<T> dataAccess,
+            int pageSize = 100);
+
+        /// <summary>
+        /// Builds a similar data virtualizing collection to the <see cref="BuildAHoardingTaskBasedSyncCollection"/> function. 
+        /// However, this collection preloads consequtive pages in the background.
+        /// </summary>
+        /// <param name="dataAccess">Provides access to the data, see <see cref="IBasicTaskBasedSyncDataAccess{T}"/></param>
+        /// <param name="pageSize">Optionally, the page size can be configured, whereas a page size of 100 elements is considered as universal enough to be the default.
+        /// A lesser page size will consequently mean more frequent page fetches and a greater page size mean a bigger chunk of data is fetched at once.
+        /// This parameter allows adjusting to specific requirements.</param>
+        /// <returns>The requested data virtualizing collection.</returns>
+        IDataVirtualizingCollection<T> BuildAHoardingPreloadingTaskBasedSyncCollection(
+            IBasicTaskBasedSyncDataAccess<T> dataAccess,
+            int pageSize = 100);
+
+        /// <summary>
         /// Builds a data virtualizing collection which operates synchronous (i.e. it waits until the page fetch is completed if page is not available yet)
         /// and hoards the fetched pages (i.e. the once fetched pages of data are kept in memory for the life time of the collection).
         /// </summary>
@@ -218,6 +244,40 @@ namespace BFF.DataVirtualizingCollection
                     dataAccess,
                     subscribeScheduler,
                     observeScheduler)
+                .Build();
+        }
+
+        /// <inheritdoc />
+        public IDataVirtualizingCollection<T> BuildAHoardingTaskBasedSyncCollection(IBasicTaskBasedSyncDataAccess<T> dataAccess,
+            int pageSize = 100)
+        {
+            var hoardingPageStore = HoardingTaskBasedSyncPageStore<T>
+                .CreateBuilder()
+                .With(dataAccess)
+                .WithPageSize(pageSize)
+                .Build();
+            return TaskBasedSyncDataVirtualizingCollection<T>
+                .CreateBuilder()
+                .WithPageStore(
+                    hoardingPageStore,
+                    dataAccess)
+                .Build();
+        }
+
+        /// <inheritdoc />
+        public IDataVirtualizingCollection<T> BuildAHoardingPreloadingTaskBasedSyncCollection(IBasicTaskBasedSyncDataAccess<T> dataAccess,
+            int pageSize = 100)
+        {
+            var hoardingPageStore = HoardingPreloadingTaskBasedSyncPageStore<T>
+                .CreateBuilder()
+                .With(dataAccess)
+                .WithPageSize(pageSize)
+                .Build();
+            return TaskBasedSyncDataVirtualizingCollection<T>
+                .CreateBuilder()
+                .WithPageStore(
+                    hoardingPageStore,
+                    dataAccess)
                 .Build();
         }
 

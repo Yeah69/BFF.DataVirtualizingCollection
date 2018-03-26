@@ -3,16 +3,16 @@ using BFF.DataVirtualizingCollection.DataAccesses;
 namespace BFF.DataVirtualizingCollection.PageStores
 {
     /// <summary>
-    /// Operates in sync way, which means that it does block the current thread if the element isn't available yet.
+    /// Operates in sync way with task-based data access, which means that it does block the current thread if the element isn't available yet.
     /// Additionally, it keeps all already fetched pages in memory until it is garbage collected.
     /// On Dispose all stored disposable elements are disposed before this store disposes itself.
     /// </summary>
     /// <typeparam name="T">The type of the stored elements.</typeparam>
-    public interface IHoardingSyncPageStore<out T> : ISyncPageStore<T>
+    public interface IHoardingTaskBasedSyncPageStore<out T> : ISyncPageStore<T>
     {
     }
     
-    internal class HoardingSyncPageStore<T> : SyncPageStoreBase<T>, IHoardingSyncPageStore<T>
+    internal class HoardingTaskBasedSyncPageStore<T> : SyncPageStoreBase<T>, IHoardingTaskBasedSyncPageStore<T>
     {
         internal static IBuilderRequired<T> CreateBuilder() => new Builder<T>();
 
@@ -20,20 +20,20 @@ namespace BFF.DataVirtualizingCollection.PageStores
         {
             IBuilderOptional<TItem> WithPageSize(int pageSize);
 
-            IHoardingSyncPageStore<TItem> Build();
+            IHoardingTaskBasedSyncPageStore<TItem> Build();
         }
 
         internal interface IBuilderRequired<TItem>
         {
-            IBuilderOptional<TItem> With(IBasicSyncDataAccess<TItem> dataAccess);
+            IBuilderOptional<TItem> With(IBasicTaskBasedSyncDataAccess<TItem> dataAccess);
         }
 
         internal class Builder<TItem> : IBuilderRequired<TItem>, IBuilderOptional<TItem>
         {
-            private IBasicSyncDataAccess<TItem> _dataAccess;
+            private IBasicTaskBasedSyncDataAccess<TItem> _dataAccess;
             private int _pageSize = 100;
 
-            public IBuilderOptional<TItem> With(IBasicSyncDataAccess<TItem> dataAccess)
+            public IBuilderOptional<TItem> With(IBasicTaskBasedSyncDataAccess<TItem> dataAccess)
             {
                 _dataAccess = dataAccess;
                 return this;
@@ -45,25 +45,25 @@ namespace BFF.DataVirtualizingCollection.PageStores
                 return this;
             }
 
-            public IHoardingSyncPageStore<TItem> Build()
+            public IHoardingTaskBasedSyncPageStore<TItem> Build()
             {
-                return new HoardingSyncPageStore<TItem>(_dataAccess)
+                return new HoardingTaskBasedSyncPageStore<TItem>(_dataAccess)
                 {
                     PageSize = _pageSize
                 };
             }
         }
 
-        private readonly IPageFetcher<T> _pageFetcher;
+        private readonly ITaskBasedPageFetcher<T> _pageFetcher;
 
-        private HoardingSyncPageStore(IPageFetcher<T> pageFetcher)
+        private HoardingTaskBasedSyncPageStore(ITaskBasedPageFetcher<T> pageFetcher)
         {
             _pageFetcher = pageFetcher;
         }
 
         protected override void OnPageNotContained(int pageKey, int pageIndex)
         {
-            PageStore[pageKey] = _pageFetcher.PageFetch(pageKey * PageSize, PageSize);
+            PageStore[pageKey] = _pageFetcher.PageFetchAsync(pageKey * PageSize, PageSize).Result;
         }
 
         protected override T OnPageContained(int pageKey, int pageIndex)

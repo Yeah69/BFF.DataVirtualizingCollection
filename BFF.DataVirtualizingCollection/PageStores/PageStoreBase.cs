@@ -33,15 +33,15 @@ namespace BFF.DataVirtualizingCollection.PageStores
 
             if (!PageStore.ContainsKey(pageKey))
             {
-                OnPageContained(pageKey, pageIndex);
+                OnPageNotContained(pageKey, pageIndex);
             }
 
-            return OnPageNotContained(pageKey, pageIndex);
+            return OnPageContained(pageKey, pageIndex);
         }
 
-        protected abstract void OnPageContained(int pageKey, int pageIndex);
+        protected abstract void OnPageNotContained(int pageKey, int pageIndex);
 
-        protected abstract T OnPageNotContained(int pageKey, int pageIndex);
+        protected abstract T OnPageContained(int pageKey, int pageIndex);
 
 
         public override void Dispose()
