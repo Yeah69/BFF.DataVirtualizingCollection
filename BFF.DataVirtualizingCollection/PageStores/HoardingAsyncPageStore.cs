@@ -76,7 +76,8 @@ namespace BFF.DataVirtualizingCollection.PageStores
                 .Subscribe(pageKey =>
                 {
                     int offset = pageKey * PageSize;
-                    T[] page = pageFetcher.PageFetch(offset, PageSize);
+                    int actualPageSize = Math.Min(PageSize, Count - offset);
+                    T[] page = pageFetcher.PageFetch(offset, actualPageSize);
                     PageStore[pageKey] = page;
                     if (DeferredRequests.ContainsKey(pageKey))
                     {

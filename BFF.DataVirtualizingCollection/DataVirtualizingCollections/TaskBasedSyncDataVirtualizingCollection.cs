@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using BFF.DataVirtualizingCollection.DataAccesses;
+using BFF.DataVirtualizingCollection.Extensions;
 using BFF.DataVirtualizingCollection.PageStores;
 
 namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
@@ -51,12 +52,14 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
             ISyncPageStore<T> pageStore,
             ITaskBasedCountFetcher countFetcher)
         {
-            _pageStore = pageStore;
-            _countTask = countFetcher
+            _pageStore = pageStore.AddTo(CompositeDisposable);
+            _countTask = (Task<int>) countFetcher
                 .CountFetchAsync()
-                .ContinueWith(t => _count = t.Result);
-            
-            CompositeDisposable.Add(_pageStore);
+                .ContinueWith(t =>
+                {
+                    _count = t.Result;
+                    _pageStore.Count = _count;
+                });
         }
 
         protected override int Count

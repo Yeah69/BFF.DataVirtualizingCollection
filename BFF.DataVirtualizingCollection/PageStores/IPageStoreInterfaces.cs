@@ -15,6 +15,8 @@ namespace BFF.DataVirtualizingCollection.PageStores
         /// <returns>IsSuccess is true if the Element could be retrieved; otherwise, false.
         /// Element is the requested element from data access, if the fetch was successful.</returns>
         T Fetch(int index);
+
+        int Count { get; set; }
     }
 
     /// <summary>

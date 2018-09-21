@@ -2,6 +2,7 @@
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using BFF.DataVirtualizingCollection.DataAccesses;
+using BFF.DataVirtualizingCollection.Extensions;
 using BFF.DataVirtualizingCollection.PageStores;
 
 namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
@@ -59,15 +60,16 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
             ICountFetcher countFetcher, 
             IScheduler observeScheduler)
         {
-            _pageStore = pageStore;
+            _pageStore = pageStore.AddTo(CompositeDisposable);
 
             Count = countFetcher.CountFetch();
 
-            var disposable = _pageStore.OnCollectionChangedReplace
+            _pageStore.Count = Count;
+
+            _pageStore.OnCollectionChangedReplace
                 .ObserveOn(observeScheduler)
-                .Subscribe(tuple => OnCollectionChangedReplace(tuple.Item1, tuple.Item2, tuple.Item3));
-            CompositeDisposable.Add(disposable);
-            CompositeDisposable.Add(_pageStore);
+                .Subscribe(tuple => OnCollectionChangedReplace(tuple.Item1, tuple.Item2, tuple.Item3))
+                .AddTo(CompositeDisposable);
         }
 
         protected override int Count { get; }

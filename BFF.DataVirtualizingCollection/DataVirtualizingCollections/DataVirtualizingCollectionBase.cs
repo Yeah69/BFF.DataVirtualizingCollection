@@ -137,7 +137,7 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
 
         public void Dispose()
         {
-            CompositeDisposable?.Dispose();
+            CompositeDisposable.Dispose();
         }
 
         protected virtual void OnCollectionChangedReplace(T newItem, T oldItem, int index)

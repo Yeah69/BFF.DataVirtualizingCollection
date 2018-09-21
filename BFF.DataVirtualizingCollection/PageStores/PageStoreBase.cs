@@ -15,6 +15,8 @@ namespace BFF.DataVirtualizingCollection.PageStores
         protected int PageSize = 100;
         protected readonly IDictionary<int, T[]> PageStore = new Dictionary<int, T[]>();
 
+        public int Count { get; set; }
+
         public abstract T Fetch(int index);
 
         public abstract void Dispose();

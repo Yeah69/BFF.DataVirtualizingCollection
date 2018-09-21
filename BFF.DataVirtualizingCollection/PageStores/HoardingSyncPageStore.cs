@@ -1,3 +1,4 @@
+using System;
 using BFF.DataVirtualizingCollection.DataAccesses;
 
 namespace BFF.DataVirtualizingCollection.PageStores
@@ -63,7 +64,9 @@ namespace BFF.DataVirtualizingCollection.PageStores
 
         protected override void OnPageNotContained(int pageKey, int pageIndex)
         {
-            PageStore[pageKey] = _pageFetcher.PageFetch(pageKey * PageSize, PageSize);
+            int offset = pageKey * PageSize;
+            int actualPageSize = Math.Min(PageSize, Count - offset);
+            PageStore[pageKey] = _pageFetcher.PageFetch(offset, actualPageSize);
         }
 
         protected override T OnPageContained(int pageKey, int pageIndex)

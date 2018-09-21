@@ -1,4 +1,5 @@
 ﻿using BFF.DataVirtualizingCollection.DataAccesses;
+using BFF.DataVirtualizingCollection.Extensions;
 using BFF.DataVirtualizingCollection.PageStores;
 
 namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
@@ -48,11 +49,11 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
             ISyncPageStore<T> pageStore,
             ICountFetcher countFetcher)
         {
-            _pageStore = pageStore;
+            _pageStore = pageStore.AddTo(CompositeDisposable);
 
             Count = countFetcher.CountFetch();
-            
-            CompositeDisposable.Add(_pageStore);
+
+            _pageStore.Count = Count;
         }
 
         protected override int Count { get; }

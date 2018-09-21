@@ -84,13 +84,14 @@ namespace BFF.DataVirtualizingCollection.PageStores
                 .Subscribe(pageKey =>
                 {
                     int offset = pageKey * PageSize;
+                    int actualPageSize = Math.Min(PageSize, Count - offset);
                     T[] page;
                     if (_preloadingTasks.ContainsKey(pageKey))
                     {
                         _preloadingTasks[pageKey].Wait();
                         if (_preloadingTasks[pageKey].IsFaulted || _preloadingTasks[pageKey].IsCanceled)
                         {
-                            page = _pageFetcher.PageFetch(pageKey * PageSize, PageSize);
+                            page = _pageFetcher.PageFetch(pageKey * PageSize, actualPageSize);
                         }
                         else
                         {
@@ -99,7 +100,7 @@ namespace BFF.DataVirtualizingCollection.PageStores
                         _preloadingTasks.Remove(pageKey);
                     }
                     else
-                        page = pageFetcher.PageFetch(offset, PageSize);
+                        page = pageFetcher.PageFetch(offset, actualPageSize);
                     PageStore[pageKey] = page;
                     if (DeferredRequests.ContainsKey(pageKey))
                     {
@@ -123,7 +124,9 @@ namespace BFF.DataVirtualizingCollection.PageStores
             {
                 _preloadingTasks[nextPageKey] = Task.Run(() =>
                 {
-                    PageStore[nextPageKey] = _pageFetcher.PageFetch(nextPageKey * PageSize, PageSize);
+                    int offset = nextPageKey * PageSize;
+                    int actualPageSize = Math.Min(PageSize, Count - offset);
+                    PageStore[nextPageKey] = _pageFetcher.PageFetch(offset, actualPageSize);
                 });
             }
 
@@ -132,7 +135,9 @@ namespace BFF.DataVirtualizingCollection.PageStores
             {
                 _preloadingTasks[previousPageKey] = Task.Run(() =>
                 {
-                    PageStore[previousPageKey] = _pageFetcher.PageFetch(previousPageKey * PageSize, PageSize);
+                    int offset = previousPageKey * PageSize;
+                    int actualPageSize = Math.Min(PageSize, Count - offset);
+                    PageStore[previousPageKey] = _pageFetcher.PageFetch(offset, actualPageSize);
                 });
             }
         }

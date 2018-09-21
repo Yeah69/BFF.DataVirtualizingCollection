@@ -73,7 +73,12 @@ namespace BFF.DataVirtualizingCollection.PageStores
             _pageRequests
                 .ObserveOn(subscribeScheduler)
                 .Distinct()
-                .SelectMany(async pageKey => (PageKey: pageKey, Page: await pageFetcher.PageFetchAsync(pageKey * PageSize, PageSize)))
+                .SelectMany(async pageKey =>
+                {
+                    int offset = pageKey * PageSize;
+                    int actualPageSize = Math.Min(PageSize, Count - offset);
+                    return (PageKey: pageKey, Page: await pageFetcher.PageFetchAsync(offset, actualPageSize));
+                })
                 .Subscribe(e =>
                 {
                     PageStore[e.PageKey] = e.Page;

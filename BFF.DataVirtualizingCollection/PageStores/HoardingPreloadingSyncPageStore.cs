@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using BFF.DataVirtualizingCollection.DataAccesses;
@@ -71,24 +72,40 @@ namespace BFF.DataVirtualizingCollection.PageStores
             {
                 _preloadingTasks[pageKey].Wait();
                 if (_preloadingTasks[pageKey].IsFaulted || _preloadingTasks[pageKey].IsCanceled)
-                    PageStore[pageKey] = _pageFetcher.PageFetch(pageKey * PageSize, PageSize);
+                {
+                    int offset = pageKey * PageSize;
+                    int actualPageSize = Math.Min(PageSize, Count - offset);
+                    PageStore[pageKey] = _pageFetcher.PageFetch(offset, actualPageSize);
+                }
                 _preloadingTasks.Remove(pageKey);
             }
             else
-                PageStore[pageKey] = _pageFetcher.PageFetch(pageKey * PageSize, PageSize);
+            {
+                int offset = pageKey * PageSize;
+                int actualPageSize = Math.Min(PageSize, Count - offset);
+                PageStore[pageKey] = _pageFetcher.PageFetch(offset, actualPageSize);
+            }
         }
 
         protected override T OnPageContained(int pageKey, int pageIndex)
         {
             int nextPageKey = pageKey + 1;
             if (!PageStore.ContainsKey(nextPageKey) && !_preloadingTasks.ContainsKey(nextPageKey))
-                _preloadingTasks[nextPageKey] = Task.Run(() =>
-                    PageStore[nextPageKey] = _pageFetcher.PageFetch(nextPageKey * PageSize, PageSize));
+                _preloadingTasks[nextPageKey] = (Task<T[]>) Task.Run(() =>
+                {
+                    int offset = nextPageKey * PageSize;
+                    int actualPageSize = Math.Min(PageSize, Count - offset);
+                    PageStore[nextPageKey] = _pageFetcher.PageFetch(offset, actualPageSize);
+                });
 
             int previousPageKey = pageKey - 1;
             if (previousPageKey >= 0 && !PageStore.ContainsKey(previousPageKey) && !_preloadingTasks.ContainsKey(previousPageKey))
-                _preloadingTasks[previousPageKey] = Task.Run(() =>
-                    PageStore[previousPageKey] = _pageFetcher.PageFetch(previousPageKey * PageSize, PageSize));
+                _preloadingTasks[previousPageKey] = (Task<T[]>) Task.Run(() =>
+                {
+                    int offset = previousPageKey * PageSize;
+                    int actualPageSize = Math.Min(PageSize, Count - offset);
+                    PageStore[previousPageKey] = _pageFetcher.PageFetch(offset, actualPageSize);
+                });
 
             return PageStore[pageKey][pageIndex];
         }

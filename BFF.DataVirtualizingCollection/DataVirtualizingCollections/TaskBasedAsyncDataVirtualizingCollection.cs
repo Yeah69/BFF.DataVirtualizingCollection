@@ -3,6 +3,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using BFF.DataVirtualizingCollection.DataAccesses;
+using BFF.DataVirtualizingCollection.Extensions;
 using BFF.DataVirtualizingCollection.PageStores;
 
 namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
@@ -63,16 +64,19 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
             ITaskBasedCountFetcher countFetcher, 
             IScheduler observeScheduler)
         {
-            _pageStore = pageStore;
-            _countTask = countFetcher
+            _pageStore = pageStore.AddTo(CompositeDisposable);
+            _countTask = (Task<int>) countFetcher
                 .CountFetchAsync()
-                .ContinueWith(t => _count = t.Result);
+                .ContinueWith(t =>
+                {
+                    _count = t.Result;
+                    _pageStore.Count = _count;
+                });
 
-            var disposable = _pageStore.OnCollectionChangedReplace
+            _pageStore.OnCollectionChangedReplace
                 .ObserveOn(observeScheduler)
-                .Subscribe(tuple => OnCollectionChangedReplace(tuple.Item1, tuple.Item2, tuple.Item3));
-            CompositeDisposable.Add(disposable);
-            CompositeDisposable.Add(_pageStore);
+                .Subscribe(tuple => OnCollectionChangedReplace(tuple.Item1, tuple.Item2, tuple.Item3))
+                .AddTo(CompositeDisposable);
         }
 
         protected override int Count
