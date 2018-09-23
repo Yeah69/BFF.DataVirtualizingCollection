@@ -65,12 +65,13 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
             IScheduler observeScheduler)
         {
             _pageStore = pageStore.AddTo(CompositeDisposable);
-            _countTask = (Task<int>) countFetcher
+            _countTask = countFetcher
                 .CountFetchAsync()
                 .ContinueWith(t =>
                 {
                     _count = t.Result;
                     _pageStore.Count = _count;
+                    return t.Result;
                 });
 
             _pageStore.OnCollectionChangedReplace
