@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BFF.DataVirtualizingCollect
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BFF.DataVirtualizingCollection.Sample", "BFF.DataVirtualizingCollection.Sample\BFF.DataVirtualizingCollection.Sample.csproj", "{2A919529-A428-42F5-808B-387AA0CCACD2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BFF.DataVirtualizingCollection.Test", "BFF.DataVirtualizingCollection.Test\BFF.DataVirtualizingCollection.Test.csproj", "{F09BE363-223D-44B2-82BF-C3B3B3D6C547}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{2A919529-A428-42F5-808B-387AA0CCACD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A919529-A428-42F5-808B-387AA0CCACD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A919529-A428-42F5-808B-387AA0CCACD2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F09BE363-223D-44B2-82BF-C3B3B3D6C547}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F09BE363-223D-44B2-82BF-C3B3B3D6C547}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F09BE363-223D-44B2-82BF-C3B3B3D6C547}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F09BE363-223D-44B2-82BF-C3B3B3D6C547}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

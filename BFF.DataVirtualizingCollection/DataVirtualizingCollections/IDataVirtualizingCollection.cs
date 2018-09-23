@@ -15,7 +15,6 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
     /// </summary>
     /// <typeparam name="T">Type of the collection items.</typeparam>
     public interface IDataVirtualizingCollection<T> :
-        IList,
         IList<T>,
         INotifyCollectionChanged,
         INotifyPropertyChanged,

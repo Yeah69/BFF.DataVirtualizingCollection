@@ -15,28 +15,20 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
         protected readonly CompositeDisposable CompositeDisposable = new CompositeDisposable();
 
         int ICollection<T>.Count => GetCountInner();
-        int ICollection.Count => GetCountInner();
-        public bool IsFixedSize => true;
-        bool IList.IsReadOnly => true;
+
         bool ICollection<T>.IsReadOnly => true;
-        public bool IsSynchronized { get; } = false;
-        public object SyncRoot { get; } = new object();
 
         protected abstract T GetItemInner(int index);
 
         public T this[int index]
         {
-            get => GetItemInner(index);
+            get => index >= Count || index < 0 
+                ? throw new IndexOutOfRangeException("Index was out of range. Must be non-negative and less than the size of the collection.")
+                : GetItemInner(index);
             set => throw new NotSupportedException();
         }
 
-        object IList.this[int index]
-        {
-            get => GetItemInner(index);
-            set => throw new NotSupportedException();
-        }
-
-        protected int GetCountInner() => Count;
+        private int GetCountInner() => Count;
 
         public IEnumerator<T> GetEnumerator()
         {
@@ -50,11 +42,6 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
 
         private int IndexOfInner() => -1;
 
-        public int IndexOf(object value)
-        {
-            return IndexOfInner();
-        }
-
         public int IndexOf(T item)
         {
             return IndexOfInner();
@@ -67,22 +54,7 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
             return ContainsInner();
         }
 
-        public bool Contains(object value)
-        {
-            return ContainsInner();
-        }
-
-        public int Add(object value)
-        {
-            throw new NotSupportedException();
-        }
-
         public void Add(T item)
-        {
-            throw new NotSupportedException();
-        }
-
-        public void Insert(int index, object value)
         {
             throw new NotSupportedException();
         }
@@ -97,32 +69,12 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
             throw new NotSupportedException();
         }
 
-        public void Remove(object value)
-        {
-            throw new NotSupportedException();
-        }
-
         void IList<T>.RemoveAt(int index)
         {
             throw new NotSupportedException();
         }
 
-        void IList.RemoveAt(int index)
-        {
-            throw new NotSupportedException();
-        }
-
-        void IList.Clear()
-        {
-            throw new NotSupportedException();
-        }
-
         void ICollection<T>.Clear()
-        {
-            throw new NotSupportedException();
-        }
-
-        public void CopyTo(Array array, int index)
         {
             throw new NotSupportedException();
         }
@@ -140,12 +92,12 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
             CompositeDisposable.Dispose();
         }
 
-        protected virtual void OnCollectionChangedReplace(T newItem, T oldItem, int index)
+        protected void OnCollectionChangedReplace(T newItem, T oldItem, int index)
         {
             CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, newItem, oldItem, index));
         }
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

@@ -91,21 +91,23 @@ namespace BFF.DataVirtualizingCollection.PageStores
         {
             int nextPageKey = pageKey + 1;
             if (!PageStore.ContainsKey(nextPageKey) && !_preloadingTasks.ContainsKey(nextPageKey))
-                _preloadingTasks[nextPageKey] = (Task<T[]>) Task.Run(() =>
+                _preloadingTasks[nextPageKey] = Task.Run(() =>
                 {
                     int offset = nextPageKey * PageSize;
                     int actualPageSize = Math.Min(PageSize, Count - offset);
-                    PageStore[nextPageKey] = _pageFetcher.PageFetch(offset, actualPageSize);
-                });
+                    return _pageFetcher.PageFetch(offset, actualPageSize);
+                })
+                .ContinueWith(t => PageStore[nextPageKey] = t.Result);
 
             int previousPageKey = pageKey - 1;
             if (previousPageKey >= 0 && !PageStore.ContainsKey(previousPageKey) && !_preloadingTasks.ContainsKey(previousPageKey))
-                _preloadingTasks[previousPageKey] = (Task<T[]>) Task.Run(() =>
+                _preloadingTasks[previousPageKey] = Task.Run(() =>
                 {
                     int offset = previousPageKey * PageSize;
                     int actualPageSize = Math.Min(PageSize, Count - offset);
-                    PageStore[previousPageKey] = _pageFetcher.PageFetch(offset, actualPageSize);
-                });
+                    return _pageFetcher.PageFetch(offset, actualPageSize);
+                })
+                .ContinueWith(t => PageStore[previousPageKey] = t.Result);
 
             return PageStore[pageKey][pageIndex];
         }
