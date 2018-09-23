@@ -25,7 +25,7 @@
                     </DataGrid.Columns>
                 </DataGrid>
             </TabItem>
-            <TabItem Header="All Positive Int32 Numbers">
+            <TabItem Header="Data with High Workload">
                 <DataGrid ItemsSource="{Binding WorkloadObjects}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Number" Binding="{Binding Number}" />

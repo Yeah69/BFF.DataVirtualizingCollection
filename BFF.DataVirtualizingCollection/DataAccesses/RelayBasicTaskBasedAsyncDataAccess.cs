@@ -7,7 +7,7 @@ namespace BFF.DataVirtualizingCollection.DataAccesses
     /// An implementation of the <see cref="IBasicTaskBasedAsyncDataAccess{T}"/>, which gets the access functions injected.
     /// </summary>
     /// <typeparam name="T">The type of the collection items.</typeparam>
-    public class RelayBasicTaskBasedAsyncDataAccess<T> : RelayBasicTaskBasedSyncDataAccess<T>, IBasicTaskBasedAsyncDataAccess<T>
+    internal class RelayBasicTaskBasedAsyncDataAccess<T> : RelayBasicTaskBasedSyncDataAccess<T>, IBasicTaskBasedAsyncDataAccess<T>
     {
         private readonly Func<T> _placeHolderFactory;
 
@@ -17,7 +17,7 @@ namespace BFF.DataVirtualizingCollection.DataAccesses
         /// <param name="pageFetcher">A function to get a task which fetches a page.</param>
         /// <param name="countFetcher">A function to get a task which fetches the item count.</param>
         /// <param name="placeHolderFactory">A function to create a placeholder.</param>
-        public RelayBasicTaskBasedAsyncDataAccess(Func<int, int, Task<T[]>> pageFetcher, Func<Task<int>> countFetcher, Func<T> placeHolderFactory)
+        internal RelayBasicTaskBasedAsyncDataAccess(Func<int, int, Task<T[]>> pageFetcher, Func<Task<int>> countFetcher, Func<T> placeHolderFactory)
             : base(pageFetcher, countFetcher)
         {
             _placeHolderFactory = placeHolderFactory;
@@ -34,7 +34,7 @@ namespace BFF.DataVirtualizingCollection.DataAccesses
     /// An implementation of the <see cref="IBasicTaskBasedSyncDataAccess{T}"/>, which gets the access functions injected.
     /// </summary>
     /// <typeparam name="T">The type of the collection items.</typeparam>
-    public class RelayBasicTaskBasedSyncDataAccess<T> : IBasicTaskBasedSyncDataAccess<T>
+    internal class RelayBasicTaskBasedSyncDataAccess<T> : IBasicTaskBasedSyncDataAccess<T>
     {
         private readonly Func<int, int, Task<T[]>> _pageFetcher;
         private readonly Func<Task<int>> _countFetcher;
@@ -44,7 +44,7 @@ namespace BFF.DataVirtualizingCollection.DataAccesses
         /// </summary>
         /// <param name="pageFetcher">A function to get a task which fetches a page.</param>
         /// <param name="countFetcher">A function to get a task which fetches the item count.</param>
-        public RelayBasicTaskBasedSyncDataAccess(Func<int, int, Task<T[]>> pageFetcher, Func<Task<int>> countFetcher)
+        internal RelayBasicTaskBasedSyncDataAccess(Func<int, int, Task<T[]>> pageFetcher, Func<Task<int>> countFetcher)
         {
             _pageFetcher = pageFetcher;
             _countFetcher = countFetcher;

@@ -11,7 +11,7 @@ namespace BFF.DataVirtualizingCollection.PageStores
     /// On Dispose all stored disposable elements are disposed before this store disposes itself.
     /// </summary>
     /// <typeparam name="T">The type of the stored elements.</typeparam>
-    public interface IHoardingPreloadingTaskBasedSyncPageStore<out T> : ISyncPageStore<T>
+    internal interface IHoardingPreloadingTaskBasedSyncPageStore<out T> : ISyncPageStore<T>
     {
     }
     

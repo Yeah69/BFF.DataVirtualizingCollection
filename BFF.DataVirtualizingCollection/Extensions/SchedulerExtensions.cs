@@ -7,7 +7,7 @@ namespace BFF.DataVirtualizingCollection.Extensions
 {
     internal static class SchedulerExtensions
     {
-        public static void MinimalSchedule(this IScheduler scheduler, Action action) => scheduler.Schedule(
+        internal static void MinimalSchedule(this IScheduler scheduler, Action action) => scheduler.Schedule(
             Unit.Default,
             (_, __) =>
             {

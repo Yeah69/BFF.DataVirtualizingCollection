@@ -8,7 +8,7 @@ namespace BFF.DataVirtualizingCollection.DataAccesses
     /// Additionally, a factory method in order to generate placeholders is required as well.
     /// </summary>
     /// <typeparam name="T">The type of the collection items.</typeparam>
-    public interface IBasicTaskBasedAsyncDataAccess<T> : IBasicTaskBasedSyncDataAccess<T>, IPlaceholderFactory<T>
+    internal interface IBasicTaskBasedAsyncDataAccess<T> : IBasicTaskBasedSyncDataAccess<T>, IPlaceholderFactory<T>
     {
     }
 
@@ -17,7 +17,7 @@ namespace BFF.DataVirtualizingCollection.DataAccesses
     /// It should be possible to fetch the count and pages of data of arbitrary size.
     /// </summary>
     /// <typeparam name="T">The type of the collection items.</typeparam>
-    public interface IBasicTaskBasedSyncDataAccess<T> : ITaskBasedPageFetcher<T>, ITaskBasedCountFetcher
+    internal interface IBasicTaskBasedSyncDataAccess<T> : ITaskBasedPageFetcher<T>, ITaskBasedCountFetcher
     {
     }
 
@@ -25,7 +25,7 @@ namespace BFF.DataVirtualizingCollection.DataAccesses
     /// Provides a function to get a task which fetches a page from a data access.
     /// </summary>
     /// <typeparam name="T">The type of the collection items.</typeparam>
-    public interface ITaskBasedPageFetcher<T>
+    internal interface ITaskBasedPageFetcher<T>
     {
         /// <summary>
         /// Gets a task which fetches a page of given page-size starting at the starting at the given offset.
@@ -39,7 +39,7 @@ namespace BFF.DataVirtualizingCollection.DataAccesses
     /// <summary>
     /// Provides a function to fetch the count of elements stored in the data access.
     /// </summary>
-    public interface ITaskBasedCountFetcher
+    internal interface ITaskBasedCountFetcher
     {
         /// <summary>
         /// Gets a task which fetches the current count of all items, which can be accessed through this collection.

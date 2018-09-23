@@ -6,7 +6,7 @@ namespace BFF.DataVirtualizingCollection.DataAccesses
     /// Additionally, a factory method is required as well.
     /// </summary>
     /// <typeparam name="T">The type of the collection items.</typeparam>
-    public interface IBasicAsyncDataAccess<out T> : IBasicSyncDataAccess<T>, IPlaceholderFactory<T>
+    internal interface IBasicAsyncDataAccess<out T> : IBasicSyncDataAccess<T>, IPlaceholderFactory<T>
     {
     }
     /// <summary>
@@ -15,7 +15,7 @@ namespace BFF.DataVirtualizingCollection.DataAccesses
     /// Additionally, a factory method is required as well.
     /// </summary>
     /// <typeparam name="T">The type of the collection items.</typeparam>
-    public interface IBasicSyncDataAccess<out T> : IPageFetcher<T>, ICountFetcher
+    internal interface IBasicSyncDataAccess<out T> : IPageFetcher<T>, ICountFetcher
     {
     }
 
@@ -23,7 +23,7 @@ namespace BFF.DataVirtualizingCollection.DataAccesses
     /// Provides a function to fetch a page from a data access.
     /// </summary>
     /// <typeparam name="T">The type of the collection items.</typeparam>
-    public interface IPageFetcher<out T>
+    internal interface IPageFetcher<out T>
     {
         /// <summary>
         /// Fetches a page of given page-size starting at the starting at the given offset.
@@ -37,7 +37,7 @@ namespace BFF.DataVirtualizingCollection.DataAccesses
     /// <summary>
     /// Provides a function to fetch the count of elements stored in the data access.
     /// </summary>
-    public interface ICountFetcher
+    internal interface ICountFetcher
     {
         /// <summary>
         /// Fetches the current count of all items, which can be accessed through this collection.
@@ -50,7 +50,7 @@ namespace BFF.DataVirtualizingCollection.DataAccesses
     /// Provides a function to create placeholder elements.
     /// </summary>
     /// <typeparam name="T">The type of the collection items.</typeparam>
-    public interface IPlaceholderFactory<out T>
+    internal interface IPlaceholderFactory<out T>
     {
         /// <summary>
         /// Creates a representative placeholder object of type T.

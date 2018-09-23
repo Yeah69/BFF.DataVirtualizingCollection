@@ -7,7 +7,7 @@ namespace BFF.DataVirtualizingCollection.PageStores
     /// The disposable part provides a way to dispose of all element which are stored in the page store.
     /// </summary>
     /// <typeparam name="T">Type of the elements stored in the data access.</typeparam>
-    public interface ISyncPageStore<out T> : IDisposable
+    internal interface ISyncPageStore<out T> : IDisposable
     {
         /// <summary>
         /// Tries to fetch
@@ -25,7 +25,7 @@ namespace BFF.DataVirtualizingCollection.PageStores
     /// The disposable part provides a way to dispose of all element which are stored in the page store.
     /// </summary>
     /// <typeparam name="T">Type of the elements stored in the data access.</typeparam>
-    public interface IAsyncPageStore<T> : ISyncPageStore<T>
+    internal interface IAsyncPageStore<T> : ISyncPageStore<T>
     {
         /// <summary>
         /// Sequence on pending replacements in the collection.
