@@ -134,7 +134,8 @@ namespace BFF.DataVirtualizingCollection
         /// </summary>
         /// <param name="pageSize">Maximum size of a single page.</param>
         /// <returns>The builder itself.</returns>
-        public static IPageHoldingBehaviorCollectionBuilder<T> Build(int pageSize = 100) => new DataVirtualizingCollectionBuilder<T>();
+        public static IPageHoldingBehaviorCollectionBuilder<T> Build(int pageSize = 100) => 
+            new DataVirtualizingCollectionBuilder<T>(pageSize);
 
         private readonly int _pageSize;
 
