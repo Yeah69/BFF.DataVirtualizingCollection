@@ -100,15 +100,44 @@ namespace BFF.DataVirtualizingCollection.Test
             Assert.Throws<IndexOutOfRangeException>(() => collection[-1]);
         }
 
-        private IDataVirtualizingCollection<int> GenerateCollectionToBeTested(int count = 6969)
+        [Fact]
+        public async Task BuildingCollectionWherePageFetcherIgnoresGivenPageSize23_70thEntry_69()
+        {
+            // Arrange
+            var collection = GenerateCollectionWherePageFetcherIgnoresGivenPageSize(pageSize: 23);
+
+            // Act
+            var placeholder = collection[69];
+            await Task.Delay(50);
+
+            // Assert
+            Assert.Equal(69, collection[69]);
+        }
+
+        private IDataVirtualizingCollection<int> GenerateCollectionToBeTested(int count = 6969, int pageSize = 100)
         {
             return DataVirtualizingCollectionBuilder<int>
                 // ReSharper disable once RedundantArgumentDefaultValue
-                .Build(pageSize: 100)
+                .Build(pageSize: pageSize)
                 .Hoarding()
                 .NonPreloading()
                 .NonTaskBasedFetchers(
-                    (offset, pageSize) => Enumerable.Range(offset, count).ToArray(),
+                    (offset, pSize) => Enumerable.Range(offset, pSize).ToArray(),
+                    () => count)
+                .AsyncIndexAccess(() => -1, TaskPoolScheduler.Default, NewThreadScheduler.Default);
+        }
+        
+        private IDataVirtualizingCollection<int> GenerateCollectionWherePageFetcherIgnoresGivenPageSize(int count = 6969, int pageSize = 100)
+        {
+            return DataVirtualizingCollectionBuilder<int>
+                // ReSharper disable once RedundantArgumentDefaultValue
+                .Build(pageSize: pageSize)
+                .Hoarding()
+                .NonPreloading()
+                .NonTaskBasedFetchers(
+                    (offset, pSize) => Enumerable
+                        .Range(offset, pageSize) // <--- This is different
+                        .ToArray(),
                     () => count)
                 .AsyncIndexAccess(() => -1, TaskPoolScheduler.Default, NewThreadScheduler.Default);
         }
