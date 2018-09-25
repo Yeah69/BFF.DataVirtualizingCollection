@@ -11,14 +11,32 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
 {
     internal abstract class DataVirtualizingCollectionBase<T> : IDataVirtualizingCollection<T>
     {
+        public void CopyTo(Array array, int index)
+        {
+            throw new NotSupportedException();
+        }
+
+        int ICollection.Count => GetCountInner();
+
+        public bool IsSynchronized => false;
+        public object SyncRoot { get; } = new object();
         protected abstract int Count { get; }
         protected readonly CompositeDisposable CompositeDisposable = new CompositeDisposable();
 
         int ICollection<T>.Count => GetCountInner();
 
         bool ICollection<T>.IsReadOnly => true;
+        object IList.this[int index]
+        {
+            get => index >= Count || index < 0
+                ? throw new IndexOutOfRangeException("Index was out of range. Must be non-negative and less than the size of the collection.")
+                : GetItemInner(index);
+            set => throw new NotSupportedException();
+        }
 
         protected abstract T GetItemInner(int index);
+
+        public bool IsReadOnly => true;
 
         public T this[int index]
         {
@@ -69,7 +87,44 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
             throw new NotSupportedException();
         }
 
+        public void Remove(object value)
+        {
+            throw new NotSupportedException();
+        }
+
+        public void RemoveAt(int index)
+        {
+            throw new NotSupportedException();
+        }
+
+        public bool IsFixedSize => true;
+
         void IList<T>.RemoveAt(int index)
+        {
+            throw new NotSupportedException();
+        }
+
+        public int Add(object value)
+        {
+            throw new NotSupportedException();
+        }
+
+        public void Clear()
+        {
+            throw new NotSupportedException();
+        }
+
+        public bool Contains(object value)
+        {
+            return ContainsInner();
+        }
+
+        public int IndexOf(object value)
+        {
+            return IndexOf((T) value);
+        }
+
+        public void Insert(int index, object value)
         {
             throw new NotSupportedException();
         }
