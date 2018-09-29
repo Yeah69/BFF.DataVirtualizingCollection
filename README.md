@@ -1,3 +1,4 @@
+
 # BFF.DataVirtualizingCollection
 This is an approach to data-virtualizing collections intended to be used in WPF projects.
 
@@ -9,30 +10,65 @@ Install it from nuget (see [nuget page](https://www.nuget.org/packages/BFF.DataV
 
 ## Why data virtualization?
 
-Say, you want to display a table from a database which contains thousands of rows in your WPF-application. If an ordinary list is used in combination of a DataGrid, then all the rows have to be loaded into memory. Even though, the amount of rows which can be displayed at once usually doesn't surpass 50 rows. Fortunately, DataGrids have UI-virtualization integrated. Which means that only the visible rows get representing UI-elements. However, still the whole data has to be loaded into memory. In order to virtualize the data in analogous manner to the UI-elements data virtualization has to be used.
+Say, you want to display a table from a database which contains thousands of rows in your WPF-application. If an ordinary list is used in combination of a `DataGrid`, then all the rows have to be loaded into memory. Even though, the amount of rows which can be displayed at once usually doesn't surpass 50 rows. Fortunately, `DataGrid`s have UI-virtualization integrated. Which means that only the visible rows get representing UI-elements. However, still the whole data has to be loaded into memory. In order to virtualize the data in analogous manner to the UI-elements data virtualization has to be used.
 
 ## How?
 
-Data virtualizing collections act as if they have all the data. However, they only fetch the data wich is currently requested on demand. Usually the data is fetched in chunks called "pages" of fixed size. For example, if the page size is set 100 and the DataGrid is initially pointing to the top most row with index zero, then initially only the first 100 elements (i.e. the first page) is fetched. As soon as the user scrolls further down and the row with index 100 is displayed, another page is loaded.
+Data virtualizing collections act as if they have all the data. However, they only fetch the data wich is currently requested on demand. Usually the data is fetched in chunks called "pages" of fixed size. For example, if the page size is set 100 and the `DataGrid` is initially pointing to the top most row with index zero, then initially only the first 100 elements (i.e. the first page) is fetched. As soon as the user scrolls further down and the row with index 100 is displayed, another page is loaded.
 The advantage is generally a better performance and less UI freeze, because lesser data is loaded at once and only on demand. Furthermore, the memory consumption improves as well.
 
 ## Use case of this project
 
-Up until now this data-virtualizing collection has been used exclusively for WPF-DataGrids. Hence, it wasn't tested for other ItemsControls. However, it is assumed that they work similarly to the DataGrids.
-The ItemsSource of DataGrids accepts arbitrary instances of IEnumerable. Which would be problematic from data-virtualizing perspective. Fortunately, the DataGrid are optimized to IList implementations and use theis indexers if the ItemsSource is castable to IList. This project uses it to its advantage in order to track which indexes were requested in recent past. Therefore, only page can be loaded only on demand.
+Up until now this data-virtualizing collection has been used exclusively for WPF-`DataGrid`s. Hence, it wasn't tested for other `ItemsControl`s. However, it is assumed that they work similarly to the `DataGrid`s.
+The `ItemsSource` of `DataGrid`s accepts arbitrary instances of `IList`. The `DataGrid` uses `IList`'s indexer to access the items. This project uses this insight to its advantage in order to track which indexes are requested. Therefore, the pages can be loaded on demand rather than all at once.
 
 ## Break in Liskov's Substitution Principle
 
-The collections from this project do implement the IList interface. However, they don't support most of the interfaces functions besides the indexer and the Count property. That is a heavy break in Liskov's Substitution Principle. Hence, these collections cannot be used like full-fledged IList implementation. But this principle break is on purpose. Let's take the function "Contains" for example. How should be checked if the data represented by this collection contains the searched element? Sure, you could check the already loaded pages. But what if you are not lucky? What if the collection doesn't even contain the element. The consequence would be to load all remaining elements in order to check for the searched element. This would contradict the initial purpose of the data virtualization and eliminate its advantages. And besides that, usually a data virtualizing solution is used in combination with databases, hence such a "Contains"-request is better of as a query applied directly to the database.
+The collections from this project do implement the `IList` interface. However, they don't support most of the interfaces functions besides the indexer and the `Count` property. That is a heavy break in Liskov's Substitution Principle. Hence, these collections cannot be used like full-fledged `IList` implementation. But this principle break is on purpose. Let's take the function `Contains`, for example. How should be checked if the data represented by this collection contains the searched element? Sure, you could check the already loaded pages. But what if you are not lucky? What if the collection doesn't even contain the element. The consequence would be to load all remaining elements in order to check for the searched element. This would contradict the initial purpose of the data virtualization and eliminate its advantages. And besides that, usually a data virtualizing solution is used in combination with databases, hence such a "Contains"-request is better of as a query applied directly to the database.
 
-## Requirements to use BFF.DataVirtualizingCollection
+## Example
 
-An implementation of either the interface IBasicSyncDataAccess or the interface IBasicAsyncDataAccess. The "Sync" variant requires a function to fetch a page of data of certain size and starting from a certain offset. Furthermore, a function is demanded, which fetches the total count of the element contained in the accessed data. The "Async" (which doesn't mean that the functions have to be implemented in async/await way) interface has only one further function, which is a factory method for placeholders. The reason for it is that the "Async"-way would return a placeholder instantly, if the page is not yet loaded, and then replace the placeholder with the right data as soon as it arrives. The "Sync" way, however, would block if an element is requested from a page which is yet missing. Hence, "Sync" doesn't need placeholders. This project provide the classes RelayBasicSyncDataAccess and RelayBasicAsyncDataAccess, which are constructed with appropriate lambdas and implement the described interfaces.
+```csharp
+public IList<int> AllPositiveIntNumbers { get; } = 
+    DataVirtualizingCollectionBuilder<int>
+        .Build(pageSize: 100)
+        .Hoarding()
+        .NonPreloading()
+        .NonTaskBasedFetchers(
+            pageFetcher: (offset, pageSize) => Enumerable.Range(offset, pageSize).ToArray(),
+            countFetcher: () => int.MaxValue)
+        .SyncIndexAccess();
+```
 
-Collections can than be build with the help of the CollectionBuilder class. Everyone is encouraged to use this project and raise an issue if something is unclear and further explaination is necessary.
+This data virtualizing collection virtualizes an `IList<int>` with a number sequence of 0 to `int.Max` - 1. Hence, it emulates a list of maximum count, because the `Count` property of `IList<T>` is of type `int`. Data virtualized collections can only be build with the `DataVirtualizingCollectionBuilder<T>`. In fact, it is the only externally public entry point of the whole library. The collections have to be build by calling the `Build()`-function and making four decision. The deciding is done by choosing the appropriate function during the method chaining. The example above is the most simple in regard of the chosen options, which makes it the "Hello, world!" of this data virtualizing library. Here is a short introduction to the options:
 
+### Build
+
+The `Build()`-function doesn't count as a decision. It is a necessity in order to create a new builder instance where onto the decisions are made. The `pageSize`-parameter is optional and its default is 100. This parameter determines the usual requested page size (the last page may have a different size).
+
+### The Page-Holding Decision
+
+First decision is how to hold the pages. At the moment of writing there is only one option: `Hoarding()`. This means that the pages are loaded on demand only. However, once loaded, they are hold in memory until the data virtualizing collection is disposed or garbage collected.
+There are plans to offer more options here. For example, a strategy which would discard and dispose pages based on the "most recently used"-principle would be interesting. But further options in this decision have to be implemented yet. Hence, for the moment this decision has placeholder character.
+
+### The Page-Loading Decision
+
+This decides the loading process of the pages. The option here are `NonPreloading()` and `Preloading()`. If `NonPreloading()` is active a page is loaded as soon as the first item of this page is requested but not sooner. If `Preloading()` is active, then the neighboring pages (next and previous; if not done already) are loaded as soon as an item of the current page is requested. The assumption here is that given a certain starting point, the user is likely to scroll in any direction. Hence, the probability is high that one of the neighboring pages is requested soon. The preloading happens in background, so requests of the current page are not blocked.
+
+### The Definition of the Fetchers
+
+Next, the fetcher have to be defined. In order to work properly the data virtualizing collection needs two kinds of fetcher. The page fetcher is given the integer parameters `offset` and `pageSize` (doesn't have to be the same value as provided to `Build()`) and expects an array of elements with amount of `pageSize` starting from the `offset`. What the page fetcher has to do in order to accomplish this result depends on the data source which is virtualized. In the example above the numbers are procedurally generated. If the data source is a database, then the page fetcher could delegate the request to ORM or a query of some kind.
+The count fetcher tells the amount of items of the data source to the data virtualizing collection. Again, the actual implementation will depend on the kind of data source. 
+
+It can be decided whether the provided fetcher are synchronous or task-based asynchronous functions.
+
+### Decision about the Index Access
+
+The last decision determines whether the item access is synchronous (`Sync()`) or asynchronous (`Async([…])`). The synchronous variant would block the thread and wait if an item from a not-yet-loaded page is requested. In same situation the asynchronous variant would return a placeholder (the user has to provide a placeholder-function) first instead of blocking the current thread and emit a notification event as soon as the item arrives. In case the page is already loaded the right item is returned directly and no notification is emitted. That way or the other the asynchronous variant does not block.
+
+This last call returns the build data virtualized collection.
 
 ## Are there altenative solutions?
 
-This project was created as a replacement for the data-virtualizing solution "AlphaChiTech.Virtualization" (see [their project site](https://github.com/anagram4wander/VirtualizingObservableCollection/tree/master/AlphaChiTech.Virtualization "AlphaChiTech.Virtualization")) in a yet-secret project called BFF. However, unlike its intelectual predecessor this project's collections do implement the IDisposable interface. On disposal all stored disposable elements are disposed of. Furthermore, the async variants of the collections do operate in asynchronous fashion "under the hood". This means that all it is sufficient to provide synchronous implementation of the data access interface. The asynchronous variants call the provided data acces from the background. Hence, the the current thread (assumeably the UI thread) is not blocked.
+This project was created as a replacement for the data-virtualizing solution "AlphaChiTech.Virtualization" in a yet-secret project called BFF. However, unlike its intelectual predecessor this project's collections do implement the `IDisposable` interface. On disposal all stored disposable elements are disposed of. Furthermore, the async variants of the collections do operate in asynchronous fashion "under the hood". This means that all it is sufficient to provide synchronous implementation of the data access interface. The asynchronous variants call the provided data acces from the background. Hence, the the current thread (assumeably the UI thread) is not blocked.
 Besides the advantages, this project is still young and may not have yet all features which the "AlphaChiTech.Virtualization" solution provides. Hence, it is recommended to have a look in there, if this project doesn't meet your personal requirements.
