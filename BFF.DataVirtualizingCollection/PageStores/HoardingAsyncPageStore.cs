@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -29,7 +30,10 @@ namespace BFF.DataVirtualizingCollection.PageStores
 
         internal interface IBuilderRequired<TItem>
         {
-            IBuilderOptional<TItem> With(IBasicAsyncDataAccess<TItem> dataAccess, IScheduler subscribeScheduler);
+            IBuilderOptional<TItem> With(
+                IBasicAsyncDataAccess<TItem> dataAccess, 
+                IScheduler subscribeScheduler,
+                Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory);
         }
 
         internal class Builder<TItem> : IBuilderRequired<TItem>, IBuilderOptional<TItem>
@@ -38,10 +42,17 @@ namespace BFF.DataVirtualizingCollection.PageStores
             private int _pageSize = 100;
             private IScheduler _subscribeScheduler;
 
-            public IBuilderOptional<TItem> With(IBasicAsyncDataAccess<TItem> dataAccess, IScheduler subscribeScheduler)
+            private Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>>
+                _pageReplacementStrategyFactory;
+
+            public IBuilderOptional<TItem> With(
+                IBasicAsyncDataAccess<TItem> dataAccess, 
+                IScheduler subscribeScheduler,
+                Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory)
             {
                 _dataAccess = dataAccess;
                 _subscribeScheduler = subscribeScheduler;
+                _pageReplacementStrategyFactory = pageReplacementStrategyFactory;
                 return this;
             }
 
@@ -53,7 +64,7 @@ namespace BFF.DataVirtualizingCollection.PageStores
 
             public IHoardingAsyncPageStore<TItem> Build()
             {
-                return new HoardingAsyncPageStore<TItem>(_dataAccess, _dataAccess, _subscribeScheduler)
+                return new HoardingAsyncPageStore<TItem>(_dataAccess, _dataAccess, _subscribeScheduler, _pageReplacementStrategyFactory)
                 {
                     PageSize = _pageSize
                 };
@@ -65,8 +76,9 @@ namespace BFF.DataVirtualizingCollection.PageStores
         private HoardingAsyncPageStore(
             IPageFetcher<T> pageFetcher,
             IPlaceholderFactory<T> placeholderFactory,
-            IScheduler subscribeScheduler) 
-            : base(placeholderFactory, subscribeScheduler)
+            IScheduler subscribeScheduler,
+            Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory) 
+            : base(placeholderFactory, subscribeScheduler, pageReplacementStrategyFactory)
         {
             CompositeDisposable.Add(_pageRequests);
 
@@ -75,8 +87,8 @@ namespace BFF.DataVirtualizingCollection.PageStores
                 .Distinct()
                 .Subscribe(pageKey =>
                 {
-                    int offset = pageKey * PageSize;
-                    int actualPageSize = Math.Min(PageSize, Count - offset);
+                    var offset = pageKey * PageSize;
+                    var actualPageSize = Math.Min(PageSize, Count - offset);
                     T[] page = pageFetcher.PageFetch(offset, actualPageSize);
                     PageStore[pageKey] = page;
                     if (DeferredRequests.ContainsKey(pageKey))
@@ -94,12 +106,10 @@ namespace BFF.DataVirtualizingCollection.PageStores
                 });
         }
 
-        protected override T OnPageContained(int pageKey, int pageIndex)
+        protected override void OnPageContained(int pageKey)
         {
             if (DeferredRequests.ContainsKey(pageKey))
                 DeferredRequests[pageKey].OnCompleted();
-            
-            return PageStore[pageKey][pageIndex];
         }
 
         protected override T OnPageNotContained(int pageKey, int pageIndex)

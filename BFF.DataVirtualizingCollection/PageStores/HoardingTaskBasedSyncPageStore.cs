@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using BFF.DataVirtualizingCollection.DataAccesses;
 
 namespace BFF.DataVirtualizingCollection.PageStores
@@ -26,17 +27,24 @@ namespace BFF.DataVirtualizingCollection.PageStores
 
         internal interface IBuilderRequired<TItem>
         {
-            IBuilderOptional<TItem> With(IBasicTaskBasedSyncDataAccess<TItem> dataAccess);
+            IBuilderOptional<TItem> With(
+                IBasicTaskBasedSyncDataAccess<TItem> dataAccess,
+                Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory);
         }
 
         internal class Builder<TItem> : IBuilderRequired<TItem>, IBuilderOptional<TItem>
         {
             private IBasicTaskBasedSyncDataAccess<TItem> _dataAccess;
             private int _pageSize = 100;
+            private Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>>
+                _pageReplacementStrategyFactory;
 
-            public IBuilderOptional<TItem> With(IBasicTaskBasedSyncDataAccess<TItem> dataAccess)
+            public IBuilderOptional<TItem> With(
+                IBasicTaskBasedSyncDataAccess<TItem> dataAccess,
+                Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory)
             {
                 _dataAccess = dataAccess;
+                _pageReplacementStrategyFactory = pageReplacementStrategyFactory;
                 return this;
             }
 
@@ -48,7 +56,7 @@ namespace BFF.DataVirtualizingCollection.PageStores
 
             public IHoardingTaskBasedSyncPageStore<TItem> Build()
             {
-                return new HoardingTaskBasedSyncPageStore<TItem>(_dataAccess)
+                return new HoardingTaskBasedSyncPageStore<TItem>(_dataAccess, _pageReplacementStrategyFactory)
                 {
                     PageSize = _pageSize
                 };
@@ -57,21 +65,21 @@ namespace BFF.DataVirtualizingCollection.PageStores
 
         private readonly ITaskBasedPageFetcher<T> _pageFetcher;
 
-        private HoardingTaskBasedSyncPageStore(ITaskBasedPageFetcher<T> pageFetcher)
+        private HoardingTaskBasedSyncPageStore(
+            ITaskBasedPageFetcher<T> pageFetcher,
+            Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory)
+            : base(pageReplacementStrategyFactory)
         {
             _pageFetcher = pageFetcher;
         }
 
-        protected override void OnPageNotContained(int pageKey, int pageIndex)
+        protected override T OnPageNotContained(int pageKey, int pageIndex)
         {
-            int offset = pageKey * PageSize;
-            int actualPageSize = Math.Min(PageSize, Count - offset);
-            PageStore[pageKey] = _pageFetcher.PageFetchAsync(offset, actualPageSize).Result;
-        }
-
-        protected override T OnPageContained(int pageKey, int pageIndex)
-        {
-            return PageStore[pageKey][pageIndex];
+            var offset = pageKey * PageSize;
+            var actualPageSize = Math.Min(PageSize, Count - offset);
+            var page = _pageFetcher.PageFetchAsync(offset, actualPageSize).Result;
+            PageStore[pageKey] = page;
+            return page[pageIndex];
         }
     }
 }

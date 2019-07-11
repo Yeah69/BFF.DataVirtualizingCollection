@@ -1,12 +1,35 @@
 using System;
+using System.Collections.Generic;
 using System.Reactive.Concurrency;
 using System.Threading.Tasks;
 using BFF.DataVirtualizingCollection.DataAccesses;
 using BFF.DataVirtualizingCollection.DataVirtualizingCollections;
+using BFF.DataVirtualizingCollection.PageRemoval;
 using BFF.DataVirtualizingCollection.PageStores;
+using BFF.DataVirtualizingCollection.Utilities;
 
 namespace BFF.DataVirtualizingCollection
 {
+    /// <summary>
+    /// Lets you configure the page loading behavior.
+    /// Here you can turn the preloading on or off. Preloading means that neighboring pages from requested pages are loaded as well, assuming that they'll be requested soon. 
+    /// </summary>
+    /// <typeparam name="T">Type of the collection items.</typeparam>
+    public interface IPageLoadingBehaviorCollectionBuilder<T>
+    {
+        /// <summary>
+        /// Pages are loaded only as soon as an item of the page is requested.
+        /// </summary>
+        /// <returns>The builder itself.</returns>
+        IPageHoldingBehaviorCollectionBuilder<T> NonPreloading();
+
+        /// <summary>
+        /// Pages are loaded as soon as an item of the page is requested or as soon as a neighboring page is loaded.
+        /// </summary>
+        /// <returns>The builder itself.</returns>
+        IPageHoldingBehaviorCollectionBuilder<T> Preloading();
+    }
+
     /// <summary>
     /// Lets you configure the page holding behavior.
     /// At the moment only one strategy (hoarding) is available.
@@ -19,27 +42,34 @@ namespace BFF.DataVirtualizingCollection
         /// In this mode pages are loaded on demand. However, once loaded the pages are hold in memory until the data virtualizing collection is disposed or garbage collected.
         /// </summary>
         /// <returns>The builder itself.</returns>
-        IPageLoadingBehaviorCollectionBuilder<T> Hoarding();
-    }
-
-    /// <summary>
-    /// Lets you configure the page loading behavior.
-    /// Here you can turn the preloading on or off. Preloading means that neighboring pages from requested pages are loaded as well, assuming that they'll be requested soon. 
-    /// </summary>
-    /// <typeparam name="T">Type of the collection items.</typeparam>
-    public interface IPageLoadingBehaviorCollectionBuilder<T>
-    {
-        /// <summary>
-        /// Pages are loaded only as soon as an item of the page is requested.
-        /// </summary>
-        /// <returns>The builder itself.</returns>
-        IFetchersKindCollectionBuilder<T> NonPreloading();
+        IFetchersKindCollectionBuilder<T> Hoarding();
 
         /// <summary>
-        /// Pages are loaded as soon as an item of the page is requested or as soon as a neighboring page is loaded.
+        /// If the page limit is reached then the page which is least recently used will be chosen for removal.
         /// </summary>
+        /// <param name="pageLimit">Has to be greater than zero (with preloading greater than two) in order to maintain at least one page in the page store (when preloading is active, then the neighbors of the most recently requested page are maintained as well).</param>
         /// <returns>The builder itself.</returns>
-        IFetchersKindCollectionBuilder<T> Preloading();
+        IFetchersKindCollectionBuilder<T> LeastRecentlyUsed(int pageLimit);
+
+        /// <summary>
+        /// If the page limit is reached then the pages (amount: removal buffer plus one) which are least recently used will be chosen for removal.
+        /// </summary>
+        /// <param name="pageLimit">Has to be greater than zero (with preloading greater than two) in order to maintain at least one page in the page store (when preloading is active, then the neighbors of the most recently requested page are maintained as well).</param>
+        /// <param name="removalCount">Has to be in between one and the page limit minus one (so at least one page remains).
+        /// With active preloading the removal count cannot be greater than the page limit minus three.</param>
+        /// <returns>The builder itself.</returns>
+        IFetchersKindCollectionBuilder<T> LeastRecentlyUsed(int pageLimit, int removalCount);
+
+        /// <summary>
+        /// With this function you can provide an own page-removal strategy.
+        /// You'll get an observable which emits all element requests in form of a key to the page and the element's index inside of the page.
+        /// You'll have to return an observable which emits page-removal requests. You can request to remove several pages at once.
+        /// </summary>
+        /// <param name="pageReplacementStrategyFactory"></param>
+        /// <returns>The builder itself.</returns>
+        IFetchersKindCollectionBuilder<T> CustomPageRemovalStrategy(
+            Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>>
+                pageReplacementStrategyFactory);
     }
 
     /// <summary>
@@ -93,11 +123,6 @@ namespace BFF.DataVirtualizingCollection
         IDataVirtualizingCollection<T> AsyncIndexAccess(Func<T> placeholderFactory, IScheduler backgroundScheduler, IScheduler notificationScheduler);
     }
 
-    internal enum PageHoldingBehavior
-    {
-        Hoarding
-    }
-
     internal enum PageLoadingBehavior
     {
         Preloading,
@@ -117,16 +142,25 @@ namespace BFF.DataVirtualizingCollection
     }
 
     /// <summary>
-    /// This class offers the function <see cref="Build"/> in order to build data virtualizing collections.
+    /// This class offers the function "Build" in order to build data virtualizing collections.
     /// The construction of such collections is encapsulated and externally only access-able via this class. 
     /// </summary>
     /// <typeparam name="T">Type of the collection items.</typeparam>
     public class DataVirtualizingCollectionBuilder<T> 
-        : IPageHoldingBehaviorCollectionBuilder<T>, 
-            IPageLoadingBehaviorCollectionBuilder<T>,
+        : IPageLoadingBehaviorCollectionBuilder<T>,
+            IPageHoldingBehaviorCollectionBuilder<T>,
             IFetchersKindCollectionBuilder<T>,
             IIndexAccessBehaviorCollectionBuilder<T>
-    { 
+    {
+        /// <summary>
+        /// Initial entry point for creating a data virtualizing collection.
+        /// This call can be used to configure the maximum size of a single page. Hence, this configures how much data will be loaded at once.
+        /// Further settings are applied via method chaining.
+        /// Page size is set to the default value 100.
+        /// </summary>
+        /// <returns>The builder itself.</returns>
+        public static IPageLoadingBehaviorCollectionBuilder<T> Build() => Build(100);
+
         /// <summary>
         /// Initial entry point for creating a data virtualizing collection.
         /// This call can be used to configure the maximum size of a single page. Hence, this configures how much data will be loaded at once.
@@ -134,12 +168,12 @@ namespace BFF.DataVirtualizingCollection
         /// </summary>
         /// <param name="pageSize">Maximum size of a single page.</param>
         /// <returns>The builder itself.</returns>
-        public static IPageHoldingBehaviorCollectionBuilder<T> Build(int pageSize = 100) => 
+        public static IPageLoadingBehaviorCollectionBuilder<T> Build(int pageSize) => 
             new DataVirtualizingCollectionBuilder<T>(pageSize);
 
         private readonly int _pageSize;
 
-        private PageHoldingBehavior _pageHoldingBehavior;
+        private Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> _pageHoldingBehavior;
 
         private PageLoadingBehavior _pageLoadingBehavior;
 
@@ -167,23 +201,37 @@ namespace BFF.DataVirtualizingCollection
         }
 
         /// <inheritdoc />
-        public IPageLoadingBehaviorCollectionBuilder<T> Hoarding()
-        {
-            _pageHoldingBehavior = PageHoldingBehavior.Hoarding;
-            return this;
-        }
-
-        /// <inheritdoc />
-        public IFetchersKindCollectionBuilder<T> NonPreloading()
+        public IPageHoldingBehaviorCollectionBuilder<T> NonPreloading()
         {
             _pageLoadingBehavior = PageLoadingBehavior.NonPreloading;
             return this;
         }
 
         /// <inheritdoc />
-        public IFetchersKindCollectionBuilder<T> Preloading()
+        public IPageHoldingBehaviorCollectionBuilder<T> Preloading()
         {
             _pageLoadingBehavior = PageLoadingBehavior.Preloading;
+            return this;
+        }
+
+        /// <inheritdoc />
+        public IFetchersKindCollectionBuilder<T> Hoarding() => CustomPageRemovalStrategy(HoardingPageNonRemoval.Create());
+
+        /// <inheritdoc />
+        public IFetchersKindCollectionBuilder<T> LeastRecentlyUsed(int pageLimit) => LeastRecentlyUsed(pageLimit, 1);
+
+        /// <inheritdoc />
+        public IFetchersKindCollectionBuilder<T> LeastRecentlyUsed(int pageLimit, int removalCount) =>
+            CustomPageRemovalStrategy(LeastRecentlyUsedPageRemoval.Create(
+                pageLimit,
+                removalCount, 
+                _pageLoadingBehavior == PageLoadingBehavior.Preloading, 
+                new DateTimeTimestampProvider()));
+
+        /// <inheritdoc />
+        public IFetchersKindCollectionBuilder<T> CustomPageRemovalStrategy(Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory)
+        {
+            _pageHoldingBehavior = pageReplacementStrategyFactory;
             return this;
         }
 
@@ -224,17 +272,16 @@ namespace BFF.DataVirtualizingCollection
 
         private IDataVirtualizingCollection<T> GenerateCollection()
         {
-            switch (_pageHoldingBehavior)
+            switch (_pageLoadingBehavior)
             {
-                case PageHoldingBehavior.Hoarding when
-                _pageLoadingBehavior == PageLoadingBehavior.NonPreloading
-                && _fetchersKind == FetchersKind.NonTaskBased
+                case PageLoadingBehavior.NonPreloading when
+                _fetchersKind == FetchersKind.NonTaskBased
                 && _indexAccessBehavior == IndexAccessBehavior.Synchronous:
                 {
                     var dataAccess = new RelayBasicSyncDataAccess<T>(_pageFetcher, _countFetcher);
                     var pageStore = HoardingSyncPageStore<T>
                         .CreateBuilder()
-                        .With(dataAccess)
+                        .With(dataAccess, _pageHoldingBehavior)
                         .WithPageSize(_pageSize)
                         .Build();
                     return SyncDataVirtualizingCollection<T>
@@ -244,15 +291,14 @@ namespace BFF.DataVirtualizingCollection
                             dataAccess)
                         .Build();
                 }
-                case PageHoldingBehavior.Hoarding when
-                _pageLoadingBehavior == PageLoadingBehavior.NonPreloading
-                && _fetchersKind == FetchersKind.NonTaskBased
+                case PageLoadingBehavior.NonPreloading when
+                _fetchersKind == FetchersKind.NonTaskBased
                 && _indexAccessBehavior == IndexAccessBehavior.Asynchronous:
                 {
                     var dataAccess = new RelayBasicAsyncDataAccess<T>(_pageFetcher, _countFetcher, _placeholderFactory);
                     var pageStore = HoardingAsyncPageStore<T>
                         .CreateBuilder()
-                        .With(dataAccess, _backgroundScheduler)
+                        .With(dataAccess, _backgroundScheduler, _pageHoldingBehavior)
                         .WithPageSize(_pageSize)
                         .Build();
                     return AsyncDataVirtualizingCollection<T>
@@ -265,16 +311,15 @@ namespace BFF.DataVirtualizingCollection
                         .Build();
                 }
                 
-                case PageHoldingBehavior.Hoarding when
-                _pageLoadingBehavior == PageLoadingBehavior.NonPreloading
-                && _fetchersKind == FetchersKind.TaskBased
+                case PageLoadingBehavior.NonPreloading when
+                    _fetchersKind == FetchersKind.TaskBased
                 && _indexAccessBehavior == IndexAccessBehavior.Synchronous:
                 {
                     var dataAccess =
                         new RelayBasicTaskBasedSyncDataAccess<T>(_taskBasedPageFetcher, _taskBasedCountFetcher);
                     var pageStore = HoardingTaskBasedSyncPageStore<T>
                         .CreateBuilder()
-                        .With(dataAccess)
+                        .With(dataAccess, _pageHoldingBehavior)
                         .WithPageSize(_pageSize)
                         .Build();
                     return TaskBasedSyncDataVirtualizingCollection<T>
@@ -284,16 +329,15 @@ namespace BFF.DataVirtualizingCollection
                             dataAccess)
                         .Build();
                 }
-                case PageHoldingBehavior.Hoarding when
-                _pageLoadingBehavior == PageLoadingBehavior.NonPreloading
-                && _fetchersKind == FetchersKind.TaskBased
+                case PageLoadingBehavior.NonPreloading when
+                _fetchersKind == FetchersKind.TaskBased
                 && _indexAccessBehavior == IndexAccessBehavior.Asynchronous:
                 {
                     var dataAccess =
                         new RelayBasicTaskBasedAsyncDataAccess<T>(_taskBasedPageFetcher, _taskBasedCountFetcher, _placeholderFactory);
                         var pageStore = HoardingTaskBasedAsyncPageStore<T>
                         .CreateBuilder()
-                        .With(dataAccess, _backgroundScheduler)
+                        .With(dataAccess, _backgroundScheduler, _pageHoldingBehavior)
                         .WithPageSize(_pageSize)
                         .Build();
                     return TaskBasedAsyncDataVirtualizingCollection<T>
@@ -309,15 +353,14 @@ namespace BFF.DataVirtualizingCollection
 
 
 
-                case PageHoldingBehavior.Hoarding when
-                _pageLoadingBehavior == PageLoadingBehavior.Preloading
-                && _fetchersKind == FetchersKind.NonTaskBased
+                case PageLoadingBehavior.Preloading when
+                _fetchersKind == FetchersKind.NonTaskBased
                 && _indexAccessBehavior == IndexAccessBehavior.Synchronous:
                     {
                         var dataAccess = new RelayBasicSyncDataAccess<T>(_pageFetcher, _countFetcher);
                         var pageStore = HoardingPreloadingSyncPageStore<T>
                             .CreateBuilder()
-                            .With(dataAccess)
+                            .With(dataAccess, _pageHoldingBehavior)
                             .WithPageSize(_pageSize)
                             .Build();
                         return SyncDataVirtualizingCollection<T>
@@ -327,15 +370,14 @@ namespace BFF.DataVirtualizingCollection
                                 dataAccess)
                             .Build();
                     }
-                case PageHoldingBehavior.Hoarding when
-                _pageLoadingBehavior == PageLoadingBehavior.Preloading
-                && _fetchersKind == FetchersKind.NonTaskBased
+                case PageLoadingBehavior.Preloading when
+                _fetchersKind == FetchersKind.NonTaskBased
                 && _indexAccessBehavior == IndexAccessBehavior.Asynchronous:
                     {
                         var dataAccess = new RelayBasicAsyncDataAccess<T>(_pageFetcher, _countFetcher, _placeholderFactory);
                         var pageStore = HoardingPreloadingAsyncPageStore<T>
                             .CreateBuilder()
-                            .With(dataAccess, _backgroundScheduler)
+                            .With(dataAccess, _backgroundScheduler, _pageHoldingBehavior)
                             .WithPageSize(_pageSize)
                             .Build();
                         return AsyncDataVirtualizingCollection<T>
@@ -348,16 +390,15 @@ namespace BFF.DataVirtualizingCollection
                             .Build();
                     }
 
-                case PageHoldingBehavior.Hoarding when
-                _pageLoadingBehavior == PageLoadingBehavior.Preloading
-                && _fetchersKind == FetchersKind.TaskBased
+                case PageLoadingBehavior.Preloading when
+                _fetchersKind == FetchersKind.TaskBased
                 && _indexAccessBehavior == IndexAccessBehavior.Synchronous:
                     {
                         var dataAccess =
                             new RelayBasicTaskBasedSyncDataAccess<T>(_taskBasedPageFetcher, _taskBasedCountFetcher);
                         var pageStore = HoardingPreloadingTaskBasedSyncPageStore<T>
                             .CreateBuilder()
-                            .With(dataAccess)
+                            .With(dataAccess, _pageHoldingBehavior)
                             .WithPageSize(_pageSize)
                             .Build();
                         return TaskBasedSyncDataVirtualizingCollection<T>
@@ -367,16 +408,15 @@ namespace BFF.DataVirtualizingCollection
                                 dataAccess)
                             .Build();
                     }
-                case PageHoldingBehavior.Hoarding when
-                _pageLoadingBehavior == PageLoadingBehavior.Preloading
-                && _fetchersKind == FetchersKind.TaskBased
+                case PageLoadingBehavior.Preloading when
+                _fetchersKind == FetchersKind.TaskBased
                 && _indexAccessBehavior == IndexAccessBehavior.Asynchronous:
                     {
                         var dataAccess =
                             new RelayBasicTaskBasedAsyncDataAccess<T>(_taskBasedPageFetcher, _taskBasedCountFetcher, _placeholderFactory);
                         var pageStore = HoardingPreloadingTaskBasedAsyncPageStore<T>
                         .CreateBuilder()
-                        .With(dataAccess, _backgroundScheduler)
+                        .With(dataAccess, _backgroundScheduler, _pageHoldingBehavior)
                         .WithPageSize(_pageSize)
                         .Build();
                         return TaskBasedAsyncDataVirtualizingCollection<T>

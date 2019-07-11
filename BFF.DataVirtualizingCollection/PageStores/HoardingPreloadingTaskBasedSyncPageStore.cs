@@ -28,17 +28,24 @@ namespace BFF.DataVirtualizingCollection.PageStores
 
         internal interface IBuilderRequired<TItem>
         {
-            IBuilderOptional<TItem> With(IBasicTaskBasedSyncDataAccess<TItem> dataAccess);
+            IBuilderOptional<TItem> With(
+                IBasicTaskBasedSyncDataAccess<TItem> dataAccess,
+                Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory);
         }
 
         internal class Builder<TItem> : IBuilderRequired<TItem>, IBuilderOptional<TItem>
         {
             private IBasicTaskBasedSyncDataAccess<TItem> _dataAccess;
             private int _pageSize = 100;
+            private Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>>
+                _pageReplacementStrategyFactory;
 
-            public IBuilderOptional<TItem> With(IBasicTaskBasedSyncDataAccess<TItem> dataAccess)
+            public IBuilderOptional<TItem> With(
+                IBasicTaskBasedSyncDataAccess<TItem> dataAccess,
+                Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory)
             {
                 _dataAccess = dataAccess;
+                _pageReplacementStrategyFactory = pageReplacementStrategyFactory;
                 return this;
             }
 
@@ -50,7 +57,7 @@ namespace BFF.DataVirtualizingCollection.PageStores
 
             public IHoardingPreloadingTaskBasedSyncPageStore<TItem> Build()
             {
-                return new HoardingPreloadingTaskBasedSyncPageStore<TItem>(_dataAccess)
+                return new HoardingPreloadingTaskBasedSyncPageStore<TItem>(_dataAccess, _pageReplacementStrategyFactory)
                 {
                     PageSize = _pageSize
                 };
@@ -61,56 +68,51 @@ namespace BFF.DataVirtualizingCollection.PageStores
 
         private readonly IDictionary<int, Task<T[]>> _preloadingTasks = new Dictionary<int, Task<T[]>>();
 
-        private HoardingPreloadingTaskBasedSyncPageStore(ITaskBasedPageFetcher<T> pageFetcher)
+        private HoardingPreloadingTaskBasedSyncPageStore(
+            ITaskBasedPageFetcher<T> pageFetcher,
+            Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory)
+            : base(pageReplacementStrategyFactory)
         {
             _pageFetcher = pageFetcher;
         }
 
-        protected override void OnPageNotContained(int pageKey, int pageIndex)
+        protected override T OnPageNotContained(int pageKey, int pageIndex)
         {
-            if (_preloadingTasks.ContainsKey(pageKey))
-            {
-                _preloadingTasks[pageKey].Wait();
-                if (_preloadingTasks[pageKey].IsFaulted || _preloadingTasks[pageKey].IsCanceled)
-                {
-                    int offset = pageKey * PageSize;
-                    int actualPageSize = Math.Min(PageSize, Count - offset);
-                    PageStore[pageKey] = _pageFetcher.PageFetchAsync(offset, actualPageSize).Result;
-                }
+            if (!_preloadingTasks.TryGetValue(pageKey, out var loadingTask))
+                return FetchPageAsync(pageKey).Result[pageIndex];
 
-                _preloadingTasks.Remove(pageKey);
-            }
-            else
+            loadingTask.Wait();
+            _preloadingTasks.Remove(pageKey);
+            return loadingTask.IsFaulted || loadingTask.IsCanceled
+                ? FetchPageAsync(pageKey).Result[pageIndex]
+                : loadingTask.Result[pageIndex];
+        }
+
+        protected override void OnPageContained(int pageKey)
+        {
+            int nextPageKey = pageKey + 1;
+            if (nextPageKey < Count % PageSize) PreloadPage(nextPageKey);
+
+            int previousPageKey = pageKey - 1;
+            if (previousPageKey >= 0) PreloadPage(previousPageKey);
+
+            void PreloadPage(int preloadingPageKey)
             {
-                int offset = pageKey * PageSize;
-                int actualPageSize = Math.Min(PageSize, Count - offset);
-                PageStore[pageKey] = _pageFetcher.PageFetchAsync(offset, actualPageSize).Result;
+                if (PageStore.ContainsKey(preloadingPageKey) || _preloadingTasks.ContainsKey(preloadingPageKey)) return;
+
+                Requests.OnNext((preloadingPageKey, -1));
+                _preloadingTasks[preloadingPageKey] =
+                    Task.Run(() => FetchPageAsync(preloadingPageKey));
             }
         }
 
-        protected override T OnPageContained(int pageKey, int pageIndex)
+        private async Task<T[]> FetchPageAsync(int pageKey)
         {
-            int nextPageKey = pageKey + 1;
-            if (!PageStore.ContainsKey(nextPageKey) && !_preloadingTasks.ContainsKey(nextPageKey))
-                _preloadingTasks[nextPageKey] = Task.Run(() =>
-                    {
-                        int offset = nextPageKey * PageSize;
-                        int actualPageSize = Math.Min(PageSize, Count - offset);
-                        return _pageFetcher.PageFetchAsync(offset, actualPageSize);
-                    })
-                    .ContinueWith(t => PageStore[nextPageKey] = t.Result);
-
-            int previousPageKey = pageKey - 1;
-            if (previousPageKey >= 0 && !PageStore.ContainsKey(previousPageKey) && !_preloadingTasks.ContainsKey(previousPageKey))
-                _preloadingTasks[previousPageKey] = Task.Run(() =>
-                    {
-                        int offset = previousPageKey * PageSize;
-                        int actualPageSize = Math.Min(PageSize, Count - offset);
-                        return _pageFetcher.PageFetchAsync(offset, actualPageSize);
-                    })
-                    .ContinueWith(t => PageStore[previousPageKey] = t.Result);
-
-            return PageStore[pageKey][pageIndex];
+            var offset = pageKey * PageSize;
+            var actualPageSize = Math.Min(PageSize, Count - offset);
+            var page = await _pageFetcher.PageFetchAsync(offset, actualPageSize).ConfigureAwait(false);
+            PageStore[pageKey] = page;
+            return page;
         }
     }
 }

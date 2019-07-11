@@ -10,6 +10,8 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
 {
     internal class TaskBasedAsyncDataVirtualizingCollection<T> : DataVirtualizingCollectionBase<T>
     {
+        #region Builder
+
         internal static IBuilderRequired<T> CreateBuilder() => new Builder<T>();
 
         internal interface IBuilderRequired<TItem>
@@ -53,6 +55,8 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
                 return this;
             }
         }
+
+        #endregion
 
         private readonly IAsyncPageStore<T> _pageStore;
 

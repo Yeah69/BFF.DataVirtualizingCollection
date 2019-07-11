@@ -6,6 +6,8 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
 {
     internal class SyncDataVirtualizingCollection<T> : DataVirtualizingCollectionBase<T>
     {
+        #region Builder
+
         internal static IDataVirtualizingCollectionBuilderRequired<T> CreateBuilder() => new Builder<T>();
 
         internal interface IDataVirtualizingCollectionBuilderRequired<TItem>
@@ -42,6 +44,8 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
                 return this;
             }
         }
+
+        #endregion
 
         private readonly ISyncPageStore<T> _pageStore;
 

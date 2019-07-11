@@ -27,8 +27,8 @@ namespace BFF.DataVirtualizingCollection.Sample
 
         public IList<long> MillionNumbers { get; } = DataVirtualizingCollectionBuilder<long>
             .Build(100)
-            .Hoarding()
             .NonPreloading()
+            .Hoarding()
             .NonTaskBasedFetchers(
                 (offset, pageSize) =>
                 {
@@ -77,8 +77,8 @@ namespace BFF.DataVirtualizingCollection.Sample
 
         public IList<int> AllPositiveIntNumbers { get; } = DataVirtualizingCollectionBuilder<int>
             .Build(100)
-            .Hoarding()
             .NonPreloading()
+            .Hoarding()
             .NonTaskBasedFetchers(
                 (offset, pageSize) =>
                 {
@@ -94,8 +94,8 @@ namespace BFF.DataVirtualizingCollection.Sample
 
         public IList<MyObject> WorkloadObjects { get; } = DataVirtualizingCollectionBuilder<MyObject>
             .Build(100)
-            .Hoarding()
             .NonPreloading()
+            .LeastRecentlyUsed(10, 5)
             .NonTaskBasedFetchers(
                 (offset, pageSize) =>
                 {
@@ -111,8 +111,8 @@ namespace BFF.DataVirtualizingCollection.Sample
 
         public IList<ProfileViewModel> Profiles { get; } = DataVirtualizingCollectionBuilder<ProfileViewModel>
             .Build(12)
-            .Hoarding()
             .NonPreloading()
+            .Hoarding()
             .NonTaskBasedFetchers(
                 (offset, pageSize) =>
                 {
@@ -266,7 +266,7 @@ namespace BFF.DataVirtualizingCollection.Sample
 
     }
 
-    public class MyObject
+    public class MyObject : IDisposable
     {
         // Simulates workload
         byte[] _workload = new byte[12500];
@@ -277,6 +277,11 @@ namespace BFF.DataVirtualizingCollection.Sample
         }
 
         public int Number { get; }
+
+        public void Dispose()
+        {
+            Console.WriteLine("Disposed");
+        }
     }
 
     public class ProfileViewModel
