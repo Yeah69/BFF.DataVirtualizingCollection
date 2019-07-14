@@ -20,6 +20,7 @@
     <PackageIconUrl>https://raw.githubusercontent.com/Yeah69/BFF.DataVirtualizingCollection/master/Icon/Yeah69Logo.ico</PackageIconUrl>
     <PackageLicenseExpression />
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <LangVersion>8</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

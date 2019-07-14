@@ -10,60 +10,12 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
 {
     internal class TaskBasedAsyncDataVirtualizingCollection<T> : DataVirtualizingCollectionBase<T>
     {
-        #region Builder
-
-        internal static IBuilderRequired<T> CreateBuilder() => new Builder<T>();
-
-        internal interface IBuilderRequired<TItem>
-        {
-            IBuilderOptional<TItem> WithPageStore(
-                IAsyncPageStore<TItem> pageStore,
-                ITaskBasedCountFetcher countFetcher,
-                IScheduler subscribeScheduler,
-                IScheduler observeScheduler);
-        }
-        internal interface IBuilderOptional<TItem>
-        {
-            IDataVirtualizingCollection<TItem> Build();
-        }
-
-        internal class Builder<TItem> : IBuilderRequired<TItem>, IBuilderOptional<TItem>
-        {
-            private IAsyncPageStore<TItem> _pageStore;
-            private IScheduler _observeScheduler;
-            private ITaskBasedCountFetcher _countFetcher;
-
-            
-
-            public IDataVirtualizingCollection<TItem> Build()
-            {
-                return new TaskBasedAsyncDataVirtualizingCollection<TItem>(
-                    _pageStore, 
-                    _countFetcher, 
-                    _observeScheduler);
-            }
-
-            public IBuilderOptional<TItem> WithPageStore(
-                IAsyncPageStore<TItem> pageStore,
-                ITaskBasedCountFetcher countFetcher,
-                IScheduler subscribeScheduler,
-                IScheduler observeScheduler)
-            {
-                _pageStore = pageStore;
-                _countFetcher = countFetcher;
-                _observeScheduler = observeScheduler;
-                return this;
-            }
-        }
-
-        #endregion
-
         private readonly IAsyncPageStore<T> _pageStore;
 
         private readonly Task<int> _countTask;
         private int _count;
 
-        private TaskBasedAsyncDataVirtualizingCollection(
+        internal TaskBasedAsyncDataVirtualizingCollection(
             IAsyncPageStore<T> pageStore, 
             ITaskBasedCountFetcher countFetcher, 
             IScheduler observeScheduler)

@@ -6,50 +6,9 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
 {
     internal class SyncDataVirtualizingCollection<T> : DataVirtualizingCollectionBase<T>
     {
-        #region Builder
-
-        internal static IDataVirtualizingCollectionBuilderRequired<T> CreateBuilder() => new Builder<T>();
-
-        internal interface IDataVirtualizingCollectionBuilderRequired<TItem>
-        {
-            IDataVirtualizingCollectionBuilderOptional<TItem> WithPageStore(
-                ISyncPageStore<TItem> pageStore,
-                ICountFetcher countFetcher);
-        }
-        internal interface IDataVirtualizingCollectionBuilderOptional<TItem>
-        {
-            IDataVirtualizingCollection<TItem> Build();
-        }
-
-        internal class Builder<TItem> : IDataVirtualizingCollectionBuilderRequired<TItem>, IDataVirtualizingCollectionBuilderOptional<TItem>
-        {
-            private ISyncPageStore<TItem> _pageStore;
-            private ICountFetcher _countFetcher;
-
-            
-
-            public IDataVirtualizingCollection<TItem> Build()
-            {
-                return new SyncDataVirtualizingCollection<TItem>(
-                    _pageStore, 
-                    _countFetcher);
-            }
-
-            public IDataVirtualizingCollectionBuilderOptional<TItem> WithPageStore(
-                ISyncPageStore<TItem> pageStore,
-                ICountFetcher countFetcher)
-            {
-                _pageStore = pageStore;
-                _countFetcher = countFetcher;
-                return this;
-            }
-        }
-
-        #endregion
-
         private readonly ISyncPageStore<T> _pageStore;
 
-        private SyncDataVirtualizingCollection(
+        internal SyncDataVirtualizingCollection(
             ISyncPageStore<T> pageStore,
             ICountFetcher countFetcher)
         {

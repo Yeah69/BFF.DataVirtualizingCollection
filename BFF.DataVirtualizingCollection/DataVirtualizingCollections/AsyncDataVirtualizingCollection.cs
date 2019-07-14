@@ -9,57 +9,9 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
 {
     internal class AsyncDataVirtualizingCollection<T> : DataVirtualizingCollectionBase<T>
     {
-        #region Builder
-
-        internal static IBuilderRequired<T> CreateBuilder() => new Builder<T>();
-
-        internal interface IBuilderRequired<TItem>
-        {
-            IBuilderOptional<TItem> WithPageStore(
-                IAsyncPageStore<TItem> pageStore,
-                ICountFetcher countFetcher,
-                IScheduler subscribeScheduler,
-                IScheduler observeScheduler);
-        }
-        internal interface IBuilderOptional<TItem>
-        {
-            IDataVirtualizingCollection<TItem> Build();
-        }
-
-        internal class Builder<TItem> : IBuilderRequired<TItem>, IBuilderOptional<TItem>
-        {
-            private IAsyncPageStore<TItem> _pageStore;
-            private IScheduler _observeScheduler;
-            private ICountFetcher _countFetcher;
-
-            
-
-            public IDataVirtualizingCollection<TItem> Build()
-            {
-                return new AsyncDataVirtualizingCollection<TItem>(
-                    _pageStore, 
-                    _countFetcher, 
-                    _observeScheduler);
-            }
-
-            public IBuilderOptional<TItem> WithPageStore(
-                IAsyncPageStore<TItem> pageStore,
-                ICountFetcher countFetcher,
-                IScheduler subscribeScheduler,
-                IScheduler observeScheduler)
-            {
-                _pageStore = pageStore;
-                _countFetcher = countFetcher;
-                _observeScheduler = observeScheduler;
-                return this;
-            }
-        }
-
-        #endregion
-
         private readonly IAsyncPageStore<T> _pageStore;
 
-        private AsyncDataVirtualizingCollection(
+        internal AsyncDataVirtualizingCollection(
             IAsyncPageStore<T> pageStore, 
             ICountFetcher countFetcher, 
             IScheduler observeScheduler)

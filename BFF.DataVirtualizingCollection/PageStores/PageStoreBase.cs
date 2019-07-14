@@ -13,7 +13,7 @@ namespace BFF.DataVirtualizingCollection.PageStores
 {
     internal abstract class PageStoreBase<T> : ISyncPageStore<T>
     {
-        protected readonly int PageSize = 100;
+        protected readonly int PageSize;
         protected readonly IDictionary<int, T[]> PageStore = new Dictionary<int, T[]>();
 
         internal PageStoreBase(int pageSize)
@@ -125,7 +125,7 @@ namespace BFF.DataVirtualizingCollection.PageStores
 
         protected readonly T Placeholder;
 
-        protected bool DisposeOnArrival = false;
+        protected bool DisposeOnArrival;
 
         protected AsyncPageStoreBase(
             int pageSize,

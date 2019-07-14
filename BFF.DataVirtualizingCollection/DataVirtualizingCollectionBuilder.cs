@@ -272,163 +272,86 @@ namespace BFF.DataVirtualizingCollection
 
         private IDataVirtualizingCollection<T> GenerateCollection()
         {
-            switch (_pageLoadingBehavior)
+            switch (_indexAccessBehavior, _fetchersKind)
             {
-                case PageLoadingBehavior.NonPreloading when
-                _fetchersKind == FetchersKind.NonTaskBased
-                && _indexAccessBehavior == IndexAccessBehavior.Synchronous:
+                case (IndexAccessBehavior.Synchronous, FetchersKind.NonTaskBased):
                 {
                     var dataAccess = new RelayBasicSyncDataAccess<T>(_pageFetcher, _countFetcher);
-                    var pageStore = new SyncNonPreloadingNonTaskBasedPageStore<T> (
-                        _pageSize, 
-                        dataAccess, 
-                        _pageHoldingBehavior);
-                    return SyncDataVirtualizingCollection<T>
-                        .CreateBuilder()
-                        .WithPageStore(
-                            pageStore,
-                            dataAccess)
-                        .Build();
+                    var pageStore = _pageLoadingBehavior switch
+                        {
+                        PageLoadingBehavior.NonPreloading => (ISyncPageStore<T>)new SyncNonPreloadingNonTaskBasedPageStore<T>(
+                            _pageSize,
+                            dataAccess,
+                            _pageHoldingBehavior),
+                        PageLoadingBehavior.Preloading => new SyncPreloadingNonTaskBasedPageStore<T>(
+                            _pageSize,
+                            dataAccess,
+                            _pageHoldingBehavior),
+                        _ => throw new ArgumentException("Can't build data-virtualizing collection with given input.")
+                        };
+                    return new SyncDataVirtualizingCollection<T>(pageStore, dataAccess);
                 }
-                case PageLoadingBehavior.NonPreloading when
-                _fetchersKind == FetchersKind.NonTaskBased
-                && _indexAccessBehavior == IndexAccessBehavior.Asynchronous:
+                case (IndexAccessBehavior.Synchronous, FetchersKind.TaskBased):
+                {
+                    var dataAccess = new RelayBasicTaskBasedSyncDataAccess<T>(_taskBasedPageFetcher, _taskBasedCountFetcher);
+                    var pageStore = _pageLoadingBehavior switch
+                        {
+                        PageLoadingBehavior.NonPreloading => (ISyncPageStore<T>)new SyncNonPreloadingTaskBasedPageStore<T>(
+                            _pageSize,
+                            dataAccess,
+                            _pageHoldingBehavior),
+                        PageLoadingBehavior.Preloading => new SyncPreloadingTaskBasedPageStore<T>(
+                            _pageSize,
+                            dataAccess,
+                            _pageHoldingBehavior),
+                        _ => throw new ArgumentException("Can't build data-virtualizing collection with given input.")
+                        };
+                    return new TaskBasedSyncDataVirtualizingCollection<T>(pageStore, dataAccess);
+                }
+                case (IndexAccessBehavior.Asynchronous, FetchersKind.NonTaskBased):
                 {
                     var dataAccess = new RelayBasicAsyncDataAccess<T>(_pageFetcher, _countFetcher, _placeholderFactory);
-                    var pageStore = new AsyncNonPreloadingNonTaskBasedPageStore<T>(
-                        _pageSize, 
-                        dataAccess, 
-                        dataAccess,
-                        _backgroundScheduler,
-                        _pageHoldingBehavior);
-                    return AsyncDataVirtualizingCollection<T>
-                        .CreateBuilder()
-                        .WithPageStore(
-                            pageStore,
-                            dataAccess, 
-                            _backgroundScheduler,
-                            _notificationScheduler)
-                        .Build();
-                }
-                
-                case PageLoadingBehavior.NonPreloading when
-                    _fetchersKind == FetchersKind.TaskBased
-                && _indexAccessBehavior == IndexAccessBehavior.Synchronous:
-                {
-                    var dataAccess =
-                        new RelayBasicTaskBasedSyncDataAccess<T>(_taskBasedPageFetcher, _taskBasedCountFetcher);
-                    var pageStore =
-                        new SyncNonPreloadingTaskBasedPageStore<T>(_pageSize, dataAccess, _pageHoldingBehavior);
-                    return TaskBasedSyncDataVirtualizingCollection<T>
-                        .CreateBuilder()
-                        .WithPageStore(
-                            pageStore,
-                            dataAccess)
-                        .Build();
-                }
-                case PageLoadingBehavior.NonPreloading when
-                _fetchersKind == FetchersKind.TaskBased
-                && _indexAccessBehavior == IndexAccessBehavior.Asynchronous:
-                {
-                    var dataAccess =
-                        new RelayBasicTaskBasedAsyncDataAccess<T>(_taskBasedPageFetcher, _taskBasedCountFetcher, _placeholderFactory);
-                    var pageStore = new AsyncNonPreloadingTaskBasedPageStore<T>(
-                        _pageSize, 
-                        dataAccess,
-                        dataAccess,
-                        _backgroundScheduler,
-                        _pageHoldingBehavior);
-                    return TaskBasedAsyncDataVirtualizingCollection<T>
-                        .CreateBuilder()
-                        .WithPageStore(
-                            pageStore,
-                            dataAccess,
-                            _backgroundScheduler,
-                            _notificationScheduler)
-                        .Build();
-                }
-
-
-
-
-                case PageLoadingBehavior.Preloading when
-                _fetchersKind == FetchersKind.NonTaskBased
-                && _indexAccessBehavior == IndexAccessBehavior.Synchronous:
-                    {
-                        var dataAccess = new RelayBasicSyncDataAccess<T>(_pageFetcher, _countFetcher);
-                        var pageStore = new SyncPreloadingNonTaskBasedPageStore<T>(
-                            _pageSize,
-                            dataAccess, 
-                            _pageHoldingBehavior);
-                        return SyncDataVirtualizingCollection<T>
-                            .CreateBuilder()
-                            .WithPageStore(
-                                pageStore,
-                                dataAccess)
-                            .Build();
-                    }
-                case PageLoadingBehavior.Preloading when
-                _fetchersKind == FetchersKind.NonTaskBased
-                && _indexAccessBehavior == IndexAccessBehavior.Asynchronous:
-                    {
-                        var dataAccess = new RelayBasicAsyncDataAccess<T>(_pageFetcher, _countFetcher, _placeholderFactory);
-                        var pageStore = new AsyncNonPreloadingNonTaskBasedPageStore<T>(
+                    var pageStore = _pageLoadingBehavior switch
+                        {
+                        PageLoadingBehavior.NonPreloading => (IAsyncPageStore<T>)new AsyncNonPreloadingNonTaskBasedPageStore<T>(
                             _pageSize,
                             dataAccess,
-                            dataAccess, 
-                            _backgroundScheduler,
-                            _pageHoldingBehavior);
-                        return AsyncDataVirtualizingCollection<T>
-                            .CreateBuilder()
-                            .WithPageStore(
-                                pageStore,
-                                dataAccess,
-                                _backgroundScheduler,
-                                _notificationScheduler)
-                            .Build();
-                    }
-
-                case PageLoadingBehavior.Preloading when
-                _fetchersKind == FetchersKind.TaskBased
-                && _indexAccessBehavior == IndexAccessBehavior.Synchronous:
-                    {
-                        var dataAccess =
-                            new RelayBasicTaskBasedSyncDataAccess<T>(_taskBasedPageFetcher, _taskBasedCountFetcher);
-                        var pageStore = new SyncPreloadingTaskBasedPageStore<T>(
-                            _pageSize, 
                             dataAccess,
-                            _pageHoldingBehavior);
-                        return TaskBasedSyncDataVirtualizingCollection<T>
-                            .CreateBuilder()
-                            .WithPageStore(
-                                pageStore,
-                                dataAccess)
-                            .Build();
-                    }
-                case PageLoadingBehavior.Preloading when
-                _fetchersKind == FetchersKind.TaskBased
-                && _indexAccessBehavior == IndexAccessBehavior.Asynchronous:
-                    {
-                        var dataAccess =
-                            new RelayBasicTaskBasedAsyncDataAccess<T>(_taskBasedPageFetcher, _taskBasedCountFetcher, _placeholderFactory);
-                        var pageStore = new AsyncPreloadingTaskBasedPageStore<T>(
-                            _pageSize, 
-                            dataAccess, 
-                            dataAccess, 
-                            _backgroundScheduler, 
-                            _pageHoldingBehavior);
-                        return TaskBasedAsyncDataVirtualizingCollection<T>
-                            .CreateBuilder()
-                            .WithPageStore(
-                                pageStore,
-                                dataAccess,
-                                _backgroundScheduler,
-                                _notificationScheduler)
-                            .Build();
-                    }
+                            _backgroundScheduler,
+                            _pageHoldingBehavior),
+                        PageLoadingBehavior.Preloading => new AsyncPreloadingNonTaskBasedPageStore<T>(
+                            _pageSize,
+                            dataAccess,
+                            dataAccess,
+                            _backgroundScheduler,
+                            _pageHoldingBehavior),
+                        _ => throw new ArgumentException("Can't build data-virtualizing collection with given input.")
+                        };
+                    return new AsyncDataVirtualizingCollection<T>(pageStore, dataAccess, _notificationScheduler);
+                }
+                case (IndexAccessBehavior.Asynchronous, FetchersKind.TaskBased):
+                {
+                    var dataAccess = new RelayBasicTaskBasedAsyncDataAccess<T>(_taskBasedPageFetcher, _taskBasedCountFetcher, _placeholderFactory);
+                    var pageStore = _pageLoadingBehavior switch
+                        {
+                        PageLoadingBehavior.NonPreloading => (IAsyncPageStore<T>)new AsyncNonPreloadingTaskBasedPageStore<T>(
+                            _pageSize,
+                            dataAccess,
+                            dataAccess,
+                            _backgroundScheduler,
+                            _pageHoldingBehavior),
+                        PageLoadingBehavior.Preloading => new AsyncPreloadingTaskBasedPageStore<T>(
+                            _pageSize,
+                            dataAccess,
+                            dataAccess,
+                            _backgroundScheduler,
+                            _pageHoldingBehavior),
+                        _ => throw new ArgumentException("Can't build data-virtualizing collection with given input.")
+                        };
+                    return new TaskBasedAsyncDataVirtualizingCollection<T>(pageStore, dataAccess, _notificationScheduler);
+                }
+                default: throw new ArgumentException("Can't build data-virtualizing collection with given input.");
             }
-
-            throw new ArgumentException("Couldn't create a collection based on given settings.");
         }
     }
 }
