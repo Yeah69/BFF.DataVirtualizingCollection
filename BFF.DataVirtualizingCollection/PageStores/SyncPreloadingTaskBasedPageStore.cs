@@ -17,61 +17,17 @@ namespace BFF.DataVirtualizingCollection.PageStores
     
     internal class SyncPreloadingTaskBasedPageStore<T> : SyncPageStoreBase<T>, ISyncPreloadingTaskBasedPageStore<T>
     {
-        internal static IBuilderRequired<T> CreateBuilder() => new Builder<T>();
-
-        internal interface IBuilderOptional<out TItem>
-        {
-            IBuilderOptional<TItem> WithPageSize(int pageSize);
-
-            ISyncPreloadingTaskBasedPageStore<TItem> Build();
-        }
-
-        internal interface IBuilderRequired<TItem>
-        {
-            IBuilderOptional<TItem> With(
-                IBasicTaskBasedSyncDataAccess<TItem> dataAccess,
-                Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory);
-        }
-
-        internal class Builder<TItem> : IBuilderRequired<TItem>, IBuilderOptional<TItem>
-        {
-            private IBasicTaskBasedSyncDataAccess<TItem> _dataAccess;
-            private int _pageSize = 100;
-            private Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>>
-                _pageReplacementStrategyFactory;
-
-            public IBuilderOptional<TItem> With(
-                IBasicTaskBasedSyncDataAccess<TItem> dataAccess,
-                Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory)
-            {
-                _dataAccess = dataAccess;
-                _pageReplacementStrategyFactory = pageReplacementStrategyFactory;
-                return this;
-            }
-
-            public IBuilderOptional<TItem> WithPageSize(int pageSize)
-            {
-                _pageSize = pageSize;
-                return this;
-            }
-
-            public ISyncPreloadingTaskBasedPageStore<TItem> Build()
-            {
-                return new SyncPreloadingTaskBasedPageStore<TItem>(_dataAccess, _pageReplacementStrategyFactory)
-                {
-                    PageSize = _pageSize
-                };
-            }
-        }
-
         private readonly ITaskBasedPageFetcher<T> _pageFetcher;
 
         private readonly IDictionary<int, Task<T[]>> _preloadingTasks = new Dictionary<int, Task<T[]>>();
 
-        private SyncPreloadingTaskBasedPageStore(
+        internal SyncPreloadingTaskBasedPageStore(
+            int pageSize,
             ITaskBasedPageFetcher<T> pageFetcher,
             Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory)
-            : base(pageReplacementStrategyFactory)
+            : base(
+                pageSize, 
+                pageReplacementStrategyFactory)
         {
             _pageFetcher = pageFetcher;
         }

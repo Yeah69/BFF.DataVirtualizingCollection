@@ -19,66 +19,19 @@ namespace BFF.DataVirtualizingCollection.PageStores
     
     internal class AsyncNonPreloadingNonTaskBasedPageStore<T> : AsyncPageStoreBase<T>, IAsyncNonPreloadingNonTaskBasedPageStore<T>
     {
-        internal static IBuilderRequired<T> CreateBuilder() => new Builder<T>();
-
-        internal interface IBuilderOptional<TItem>
-        {
-            IBuilderOptional<TItem> WithPageSize(int pageSize);
-
-            IAsyncNonPreloadingNonTaskBasedPageStore<TItem> Build();
-        }
-
-        internal interface IBuilderRequired<TItem>
-        {
-            IBuilderOptional<TItem> With(
-                IBasicAsyncDataAccess<TItem> dataAccess, 
-                IScheduler subscribeScheduler,
-                Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory);
-        }
-
-        internal class Builder<TItem> : IBuilderRequired<TItem>, IBuilderOptional<TItem>
-        {
-            private IBasicAsyncDataAccess<TItem> _dataAccess;
-            private int _pageSize = 100;
-            private IScheduler _subscribeScheduler;
-
-            private Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>>
-                _pageReplacementStrategyFactory;
-
-            public IBuilderOptional<TItem> With(
-                IBasicAsyncDataAccess<TItem> dataAccess, 
-                IScheduler subscribeScheduler,
-                Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory)
-            {
-                _dataAccess = dataAccess;
-                _subscribeScheduler = subscribeScheduler;
-                _pageReplacementStrategyFactory = pageReplacementStrategyFactory;
-                return this;
-            }
-
-            public IBuilderOptional<TItem> WithPageSize(int pageSize)
-            {
-                _pageSize = pageSize;
-                return this;
-            }
-
-            public IAsyncNonPreloadingNonTaskBasedPageStore<TItem> Build()
-            {
-                return new AsyncNonPreloadingNonTaskBasedPageStore<TItem>(_dataAccess, _dataAccess, _subscribeScheduler, _pageReplacementStrategyFactory)
-                {
-                    PageSize = _pageSize
-                };
-            }
-        }
-
         private readonly Subject<int> _pageRequests = new Subject<int>();
 
-        private AsyncNonPreloadingNonTaskBasedPageStore(
+        internal AsyncNonPreloadingNonTaskBasedPageStore(
+            int pageSize,
             IPageFetcher<T> pageFetcher,
             IPlaceholderFactory<T> placeholderFactory,
             IScheduler subscribeScheduler,
             Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory) 
-            : base(placeholderFactory, subscribeScheduler, pageReplacementStrategyFactory)
+            : base(
+                pageSize, 
+                placeholderFactory, 
+                subscribeScheduler,
+                pageReplacementStrategyFactory)
         {
             CompositeDisposable.Add(_pageRequests);
 
@@ -89,7 +42,7 @@ namespace BFF.DataVirtualizingCollection.PageStores
                 {
                     var offset = pageKey * PageSize;
                     var actualPageSize = Math.Min(PageSize, Count - offset);
-                    T[] page = pageFetcher.PageFetch(offset, actualPageSize);
+                    var page = pageFetcher.PageFetch(offset, actualPageSize);
                     if(DisposeOnArrival)
                         PageDisposal(page);
                     else

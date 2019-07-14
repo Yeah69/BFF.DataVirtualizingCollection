@@ -13,8 +13,13 @@ namespace BFF.DataVirtualizingCollection.PageStores
 {
     internal abstract class PageStoreBase<T> : ISyncPageStore<T>
     {
-        protected int PageSize = 100;
+        protected readonly int PageSize = 100;
         protected readonly IDictionary<int, T[]> PageStore = new Dictionary<int, T[]>();
+
+        internal PageStoreBase(int pageSize)
+        {
+            PageSize = pageSize;
+        }
 
         public int Count { get; set; }
 
@@ -57,7 +62,10 @@ namespace BFF.DataVirtualizingCollection.PageStores
         protected readonly ISubject<(int PageKey, int PageIndex)> Requests;
         private readonly CompositeDisposable _compositeDisposable = new CompositeDisposable();
 
-        protected SyncPageStoreBase(Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory)
+        protected SyncPageStoreBase(
+            int pageSize,
+            Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory)
+            : base (pageSize)
         {
             Requests = new Subject<(int PageKey, int PageIndex)>().AddTo(_compositeDisposable);
             pageReplacementStrategyFactory(Requests)
@@ -120,9 +128,11 @@ namespace BFF.DataVirtualizingCollection.PageStores
         protected bool DisposeOnArrival = false;
 
         protected AsyncPageStoreBase(
+            int pageSize,
             IPlaceholderFactory<T> placeholderFactory,
             IScheduler subscribeScheduler,
             Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory)
+            : base(pageSize)
         {
             _subscribeScheduler = subscribeScheduler;
             Placeholder = placeholderFactory.CreatePlaceholder();

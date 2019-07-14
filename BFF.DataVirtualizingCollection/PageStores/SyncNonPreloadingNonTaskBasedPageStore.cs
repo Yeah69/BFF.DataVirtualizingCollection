@@ -16,59 +16,15 @@ namespace BFF.DataVirtualizingCollection.PageStores
     
     internal class SyncNonPreloadingNonTaskBasedPageStore<T> : SyncPageStoreBase<T>, ISyncNonPreloadingNonTaskBasedPageStore<T>
     {
-        internal static IBuilderRequired<T> CreateBuilder() => new Builder<T>();
-
-        internal interface IBuilderOptional<out TItem>
-        {
-            IBuilderOptional<TItem> WithPageSize(int pageSize);
-
-            ISyncNonPreloadingNonTaskBasedPageStore<TItem> Build();
-        }
-
-        internal interface IBuilderRequired<TItem>
-        {
-            IBuilderOptional<TItem> With(
-                IBasicSyncDataAccess<TItem> dataAccess,
-                Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory);
-        }
-
-        internal class Builder<TItem> : IBuilderRequired<TItem>, IBuilderOptional<TItem>
-        {
-            private IBasicSyncDataAccess<TItem> _dataAccess;
-            private int _pageSize = 100;
-            private Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>>
-                _pageReplacementStrategyFactory;
-
-            public IBuilderOptional<TItem> With(
-                IBasicSyncDataAccess<TItem> dataAccess,
-                Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory)
-            {
-                _dataAccess = dataAccess;
-                _pageReplacementStrategyFactory = pageReplacementStrategyFactory;
-                return this;
-            }
-
-            public IBuilderOptional<TItem> WithPageSize(int pageSize)
-            {
-                _pageSize = pageSize;
-                return this;
-            }
-
-            public ISyncNonPreloadingNonTaskBasedPageStore<TItem> Build()
-            {
-                return new SyncNonPreloadingNonTaskBasedPageStore<TItem>(_dataAccess, _pageReplacementStrategyFactory)
-                {
-                    PageSize = _pageSize
-                };
-            }
-        }
-
         private readonly IPageFetcher<T> _pageFetcher;
 
-        private SyncNonPreloadingNonTaskBasedPageStore(
+        internal SyncNonPreloadingNonTaskBasedPageStore(
+            int pageSize,
             IPageFetcher<T> pageFetcher,
             Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory)
-            : base (pageReplacementStrategyFactory)
+            : base(
+                pageSize,
+                pageReplacementStrategyFactory)
         {
             _pageFetcher = pageFetcher;
         }

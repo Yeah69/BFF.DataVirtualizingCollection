@@ -279,11 +279,10 @@ namespace BFF.DataVirtualizingCollection
                 && _indexAccessBehavior == IndexAccessBehavior.Synchronous:
                 {
                     var dataAccess = new RelayBasicSyncDataAccess<T>(_pageFetcher, _countFetcher);
-                    var pageStore = SyncNonPreloadingNonTaskBasedPageStore<T>
-                        .CreateBuilder()
-                        .With(dataAccess, _pageHoldingBehavior)
-                        .WithPageSize(_pageSize)
-                        .Build();
+                    var pageStore = new SyncNonPreloadingNonTaskBasedPageStore<T> (
+                        _pageSize, 
+                        dataAccess, 
+                        _pageHoldingBehavior);
                     return SyncDataVirtualizingCollection<T>
                         .CreateBuilder()
                         .WithPageStore(
@@ -296,11 +295,12 @@ namespace BFF.DataVirtualizingCollection
                 && _indexAccessBehavior == IndexAccessBehavior.Asynchronous:
                 {
                     var dataAccess = new RelayBasicAsyncDataAccess<T>(_pageFetcher, _countFetcher, _placeholderFactory);
-                    var pageStore = AsyncNonPreloadingNonTaskBasedPageStore<T>
-                        .CreateBuilder()
-                        .With(dataAccess, _backgroundScheduler, _pageHoldingBehavior)
-                        .WithPageSize(_pageSize)
-                        .Build();
+                    var pageStore = new AsyncNonPreloadingNonTaskBasedPageStore<T>(
+                        _pageSize, 
+                        dataAccess, 
+                        dataAccess,
+                        _backgroundScheduler,
+                        _pageHoldingBehavior);
                     return AsyncDataVirtualizingCollection<T>
                         .CreateBuilder()
                         .WithPageStore(
@@ -317,11 +317,8 @@ namespace BFF.DataVirtualizingCollection
                 {
                     var dataAccess =
                         new RelayBasicTaskBasedSyncDataAccess<T>(_taskBasedPageFetcher, _taskBasedCountFetcher);
-                    var pageStore = SyncNonPreloadingTaskBasedPageStore<T>
-                        .CreateBuilder()
-                        .With(dataAccess, _pageHoldingBehavior)
-                        .WithPageSize(_pageSize)
-                        .Build();
+                    var pageStore =
+                        new SyncNonPreloadingTaskBasedPageStore<T>(_pageSize, dataAccess, _pageHoldingBehavior);
                     return TaskBasedSyncDataVirtualizingCollection<T>
                         .CreateBuilder()
                         .WithPageStore(
@@ -335,11 +332,12 @@ namespace BFF.DataVirtualizingCollection
                 {
                     var dataAccess =
                         new RelayBasicTaskBasedAsyncDataAccess<T>(_taskBasedPageFetcher, _taskBasedCountFetcher, _placeholderFactory);
-                        var pageStore = AsyncNonPreloadingTaskBasedPageStore<T>
-                        .CreateBuilder()
-                        .With(dataAccess, _backgroundScheduler, _pageHoldingBehavior)
-                        .WithPageSize(_pageSize)
-                        .Build();
+                    var pageStore = new AsyncNonPreloadingTaskBasedPageStore<T>(
+                        _pageSize, 
+                        dataAccess,
+                        dataAccess,
+                        _backgroundScheduler,
+                        _pageHoldingBehavior);
                     return TaskBasedAsyncDataVirtualizingCollection<T>
                         .CreateBuilder()
                         .WithPageStore(
@@ -358,11 +356,10 @@ namespace BFF.DataVirtualizingCollection
                 && _indexAccessBehavior == IndexAccessBehavior.Synchronous:
                     {
                         var dataAccess = new RelayBasicSyncDataAccess<T>(_pageFetcher, _countFetcher);
-                        var pageStore = SyncPreloadingNonTaskBasedPageStore<T>
-                            .CreateBuilder()
-                            .With(dataAccess, _pageHoldingBehavior)
-                            .WithPageSize(_pageSize)
-                            .Build();
+                        var pageStore = new SyncPreloadingNonTaskBasedPageStore<T>(
+                            _pageSize,
+                            dataAccess, 
+                            _pageHoldingBehavior);
                         return SyncDataVirtualizingCollection<T>
                             .CreateBuilder()
                             .WithPageStore(
@@ -375,11 +372,12 @@ namespace BFF.DataVirtualizingCollection
                 && _indexAccessBehavior == IndexAccessBehavior.Asynchronous:
                     {
                         var dataAccess = new RelayBasicAsyncDataAccess<T>(_pageFetcher, _countFetcher, _placeholderFactory);
-                        var pageStore = AsyncPreloadingNonTaskBasedPageStore<T>
-                            .CreateBuilder()
-                            .With(dataAccess, _backgroundScheduler, _pageHoldingBehavior)
-                            .WithPageSize(_pageSize)
-                            .Build();
+                        var pageStore = new AsyncNonPreloadingNonTaskBasedPageStore<T>(
+                            _pageSize,
+                            dataAccess,
+                            dataAccess, 
+                            _backgroundScheduler,
+                            _pageHoldingBehavior);
                         return AsyncDataVirtualizingCollection<T>
                             .CreateBuilder()
                             .WithPageStore(
@@ -396,11 +394,10 @@ namespace BFF.DataVirtualizingCollection
                     {
                         var dataAccess =
                             new RelayBasicTaskBasedSyncDataAccess<T>(_taskBasedPageFetcher, _taskBasedCountFetcher);
-                        var pageStore = SyncPreloadingTaskBasedPageStore<T>
-                            .CreateBuilder()
-                            .With(dataAccess, _pageHoldingBehavior)
-                            .WithPageSize(_pageSize)
-                            .Build();
+                        var pageStore = new SyncPreloadingTaskBasedPageStore<T>(
+                            _pageSize, 
+                            dataAccess,
+                            _pageHoldingBehavior);
                         return TaskBasedSyncDataVirtualizingCollection<T>
                             .CreateBuilder()
                             .WithPageStore(
@@ -414,11 +411,12 @@ namespace BFF.DataVirtualizingCollection
                     {
                         var dataAccess =
                             new RelayBasicTaskBasedAsyncDataAccess<T>(_taskBasedPageFetcher, _taskBasedCountFetcher, _placeholderFactory);
-                        var pageStore = AsyncPreloadingTaskBasedPageStore<T>
-                        .CreateBuilder()
-                        .With(dataAccess, _backgroundScheduler, _pageHoldingBehavior)
-                        .WithPageSize(_pageSize)
-                        .Build();
+                        var pageStore = new AsyncPreloadingTaskBasedPageStore<T>(
+                            _pageSize, 
+                            dataAccess, 
+                            dataAccess, 
+                            _backgroundScheduler, 
+                            _pageHoldingBehavior);
                         return TaskBasedAsyncDataVirtualizingCollection<T>
                             .CreateBuilder()
                             .WithPageStore(
