@@ -1,13 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2020
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28917.182
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BFF.DataVirtualizingCollection", "BFF.DataVirtualizingCollection\BFF.DataVirtualizingCollection.csproj", "{D4D769DA-F7A2-43F0-ADA7-5895D36D585F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BFF.DataVirtualizingCollection.Sample", "BFF.DataVirtualizingCollection.Sample\BFF.DataVirtualizingCollection.Sample.csproj", "{2A919529-A428-42F5-808B-387AA0CCACD2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BFF.DataVirtualizingCollection.Test", "BFF.DataVirtualizingCollection.Test\BFF.DataVirtualizingCollection.Test.csproj", "{F09BE363-223D-44B2-82BF-C3B3B3D6C547}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BFF.DataVirtualizingCollection.Test", "BFF.DataVirtualizingCollection.Test\BFF.DataVirtualizingCollection.Test.csproj", "{F09BE363-223D-44B2-82BF-C3B3B3D6C547}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Icon", "Icon", "{2536F943-EEC8-4CF7-B0B2-E3569E164152}"
+	ProjectSection(SolutionItems) = preProject
+		Icon\Yeah69Logo.ico = Icon\Yeah69Logo.ico
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -82,9 +82,10 @@ namespace BFF.DataVirtualizingCollection.Test.PageRemoval
             for (var i = 0; i <= expected; i += 100)
             {
                 var _ = ((IList<IDisposable>)collection)[i];
+                await Task.Delay(50);
             }
             collection.Dispose();
-            await Task.Delay(50);
+            await Task.Delay(5000);
 
             // Assert
             Assert.Equal(expected, set.Count);

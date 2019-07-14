@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using BFF.DataVirtualizingCollection.DataAccesses;
 
 namespace BFF.DataVirtualizingCollection.PageStores
@@ -11,11 +10,11 @@ namespace BFF.DataVirtualizingCollection.PageStores
     /// On Dispose all stored disposable elements are disposed before this store disposes itself.
     /// </summary>
     /// <typeparam name="T">The type of the stored elements.</typeparam>
-    internal interface IHoardingPreloadingSyncPageStore<out T> : ISyncPageStore<T>
+    internal interface ISyncNonPreloadingNonTaskBasedPageStore<out T> : ISyncPageStore<T>
     {
     }
     
-    internal class HoardingPreloadingSyncPageStore<T> : SyncPageStoreBase<T>, IHoardingPreloadingSyncPageStore<T>
+    internal class SyncNonPreloadingNonTaskBasedPageStore<T> : SyncPageStoreBase<T>, ISyncNonPreloadingNonTaskBasedPageStore<T>
     {
         internal static IBuilderRequired<T> CreateBuilder() => new Builder<T>();
 
@@ -23,12 +22,13 @@ namespace BFF.DataVirtualizingCollection.PageStores
         {
             IBuilderOptional<TItem> WithPageSize(int pageSize);
 
-            IHoardingPreloadingSyncPageStore<TItem> Build();
+            ISyncNonPreloadingNonTaskBasedPageStore<TItem> Build();
         }
 
         internal interface IBuilderRequired<TItem>
         {
-            IBuilderOptional<TItem> With(IBasicSyncDataAccess<TItem> dataAccess,
+            IBuilderOptional<TItem> With(
+                IBasicSyncDataAccess<TItem> dataAccess,
                 Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory);
         }
 
@@ -54,11 +54,9 @@ namespace BFF.DataVirtualizingCollection.PageStores
                 return this;
             }
 
-            public IHoardingPreloadingSyncPageStore<TItem> Build()
+            public ISyncNonPreloadingNonTaskBasedPageStore<TItem> Build()
             {
-                return new HoardingPreloadingSyncPageStore<TItem>(
-                    _dataAccess,
-                    _pageReplacementStrategyFactory)
+                return new SyncNonPreloadingNonTaskBasedPageStore<TItem>(_dataAccess, _pageReplacementStrategyFactory)
                 {
                     PageSize = _pageSize
                 };
@@ -67,52 +65,21 @@ namespace BFF.DataVirtualizingCollection.PageStores
 
         private readonly IPageFetcher<T> _pageFetcher;
 
-        private readonly IDictionary<int, Task<T[]>> _preloadingTasks = new Dictionary<int, Task<T[]>>();
-
-        private HoardingPreloadingSyncPageStore(
+        private SyncNonPreloadingNonTaskBasedPageStore(
             IPageFetcher<T> pageFetcher,
-            Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory) 
-            : base(pageReplacementStrategyFactory)
+            Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory)
+            : base (pageReplacementStrategyFactory)
         {
             _pageFetcher = pageFetcher;
         }
 
         protected override T OnPageNotContained(int pageKey, int pageIndex)
         {
-            if (!_preloadingTasks.TryGetValue(pageKey, out var loadingTask))
-                return FetchPage(pageKey)[pageIndex];
-
-            loadingTask.Wait();
-            _preloadingTasks.Remove(pageKey);
-            return loadingTask.IsFaulted || loadingTask.IsCanceled
-                ? FetchPage(pageKey)[pageIndex]
-                : loadingTask.Result[pageIndex];
-        }
-
-        protected override void OnPageContained(int pageKey)
-        {
-            var nextPageKey = pageKey + 1;
-            if (nextPageKey < Count % PageSize) PreloadPage(nextPageKey);
-
-            var previousPageKey = pageKey - 1;
-            if (previousPageKey >= 0) PreloadPage(previousPageKey);
-
-            void PreloadPage(int preloadingPageKey)
-            {
-                if (PageStore.ContainsKey(preloadingPageKey) || _preloadingTasks.ContainsKey(preloadingPageKey)) return;
-
-                Requests.OnNext((preloadingPageKey, -1));
-                _preloadingTasks[preloadingPageKey] = 
-                    Task.Run(() => FetchPage(preloadingPageKey));
-            }
-        }
-        private T[] FetchPage(int pageKey)
-        {
             var offset = pageKey * PageSize;
             var actualPageSize = Math.Min(PageSize, Count - offset);
             var page = _pageFetcher.PageFetch(offset, actualPageSize);
             PageStore[pageKey] = page;
-            return page;
+            return page[pageIndex];
         }
     }
 }

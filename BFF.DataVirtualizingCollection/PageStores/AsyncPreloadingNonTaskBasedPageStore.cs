@@ -14,11 +14,11 @@ namespace BFF.DataVirtualizingCollection.PageStores
     /// On Dispose all stored disposable elements are disposed before this store disposes itself.
     /// </summary>
     /// <typeparam name="T">The type of the stored elements.</typeparam>
-    internal interface IHoardingPreloadingTaskBasedAsyncPageStore<T> : IAsyncPageStore<T>
+    internal interface IAsyncPreloadingNonTaskBasedPageStore<T> : IAsyncPageStore<T>
     {
     }
 
-    internal class HoardingPreloadingTaskBasedAsyncPageStore<T> : AsyncPageStoreBase<T>, IHoardingPreloadingTaskBasedAsyncPageStore<T>
+    internal class AsyncPreloadingNonTaskBasedPageStore<T> : AsyncPageStoreBase<T>, IAsyncPreloadingNonTaskBasedPageStore<T>
     {
         internal static IBuilderRequired<T> CreateBuilder() => new Builder<T>();
 
@@ -26,27 +26,27 @@ namespace BFF.DataVirtualizingCollection.PageStores
         {
             IBuilderOptional<TItem> WithPageSize(int pageSize);
 
-            IHoardingPreloadingTaskBasedAsyncPageStore<TItem> Build();
+            IAsyncPreloadingNonTaskBasedPageStore<TItem> Build();
         }
 
         internal interface IBuilderRequired<TItem>
         {
             IBuilderOptional<TItem> With(
-                IBasicTaskBasedAsyncDataAccess<TItem> dataAccess, 
+                IBasicAsyncDataAccess<TItem> dataAccess, 
                 IScheduler subscribeScheduler,
                 Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory);
         }
 
         internal class Builder<TItem> : IBuilderRequired<TItem>, IBuilderOptional<TItem>
         {
-            private IBasicTaskBasedAsyncDataAccess<TItem> _dataAccess;
+            private IBasicAsyncDataAccess<TItem> _dataAccess;
             private int _pageSize = 100;
             private IScheduler _subscribeScheduler;
             private Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>>
                 _pageReplacementStrategyFactory;
 
             public IBuilderOptional<TItem> With(
-                IBasicTaskBasedAsyncDataAccess<TItem> dataAccess, 
+                IBasicAsyncDataAccess<TItem> dataAccess, 
                 IScheduler subscribeScheduler,
                 Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory)
             {
@@ -62,23 +62,23 @@ namespace BFF.DataVirtualizingCollection.PageStores
                 return this;
             }
 
-            public IHoardingPreloadingTaskBasedAsyncPageStore<TItem> Build()
+            public IAsyncPreloadingNonTaskBasedPageStore<TItem> Build()
             {
-                return new HoardingPreloadingTaskBasedAsyncPageStore<TItem>(_dataAccess, _dataAccess, _subscribeScheduler, _pageReplacementStrategyFactory)
+                return new AsyncPreloadingNonTaskBasedPageStore<TItem>(_dataAccess, _dataAccess, _subscribeScheduler, _pageReplacementStrategyFactory)
                 {
                     PageSize = _pageSize
                 };
             }
         }
 
-        private readonly ITaskBasedPageFetcher<T> _pageFetcher;
+        private readonly IPageFetcher<T> _pageFetcher;
 
         private readonly Subject<int> _pageRequests = new Subject<int>();
 
         private readonly IDictionary<int, Task<T[]>> _preloadingTasks = new Dictionary<int, Task<T[]>>();
 
-        private HoardingPreloadingTaskBasedAsyncPageStore(
-            ITaskBasedPageFetcher<T> pageFetcher,
+        private AsyncPreloadingNonTaskBasedPageStore(
+            IPageFetcher<T> pageFetcher,
             IPlaceholderFactory<T> placeholderFactory,
             IScheduler subscribeScheduler,
             Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory) 
@@ -91,37 +91,50 @@ namespace BFF.DataVirtualizingCollection.PageStores
             _pageRequests
                 .ObserveOn(subscribeScheduler)
                 .Distinct()
-                .SelectMany(async pageKey =>
+                .Subscribe(pageKey =>
                 {
                     T[] page;
                     if (!_preloadingTasks.TryGetValue(pageKey, out var loadingTask))
-                        page = await FetchPageAsync(pageKey).ConfigureAwait(false);
+                        page = FetchPage(pageKey);
                     else
                     {
                         loadingTask.Wait();
                         _preloadingTasks.Remove(pageKey);
                         page = loadingTask.IsFaulted || loadingTask.IsCanceled
-                            ? await FetchPageAsync(pageKey).ConfigureAwait(false)
-                            : await loadingTask.ConfigureAwait(false);
+                            ? FetchPage(pageKey)
+                            : loadingTask.Result;
                     }
 
-                    return (PageKey: pageKey, Page: page);
-                })
-                .Subscribe(e =>
-                {
-                    if (DeferredRequests.ContainsKey(e.PageKey))
+                    if (DeferredRequests.ContainsKey(pageKey))
                     {
-                        var disposable = DeferredRequests[e.PageKey]
+                        var disposable = DeferredRequests[pageKey]
                             .ObserveOn(subscribeScheduler)
                             .Distinct()
                             .Subscribe(tuple =>
                             {
                                 OnCollectionChangedReplaceSubject.OnNext(
-                                    (e.Page[tuple.Item1], tuple.Item2, e.PageKey * PageSize + tuple.Item1));
-                            }, () => DeferredRequests.Remove(e.PageKey));
+                                    (page[tuple.Item1], tuple.Item2, pageKey * PageSize + tuple.Item1));
+                            }, () => DeferredRequests.Remove(pageKey));
                         CompositeDisposable.Add(disposable);
                     }
                 });
+        }
+        
+        private void PreloadingPages(int pk)
+        {
+            var nextPageKey = pk + 1;
+            if (nextPageKey < Count % PageSize) PreloadPage(nextPageKey);
+
+            var previousPageKey = pk - 1;
+            if (previousPageKey >= 0) PreloadPage(previousPageKey);
+
+            void PreloadPage(int preloadingPageKey)
+            {
+                if (PageStore.ContainsKey(preloadingPageKey) || _preloadingTasks.ContainsKey(preloadingPageKey)) return;
+
+                Requests.OnNext((preloadingPageKey, -1));
+                _preloadingTasks[preloadingPageKey] = Task.Run(() => FetchPage(preloadingPageKey));
+            }
         }
 
         protected override void OnPageContained(int pageKey)
@@ -145,30 +158,15 @@ namespace BFF.DataVirtualizingCollection.PageStores
             return Placeholder;
         }
 
-        private void PreloadingPages(int pageKey)
-        {
-            var nextPageKey = pageKey + 1;
-            if(nextPageKey < Count % PageSize) PreloadPage(nextPageKey);
-
-            var previousPageKey = pageKey - 1;
-            if (previousPageKey >= 0) PreloadPage(previousPageKey);
-
-            void PreloadPage(int preloadingPageKey)
-            {
-                if (PageStore.ContainsKey(preloadingPageKey) || _preloadingTasks.ContainsKey(preloadingPageKey)) return;
-
-                Requests.OnNext((preloadingPageKey, -1));
-                _preloadingTasks[preloadingPageKey] = 
-                    Task.Run(() => FetchPageAsync(preloadingPageKey));
-            }
-        }
-
-        private async Task<T[]> FetchPageAsync(int pageKey)
+        private T[] FetchPage(int pageKey)
         {
             var offset = pageKey * PageSize;
             var actualPageSize = Math.Min(PageSize, Count - offset);
-            var page = await _pageFetcher.PageFetchAsync(offset, actualPageSize).ConfigureAwait(false);
-            PageStore[pageKey] = page;
+            var page = _pageFetcher.PageFetch(offset, actualPageSize);
+            if (DisposeOnArrival)
+                PageDisposal(page);
+            else
+                PageStore[pageKey] = page;
             return page;
         }
     }

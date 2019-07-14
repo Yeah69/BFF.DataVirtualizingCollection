@@ -13,11 +13,11 @@ namespace BFF.DataVirtualizingCollection.PageStores
     /// On Dispose all stored disposable elements are disposed before this store disposes itself.
     /// </summary>
     /// <typeparam name="T">The type of the stored elements.</typeparam>
-    internal interface IHoardingAsyncPageStore<T> : IAsyncPageStore<T>
+    internal interface IAsyncNonPreloadingNonTaskBasedPageStore<T> : IAsyncPageStore<T>
     {
     }
     
-    internal class HoardingAsyncPageStore<T> : AsyncPageStoreBase<T>, IHoardingAsyncPageStore<T>
+    internal class AsyncNonPreloadingNonTaskBasedPageStore<T> : AsyncPageStoreBase<T>, IAsyncNonPreloadingNonTaskBasedPageStore<T>
     {
         internal static IBuilderRequired<T> CreateBuilder() => new Builder<T>();
 
@@ -25,7 +25,7 @@ namespace BFF.DataVirtualizingCollection.PageStores
         {
             IBuilderOptional<TItem> WithPageSize(int pageSize);
 
-            IHoardingAsyncPageStore<TItem> Build();
+            IAsyncNonPreloadingNonTaskBasedPageStore<TItem> Build();
         }
 
         internal interface IBuilderRequired<TItem>
@@ -62,9 +62,9 @@ namespace BFF.DataVirtualizingCollection.PageStores
                 return this;
             }
 
-            public IHoardingAsyncPageStore<TItem> Build()
+            public IAsyncNonPreloadingNonTaskBasedPageStore<TItem> Build()
             {
-                return new HoardingAsyncPageStore<TItem>(_dataAccess, _dataAccess, _subscribeScheduler, _pageReplacementStrategyFactory)
+                return new AsyncNonPreloadingNonTaskBasedPageStore<TItem>(_dataAccess, _dataAccess, _subscribeScheduler, _pageReplacementStrategyFactory)
                 {
                     PageSize = _pageSize
                 };
@@ -73,7 +73,7 @@ namespace BFF.DataVirtualizingCollection.PageStores
 
         private readonly Subject<int> _pageRequests = new Subject<int>();
 
-        private HoardingAsyncPageStore(
+        private AsyncNonPreloadingNonTaskBasedPageStore(
             IPageFetcher<T> pageFetcher,
             IPlaceholderFactory<T> placeholderFactory,
             IScheduler subscribeScheduler,
@@ -90,7 +90,10 @@ namespace BFF.DataVirtualizingCollection.PageStores
                     var offset = pageKey * PageSize;
                     var actualPageSize = Math.Min(PageSize, Count - offset);
                     T[] page = pageFetcher.PageFetch(offset, actualPageSize);
-                    PageStore[pageKey] = page;
+                    if(DisposeOnArrival)
+                        PageDisposal(page);
+                    else
+                        PageStore[pageKey] = page;
                     if (DeferredRequests.ContainsKey(pageKey))
                     {
                         var disposable = DeferredRequests[pageKey]

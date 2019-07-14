@@ -43,7 +43,7 @@ namespace BFF.DataVirtualizingCollection.PageStores
             PageStore.Clear();
         }
 
-        private static void PageDisposal(T[] page)
+        protected static void PageDisposal(T[] page)
         {
             foreach (var disposable in page.OfType<IDisposable>())
             {
@@ -117,6 +117,8 @@ namespace BFF.DataVirtualizingCollection.PageStores
 
         protected readonly T Placeholder;
 
+        protected bool DisposeOnArrival = false;
+
         protected AsyncPageStoreBase(
             IPlaceholderFactory<T> placeholderFactory,
             IScheduler subscribeScheduler,
@@ -164,6 +166,7 @@ namespace BFF.DataVirtualizingCollection.PageStores
 
         public override void Dispose()
         {
+            DisposeOnArrival = true;
             _subscribeScheduler.MinimalSchedule(() =>
             {
                 CompositeDisposable.Dispose();
