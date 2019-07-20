@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
 {
@@ -21,5 +22,9 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
         INotifyPropertyChanged,
         IDisposable
     {
+        /// <summary>
+        /// Task is successfully completed when initialization is completed
+        /// </summary>
+        Task InitializationCompleted { get; }
     }
 }

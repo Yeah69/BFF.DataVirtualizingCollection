@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reactive.Concurrency;
+using System.Threading;
 using System.Threading.Tasks;
 using BFF.DataVirtualizingCollection.DataVirtualizingCollections;
 
@@ -201,12 +202,27 @@ namespace BFF.DataVirtualizingCollection.Test
             fetchersKind switch
                 {
                 FetchersKind.NonTaskBased => fetchersKindCollectionBuilder.NonTaskBasedFetchers(
-                    pageFetcher,
-                    countFetcher),
-                FetchersKind.TaskBased => fetchersKindCollectionBuilder.TaskBasedFetchers(
                     (offset, pSize) =>
-                        Task.FromResult(pageFetcher(offset, pSize)),
-                    () => Task.FromResult(countFetcher())),
+                    {
+                        Thread.Sleep(25);
+                        return pageFetcher(offset, pSize);
+                    },
+                    () =>
+                    {
+                        Thread.Sleep(25);
+                        return countFetcher();
+                    }),
+                FetchersKind.TaskBased => fetchersKindCollectionBuilder.TaskBasedFetchers(
+                    async (offset, pSize) =>
+                    {
+                        await Task.Delay(25);
+                        return pageFetcher(offset, pSize);
+                    },
+                    async () =>
+                    {
+                        await Task.Delay(25);
+                        return countFetcher();
+                    }),
                 _ => throw new Exception("Test configuration failed!")
                 };
 
@@ -220,7 +236,7 @@ namespace BFF.DataVirtualizingCollection.Test
                 IndexAccessBehavior.Asynchronous => indexAccessBehaviorCollectionBuilder.AsyncIndexAccess(
                     placeholderFactory,
                     TaskPoolScheduler.Default,
-                    NewThreadScheduler.Default),
+                    new EventLoopScheduler()),
                 _ => throw new Exception("Test configuration failed!")
                 };
     }

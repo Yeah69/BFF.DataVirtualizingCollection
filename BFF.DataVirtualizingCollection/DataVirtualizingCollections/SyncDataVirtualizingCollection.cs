@@ -1,29 +1,29 @@
-﻿using BFF.DataVirtualizingCollection.DataAccesses;
+﻿using System;
+using System.Threading.Tasks;
 using BFF.DataVirtualizingCollection.Extensions;
-using BFF.DataVirtualizingCollection.PageStores;
+using BFF.DataVirtualizingCollection.PageStorage;
 
 namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
 {
-    internal class SyncDataVirtualizingCollection<T> : DataVirtualizingCollectionBase<T>
+    internal sealed class SyncDataVirtualizingCollection<T> : DataVirtualizingCollectionBase<T>
     {
-        private readonly ISyncPageStore<T> _pageStore;
+        private readonly IPageStorage<T> _pageStorage;
 
         internal SyncDataVirtualizingCollection(
-            ISyncPageStore<T> pageStore,
-            ICountFetcher countFetcher)
+            Func<int, IPageStorage<T>> pageStoreFactory,
+            Func<int> countFetcher)
         {
-            _pageStore = pageStore.AddTo(CompositeDisposable);
-
-            Count = countFetcher.CountFetch();
-
-            _pageStore.Count = Count;
+            Count = countFetcher();
+            _pageStorage = pageStoreFactory(Count).AddTo(CompositeDisposable);
         }
 
         protected override int Count { get; }
 
         protected override T GetItemInner(int index)
         {
-            return _pageStore.Fetch(index);
+            return _pageStorage[index];
         }
+
+        public override Task InitializationCompleted { get; } = Task.CompletedTask;
     }
 }

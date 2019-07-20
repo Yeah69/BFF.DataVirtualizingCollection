@@ -38,6 +38,8 @@ namespace BFF.DataVirtualizingCollection.Test.DataAccess
                 6969,
                 100);
 
+            await collection.InitializationCompleted;
+
             // Act
             var placeholder = ((IList<int>)collection)[0];
             await Task.Delay(50);
@@ -63,6 +65,8 @@ namespace BFF.DataVirtualizingCollection.Test.DataAccess
                 indexAccessBehavior,
                 6969,
                 100);
+
+            await collection.InitializationCompleted;
 
             // Act
             var placeholder = ((IList<int>)collection)[69];
@@ -90,6 +94,8 @@ namespace BFF.DataVirtualizingCollection.Test.DataAccess
                 6969,
                 100);
 
+            await collection.InitializationCompleted;
+
             // Act
             var placeholder = ((IList<int>)collection)[123];
             await Task.Delay(50);
@@ -115,6 +121,8 @@ namespace BFF.DataVirtualizingCollection.Test.DataAccess
                 indexAccessBehavior,
                 6969,
                 100);
+
+            await collection.InitializationCompleted;
 
             // Act
             var placeholder = ((IList<int>)collection)[6000];
@@ -142,6 +150,8 @@ namespace BFF.DataVirtualizingCollection.Test.DataAccess
                 6969,
                 100);
 
+            await collection.InitializationCompleted;
+
             // Act
             var placeholder = ((IList<int>)collection)[6968];
             await Task.Delay(50);
@@ -153,7 +163,7 @@ namespace BFF.DataVirtualizingCollection.Test.DataAccess
 
         [Theory]
         [MemberData(nameof(Combinations))]
-        public void BuildingCollectionWith6969Elements_6970thEntry_ThrowsIndexOutOfRangeException(
+        public async Task BuildingCollectionWith6969Elements_6970thEntry_ThrowsIndexOutOfRangeException(
             PageLoadingBehavior pageLoadingBehavior,
             PageRemovalBehavior pageRemovalBehavior,
             FetchersKind fetchersKind,
@@ -167,6 +177,8 @@ namespace BFF.DataVirtualizingCollection.Test.DataAccess
                 indexAccessBehavior,
                 6969,
                 100);
+
+            await collection.InitializationCompleted;
 
             // Act + Assert
             Assert.Throws<IndexOutOfRangeException>(() => ((IList<int>)collection)[6969]);
@@ -174,7 +186,7 @@ namespace BFF.DataVirtualizingCollection.Test.DataAccess
 
         [Theory]
         [MemberData(nameof(Combinations))]
-        public void BuildingCollectionWith6969Elements_MinusFirstEntry_ThrowsIndexOutOfRangeException(
+        public async Task BuildingCollectionWith6969Elements_MinusFirstEntry_ThrowsIndexOutOfRangeException(
             PageLoadingBehavior pageLoadingBehavior,
             PageRemovalBehavior pageRemovalBehavior,
             FetchersKind fetchersKind,
@@ -188,6 +200,8 @@ namespace BFF.DataVirtualizingCollection.Test.DataAccess
                 indexAccessBehavior,
                 6969,
                 100);
+
+            await collection.InitializationCompleted;
 
             // Act + Assert
             Assert.Throws<IndexOutOfRangeException>(() => ((IList<int>)collection)[-1]);
@@ -209,6 +223,8 @@ namespace BFF.DataVirtualizingCollection.Test.DataAccess
                 indexAccessBehavior,
                 6969,
                 23);
+
+            await collection.InitializationCompleted;
 
             // Act
             var placeholder = ((IList<int>)collection)[69];

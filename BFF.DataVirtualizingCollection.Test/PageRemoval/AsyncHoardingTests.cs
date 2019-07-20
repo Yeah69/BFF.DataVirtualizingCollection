@@ -42,6 +42,8 @@ namespace BFF.DataVirtualizingCollection.Test.PageRemoval
                         .ToArray(),
                 Disposable.Empty);
 
+            await collection.InitializationCompleted;
+
             // Act
             for (var i = 0; i <= 6900; i += 100)
             {
@@ -78,6 +80,8 @@ namespace BFF.DataVirtualizingCollection.Test.PageRemoval
                         .ToArray(),
                 Disposable.Empty);
 
+            await collection.InitializationCompleted;
+
             // Act
             for (var i = 0; i <= expected; i += 100)
             {
@@ -85,7 +89,6 @@ namespace BFF.DataVirtualizingCollection.Test.PageRemoval
                 await Task.Delay(50);
             }
             collection.Dispose();
-            await Task.Delay(5000);
 
             // Assert
             Assert.Equal(expected, set.Count);

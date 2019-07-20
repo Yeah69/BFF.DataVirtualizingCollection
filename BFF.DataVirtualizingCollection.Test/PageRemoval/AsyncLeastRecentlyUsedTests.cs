@@ -57,6 +57,8 @@ namespace BFF.DataVirtualizingCollection.Test.PageRemoval
                 10,
                 1);
 
+            await collection.InitializationCompleted;
+
             // Act
             for (var i = 0; i <= 900; i += 100)
             {
@@ -94,6 +96,8 @@ namespace BFF.DataVirtualizingCollection.Test.PageRemoval
                 10,
                 1);
 
+            await collection.InitializationCompleted;
+
             // Act
             for (var i = 0; i <= 800; i += 100)
             {
@@ -130,6 +134,8 @@ namespace BFF.DataVirtualizingCollection.Test.PageRemoval
                 Disposable.Empty,
                 10,
                 1);
+
+            await collection.InitializationCompleted;
 
             // Act
             for (var i = 0; i <= 900; i += 100)
@@ -172,6 +178,8 @@ namespace BFF.DataVirtualizingCollection.Test.PageRemoval
                 Disposable.Empty,
                 10,
                 1);
+
+            await collection.InitializationCompleted;
 
             // Act
             for (var i = 0; i <= 800; i += 100)
@@ -216,6 +224,8 @@ namespace BFF.DataVirtualizingCollection.Test.PageRemoval
                 10,
                 1);
 
+            await collection.InitializationCompleted;
+
             // Act
             for (var i = 0; i <= 1000; i += 100)
             {
@@ -224,7 +234,8 @@ namespace BFF.DataVirtualizingCollection.Test.PageRemoval
             }
 
             // Assert
-            Assert.True(set.Count == expected.Length && set.IsSubsetOf(expected));
+            Assert.Equal(set.Count, expected.Length);
+            Assert.True(set.IsSubsetOf(expected));
 
         }
 
@@ -255,6 +266,8 @@ namespace BFF.DataVirtualizingCollection.Test.PageRemoval
                 10,
                 1);
 
+            await collection.InitializationCompleted;
+
             // Act
             for (var i = 0; i <= 900; i += 100)
             {
@@ -263,7 +276,8 @@ namespace BFF.DataVirtualizingCollection.Test.PageRemoval
             }
 
             // Assert
-            Assert.True(set.Count == expected.Length && set.IsSubsetOf(expected));
+            Assert.Equal(set.Count, expected.Length);
+            Assert.True(set.IsSubsetOf(expected));
 
         }
 
@@ -294,6 +308,8 @@ namespace BFF.DataVirtualizingCollection.Test.PageRemoval
                 10,
                 3);
 
+            await collection.InitializationCompleted;
+
             // Act
             for (var i = 0; i <= 1000; i += 100)
             {
@@ -302,7 +318,8 @@ namespace BFF.DataVirtualizingCollection.Test.PageRemoval
             }
 
             // Assert
-            Assert.True(set.Count == expected.Length && set.IsSubsetOf(expected));
+            Assert.Equal(set.Count, expected.Length);
+            Assert.True(set.IsSubsetOf(expected));
 
         }
 
@@ -333,6 +350,8 @@ namespace BFF.DataVirtualizingCollection.Test.PageRemoval
                 1,
                 1);
 
+            await collection.InitializationCompleted;
+
             // Act
             for (var i = 0; i <= 300; i += 100)
             {
@@ -341,7 +360,8 @@ namespace BFF.DataVirtualizingCollection.Test.PageRemoval
             }
 
             // Assert
-            Assert.True(set.Count == expected.Length && set.IsSubsetOf(expected));
+            Assert.Equal(set.Count, expected.Length);
+            Assert.True(set.IsSubsetOf(expected));
         }
 
         [Theory]
@@ -371,6 +391,8 @@ namespace BFF.DataVirtualizingCollection.Test.PageRemoval
                 4,
                 3);
 
+            await collection.InitializationCompleted;
+
             // Act
             for (var i = 0; i <= 300; i += 100)
             {
@@ -379,7 +401,8 @@ namespace BFF.DataVirtualizingCollection.Test.PageRemoval
             }
 
             // Assert
-            Assert.True(set.Count == expected.Length && set.IsSubsetOf(expected));
+            Assert.Equal(set.Count, expected.Length);
+            Assert.True(set.IsSubsetOf(expected));
         }
     }
 }

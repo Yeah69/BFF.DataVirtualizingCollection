@@ -3,7 +3,6 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:futaTill="clr-namespace:FutaTill"
     xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:sample="clr-namespace:BFF.DataVirtualizingCollection.Sample"
@@ -65,7 +64,7 @@
                         </ListBox.ItemContainerStyle>
                         <ListBox.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <futaTill:VirtualizingTilePanel ChildHeight="529" MinChildWidth="374" />
+                                <sample:VirtualizingTilePanel ChildHeight="529" MinChildWidth="374" />
                             </ItemsPanelTemplate>
                         </ListBox.ItemsPanel>
                         <ListBox.ItemTemplate>

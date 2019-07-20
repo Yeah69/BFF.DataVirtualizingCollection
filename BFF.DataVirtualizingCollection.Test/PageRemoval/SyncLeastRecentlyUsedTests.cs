@@ -217,7 +217,8 @@ namespace BFF.DataVirtualizingCollection.Test.PageRemoval
             }
 
             // Assert
-            Assert.True(set.Count == expected.Length && set.IsSubsetOf(expected));
+            Assert.Equal(set.Count, expected.Length);
+            Assert.True(set.IsSubsetOf(expected));
 
         }
 
@@ -255,7 +256,8 @@ namespace BFF.DataVirtualizingCollection.Test.PageRemoval
             }
 
             // Assert
-            Assert.True(set.Count == expected.Length && set.IsSubsetOf(expected));
+            Assert.Equal(set.Count, expected.Length);
+            Assert.True(set.IsSubsetOf(expected));
 
         }
 
@@ -293,7 +295,8 @@ namespace BFF.DataVirtualizingCollection.Test.PageRemoval
             }
 
             // Assert
-            Assert.True(set.Count == expected.Length && set.IsSubsetOf(expected));
+            Assert.Equal(set.Count, expected.Length);
+            Assert.True(set.IsSubsetOf(expected));
 
         }
 
@@ -332,7 +335,8 @@ namespace BFF.DataVirtualizingCollection.Test.PageRemoval
             }
 
             // Assert
-            Assert.True(set.Count == expected.Length && set.IsSubsetOf(expected));
+            Assert.Equal(set.Count, expected.Length);
+            Assert.True(set.IsSubsetOf(expected));
         }
 
         [Theory]
@@ -369,7 +373,8 @@ namespace BFF.DataVirtualizingCollection.Test.PageRemoval
             }
 
             // Assert
-            Assert.True(set.Count == expected.Length && set.IsSubsetOf(expected));
+            Assert.Equal(set.Count, expected.Length);
+            Assert.True(set.IsSubsetOf(expected));
         }
     }
 }

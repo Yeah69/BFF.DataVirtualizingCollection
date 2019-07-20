@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
 {
@@ -144,6 +145,7 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
 
         public void Dispose()
         {
+            InitializationCompleted.Wait();
             CompositeDisposable.Dispose();
         }
 
@@ -156,5 +158,7 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        public abstract Task InitializationCompleted { get; }
     }
 }
