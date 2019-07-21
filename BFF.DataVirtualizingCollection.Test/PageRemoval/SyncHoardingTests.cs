@@ -54,14 +54,14 @@ namespace BFF.DataVirtualizingCollection.Test.PageRemoval
 
         [Theory]
         [MemberData(nameof(Combinations))]
-        public void With6969ElementsAndPageSize100_GetAnElementFromEachPageDisposeCollection_AllDisposed(
+        public void With69ElementsAndPageSize10_GetAnElementFromEachPageDisposeCollection_AllDisposed(
             PageLoadingBehavior pageLoadingBehavior,
             PageRemovalBehavior pageRemovalBehavior,
             FetchersKind fetchersKind,
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            const int expected = 69696;
+            const int expected = 69;
             var set = new HashSet<int>();
             var collection = Factory.CreateCollectionWithCustomPageFetchingLogic(
                 pageLoadingBehavior,
@@ -69,7 +69,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageRemoval
                 fetchersKind,
                 indexAccessBehavior,
                 expected,
-                100,
+                10,
                 (offset, pSize) =>
                     Enumerable
                         .Range(offset, pSize)
@@ -78,7 +78,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageRemoval
                 Disposable.Empty);
 
             // Act
-            for (var i = 0; i <= expected; i += 100)
+            for (var i = 0; i <= expected; i += 10)
             {
                 var _ = ((IList<IDisposable>)collection)[i];
             }

@@ -215,12 +215,12 @@ namespace BFF.DataVirtualizingCollection.Test
                 FetchersKind.TaskBased => fetchersKindCollectionBuilder.TaskBasedFetchers(
                     async (offset, pSize) =>
                     {
-                        await Task.Delay(25);
+                        await Task.Delay(25).ConfigureAwait(false);
                         return pageFetcher(offset, pSize);
                     },
                     async () =>
                     {
-                        await Task.Delay(25);
+                        await Task.Delay(25).ConfigureAwait(false);
                         return countFetcher();
                     }),
                 _ => throw new Exception("Test configuration failed!")
@@ -235,7 +235,7 @@ namespace BFF.DataVirtualizingCollection.Test
                 IndexAccessBehavior.Synchronous => indexAccessBehaviorCollectionBuilder.SyncIndexAccess(),
                 IndexAccessBehavior.Asynchronous => indexAccessBehaviorCollectionBuilder.AsyncIndexAccess(
                     placeholderFactory,
-                    TaskPoolScheduler.Default,
+                    new EventLoopScheduler(),
                     new EventLoopScheduler()),
                 _ => throw new Exception("Test configuration failed!")
                 };

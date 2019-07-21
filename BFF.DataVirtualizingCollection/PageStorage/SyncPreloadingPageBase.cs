@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 
 namespace BFF.DataVirtualizingCollection.PageStorage
 {
@@ -16,8 +17,10 @@ namespace BFF.DataVirtualizingCollection.PageStorage
 
         internal SyncPreloadingPageBase(
             int pageSize,
-            IScheduler scheduler)
+            [NotNull] IScheduler scheduler)
         {
+            scheduler = scheduler ?? throw new ArgumentNullException(nameof(scheduler));
+
             _pageSize = pageSize;
             _scheduler = scheduler;
 
@@ -49,9 +52,12 @@ namespace BFF.DataVirtualizingCollection.PageStorage
         internal SyncPreloadingNonTaskBasedPage(
             int offset,
             int pageSize,
-            Func<int, int, T[]> pageFetcher,
-            IScheduler scheduler) : base(pageSize, scheduler)
+            [NotNull] Func<int, int, T[]> pageFetcher,
+            [NotNull] IScheduler scheduler) : base(pageSize, scheduler)
         {
+            pageFetcher = pageFetcher ?? throw new ArgumentNullException(nameof(pageFetcher));
+            scheduler = scheduler ?? throw new ArgumentNullException(nameof(scheduler));
+
             PageContent = Observable
                 .Start(() => pageFetcher(offset, pageSize), scheduler)
                 .RunAsync(CancellationToken.None);
@@ -63,9 +69,12 @@ namespace BFF.DataVirtualizingCollection.PageStorage
         internal SyncPreloadingTaskBasedPage(
             int offset,
             int pageSize,
-            Func<int, int, Task<T[]>> pageFetcher,
-            IScheduler scheduler) : base(pageSize, scheduler)
+            [NotNull] Func<int, int, Task<T[]>> pageFetcher,
+            [NotNull] IScheduler scheduler) : base(pageSize, scheduler)
         {
+            pageFetcher = pageFetcher ?? throw new ArgumentNullException(nameof(pageFetcher));
+            scheduler = scheduler ?? throw new ArgumentNullException(nameof(scheduler));
+
             PageContent = Observable
                 .StartAsync(() => pageFetcher(offset, pageSize), scheduler)
                 .RunAsync(CancellationToken.None);

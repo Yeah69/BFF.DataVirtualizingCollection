@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 
 namespace BFF.DataVirtualizingCollection.PageStorage
 {
@@ -35,8 +36,10 @@ namespace BFF.DataVirtualizingCollection.PageStorage
         internal SyncNonPreloadingNonTaskBasedPage(
             int offset,
             int pageSize,
-            Func<int, int, T[]> pageFetcher) : base(pageSize)
+            [NotNull] Func<int, int, T[]> pageFetcher) : base(pageSize)
         {
+            pageFetcher = pageFetcher ?? throw new ArgumentNullException(nameof(pageFetcher));
+
             PageContent = pageFetcher(offset, pageSize);
         }
     }
@@ -46,8 +49,10 @@ namespace BFF.DataVirtualizingCollection.PageStorage
         internal SyncNonPreloadingTaskBasedPage(
             int offset,
             int pageSize,
-            Func<int, int, Task<T[]>> pageFetcher) : base(pageSize)
+            [NotNull] Func<int, int, Task<T[]>> pageFetcher) : base(pageSize)
         {
+            pageFetcher = pageFetcher ?? throw new ArgumentNullException(nameof(pageFetcher));
+
             // The blocking call to Result is accepted because this is the sync access mode
             PageContent = pageFetcher(offset, pageSize).Result;
         }

@@ -6,6 +6,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 using BFF.DataVirtualizingCollection.Extensions;
 using BFF.DataVirtualizingCollection.PageRemoval;
+using JetBrains.Annotations;
 
 namespace BFF.DataVirtualizingCollection.PageStorage
 {
@@ -30,10 +31,14 @@ namespace BFF.DataVirtualizingCollection.PageStorage
             int pageSize,
             int count,
             bool isPreloadingActive,
-            Func<int, int, IPage<T>> nonPreloadingPage,
-            Func<int, int, IPage<T>> preloadingPage,
-            Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory)
+            [NotNull] Func<int, int, IPage<T>> nonPreloadingPage,
+            [CanBeNull] Func<int, int, IPage<T>> preloadingPage,
+            [NotNull] Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory)
         {
+            nonPreloadingPage = nonPreloadingPage ?? throw new ArgumentNullException(nameof(nonPreloadingPage));
+            pageReplacementStrategyFactory = pageReplacementStrategyFactory ?? throw new ArgumentNullException(nameof(pageReplacementStrategyFactory));
+            if (!isPreloadingActive && preloadingPage is null) throw new ArgumentNullException(nameof(preloadingPage));
+
             _pageSize = pageSize;
             _count = count;
             _pageCount = count % pageSize == 0 

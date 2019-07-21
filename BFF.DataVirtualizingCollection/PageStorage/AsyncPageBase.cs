@@ -4,6 +4,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 
 namespace BFF.DataVirtualizingCollection.PageStorage
 {
@@ -17,9 +18,12 @@ namespace BFF.DataVirtualizingCollection.PageStorage
 
         internal AsyncPageBase(
             int pageSize,
-            Func<T> placeholderFactory,
-            IScheduler scheduler)
+            [NotNull] Func<T> placeholderFactory,
+            [NotNull] IScheduler scheduler)
         {
+            placeholderFactory = placeholderFactory ?? throw new ArgumentNullException(nameof(placeholderFactory));
+            scheduler = scheduler ?? throw new ArgumentNullException(nameof(scheduler));
+
             _pageSize = pageSize;
             _scheduler = scheduler;
             Page = Enumerable
@@ -28,18 +32,11 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                 .ToArray();
         }
 
-        public T this[int index]
-        {
-            get
-            {
-                if (index >= _pageSize || index < 0)
-                    throw new IndexOutOfRangeException(
-                        "Index was out of range. Must be non-negative and less than the size of the collection.");
-
-                return Page[index];
-                            
-            }
-        }
+        public T this[int index] =>
+            index >= _pageSize || index < 0
+                ? throw new IndexOutOfRangeException(
+                    "Index was out of range. Must be non-negative and less than the size of the collection.")
+                : Page[index];
 
         public void Dispose()
         {
@@ -62,12 +59,16 @@ namespace BFF.DataVirtualizingCollection.PageStorage
         internal AsyncNonTaskBasedPage(
             int offset,
             int pageSize,
-            Func<int, int, T[]> pageFetcher,
-            Func<T> placeholderFactory,
-            IScheduler scheduler,
-            IObserver<(int Offset, int PageSize, T[] PreviousPage, T[] Page)> pageArrivalObservations) 
+            [NotNull] Func<int, int, T[]> pageFetcher,
+            [NotNull] Func<T> placeholderFactory,
+            [NotNull] IScheduler scheduler,
+            [NotNull] IObserver<(int Offset, int PageSize, T[] PreviousPage, T[] Page)> pageArrivalObservations) 
             : base(pageSize, placeholderFactory, scheduler)
         {
+            pageFetcher = pageFetcher ?? throw new ArgumentNullException(nameof(pageFetcher));
+            scheduler = scheduler ?? throw new ArgumentNullException(nameof(scheduler));
+            pageArrivalObservations = pageArrivalObservations ?? throw new ArgumentNullException(nameof(pageArrivalObservations));
+
             PageFetchCompletion = Observable
                 .Start(() =>
                 {
@@ -86,12 +87,16 @@ namespace BFF.DataVirtualizingCollection.PageStorage
         internal AsyncTaskBasedPage(
             int offset,
             int pageSize,
-            Func<int, int, Task<T[]>> pageFetcher,
-            Func<T> placeholderFactory,
-            IScheduler scheduler,
-            IObserver<(int Offset, int PageSize, T[] PreviousPage, T[] Page)> pageArrivalObservations)
+            [NotNull] Func<int, int, Task<T[]>> pageFetcher,
+            [NotNull] Func<T> placeholderFactory,
+            [NotNull] IScheduler scheduler,
+            [NotNull] IObserver<(int Offset, int PageSize, T[] PreviousPage, T[] Page)> pageArrivalObservations)
             : base(pageSize, placeholderFactory, scheduler)
         {
+            pageFetcher = pageFetcher ?? throw new ArgumentNullException(nameof(pageFetcher));
+            scheduler = scheduler ?? throw new ArgumentNullException(nameof(scheduler));
+            pageArrivalObservations = pageArrivalObservations ?? throw new ArgumentNullException(nameof(pageArrivalObservations));
+
             PageFetchCompletion = Observable
                 .StartAsync(async () =>
                 {
