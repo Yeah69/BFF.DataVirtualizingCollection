@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace BFF.DataVirtualizingCollection.Test.DataAccess
+namespace BFF.DataVirtualizingCollection.Test.Integration.DataAccess
 {
     public class AsyncDataAccessTests
     {
