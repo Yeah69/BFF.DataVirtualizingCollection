@@ -3,6 +3,7 @@ using System.Reactive.Disposables;
 using System.Threading.Tasks;
 using BFF.DataVirtualizingCollection.PageStorage;
 using Xunit;
+// ReSharper disable AssignNullToNotNullAttribute *** Testing exception on null passing
 
 namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
 {
@@ -53,6 +54,7 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
         }
     }
 
+    // ReSharper disable once UnusedMember.Global
     public class SyncNonPreloadingNonTaskBasedPageTests : SyncNonPreloadingPageBaseTestsBase
     {
         internal override IPage<int> PageWithPageSizeOne =>
@@ -69,6 +71,7 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
         }
     }
 
+    // ReSharper disable once UnusedMember.Global
     public class SyncNonPreloadingTaskBasedPageTests : SyncNonPreloadingPageBaseTestsBase
     {
         internal override IPage<int> PageWithPageSizeOne =>

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reactive.Disposables;
 using Xunit;
 
-namespace BFF.DataVirtualizingCollection.Test.PageRemoval
+namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
 {
     public class SyncHoardingTests
     {

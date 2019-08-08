@@ -5,7 +5,7 @@ using System.Reactive.Disposables;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace BFF.DataVirtualizingCollection.Test.PageRemoval
+namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
 {
     public class AsyncLeastRecentlyUsedTests
     {

@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BFF.DataVirtualizingCollection.DataVirtualizingCollections;
 
-namespace BFF.DataVirtualizingCollection.Test
+namespace BFF.DataVirtualizingCollection.Test.Integration
 {
     public enum PageLoadingBehavior
     {

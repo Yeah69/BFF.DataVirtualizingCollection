@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Xunit;
 
-namespace BFF.DataVirtualizingCollection.Test.DataAccess
+namespace BFF.DataVirtualizingCollection.Test.Integration.DataAccess
 {
     public class SyncDataAccessTests
     {

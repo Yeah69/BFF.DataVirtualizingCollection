@@ -7,6 +7,9 @@ using NSubstitute;
 using NSubstitute.Extensions;
 using NSubstitute.ReceivedExtensions;
 using Xunit;
+// ReSharper disable UnusedVariable *** Necessary for some tests
+// ReSharper disable AssignNullToNotNullAttribute *** Testing exception on null passing
+// ReSharper disable AccessToDisposedClosure *** Controlled disposal
 
 namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
 {
