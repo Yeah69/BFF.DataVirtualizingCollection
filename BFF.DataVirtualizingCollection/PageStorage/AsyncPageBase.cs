@@ -45,12 +45,17 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                 .StartAsync(async () =>
                 {
                     await PageFetchCompletion;
-                    foreach (var disposable in Page.OfType<IDisposable>())
-                    {
-                        disposable.Dispose();
-                    }
+                    DisposePageItems(Page);
                     PageFetchCompletion.Dispose();
                 }, _scheduler);
+        }
+
+        protected static void DisposePageItems(T[] page)
+        {
+            foreach (var disposable in page.OfType<IDisposable>())
+            {
+                disposable.Dispose();
+            }
         }
     }
 
@@ -74,6 +79,7 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                 {
                     var previousPage = Page;
                     Page = pageFetcher(offset, pageSize);
+                    DisposePageItems(previousPage);
                     if (!IsDisposed)
                         pageArrivalObservations.OnNext((offset, pageSize, previousPage, Page));
                 }, scheduler)
@@ -102,6 +108,7 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                 {
                     var previousPage = Page;
                     Page = await pageFetcher(offset, pageSize);
+                    DisposePageItems(previousPage);
                     if (!IsDisposed)
                         pageArrivalObservations.OnNext((offset, pageSize, previousPage, Page));
                 }, scheduler)

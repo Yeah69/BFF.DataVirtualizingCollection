@@ -22,6 +22,8 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
 
         internal abstract AsyncPageBase<IDisposable> PageWithDisposable(IDisposable disposable);
 
+        internal abstract AsyncPageBase<IDisposable> PageWithDisposablePlaceholder(IDisposable disposable);
+
         [Fact]
         internal void Constructor_PageFetcherNull_ThrowsArgumentNullException()
         {
@@ -106,6 +108,21 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
 
             // Assert
             Assert.Equal(69, value);
+        }
+
+        [Fact]
+        internal async Task Index_PlaceholderIsDisposable_DisposePlaceholderWhenActualPageArrives()
+        {
+            // Arrange
+            var isDisposed = new TaskCompletionSource<Unit>();
+            var disposable = Disposable.Create(() => isDisposed.SetResult(Unit.Default));
+            using var sut = PageWithDisposablePlaceholder(disposable);
+
+            // Act
+            var _ = sut[0];
+
+            // Assert
+            await isDisposed.Task.ToObservable().Timeout(TimeSpan.FromSeconds(5)).ToTask();
         }
     }
 
@@ -200,6 +217,22 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
                     DefaultScheduler.Instance,
                     Observer.Create<(int Offset, int PageSize, IDisposable[] PreviousPage, IDisposable[] Page)>(_ => { }));
         }
+
+        internal override AsyncPageBase<IDisposable> PageWithDisposablePlaceholder(IDisposable disposable)
+        {
+            return
+                new AsyncNonTaskBasedPage<IDisposable>(
+                    0,
+                    1,
+                    (offset, pageSize) =>
+                    {
+                        Thread.Sleep(10);
+                        return new []{ Disposable.Empty };
+                    },
+                    () => disposable,
+                    DefaultScheduler.Instance,
+                    Observer.Create<(int Offset, int PageSize, IDisposable[] PreviousPage, IDisposable[] Page)>(_ => { }));
+        }
     }
 
     // ReSharper disable once UnusedMember.Global
@@ -290,6 +323,22 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
                         return new[] { disposable };
                     },
                     () => Disposable.Empty,
+                    DefaultScheduler.Instance,
+                    Observer.Create<(int Offset, int PageSize, IDisposable[] PreviousPage, IDisposable[] Page)>(_ => { }));
+        }
+
+        internal override AsyncPageBase<IDisposable> PageWithDisposablePlaceholder(IDisposable disposable)
+        {
+            return
+                new AsyncTaskBasedPage<IDisposable>(
+                    0,
+                    1,
+                    async (offset, pageSize) =>
+                    {
+                        await Task.Delay(10);
+                        return new[] { Disposable.Empty };
+                    },
+                    () => disposable,
                     DefaultScheduler.Instance,
                     Observer.Create<(int Offset, int PageSize, IDisposable[] PreviousPage, IDisposable[] Page)>(_ => { }));
         }
