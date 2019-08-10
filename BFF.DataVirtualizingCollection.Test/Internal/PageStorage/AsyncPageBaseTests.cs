@@ -115,8 +115,12 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
         internal override IPage<int> PageWithPageSizeOne =>
             new AsyncNonTaskBasedPage<int>(
                 0, 
-                1, 
-                (offset, pageSize) => new[] { 69 }, 
+                1,
+                (offset, pageSize) =>
+                {
+                    Thread.Sleep(10);
+                    return new[] { 69 };
+                }, 
                 () => 23, 
                 DefaultScheduler.Instance, 
                 Observer.Create<(int Offset, int PageSize, int[] PreviousPage, int[] Page)>(_ => { }));
@@ -133,7 +137,11 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
             new AsyncNonTaskBasedPage<int>(
                 0,
                 1,
-                (offset, pageSize) => new[] { 69 },
+                (offset, pageSize) =>
+                {
+                    Thread.Sleep(10);
+                    return new[] { 69 };
+                },
                 null,
                 DefaultScheduler.Instance,
                 Observer.Create<(int Offset, int PageSize, int[] PreviousPage, int[] Page)>(_ => { }));
@@ -142,7 +150,11 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
             new AsyncNonTaskBasedPage<int>(
                 0,
                 1,
-                (offset, pageSize) => new[] { 69 },
+                (offset, pageSize) =>
+                {
+                    Thread.Sleep(10);
+                    return new[] { 69 };
+                },
                 () => 23,
                 null,
                 Observer.Create<(int Offset, int PageSize, int[] PreviousPage, int[] Page)>(_ => { }));
@@ -151,7 +163,11 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
             new AsyncNonTaskBasedPage<int>(
                 0,
                 1,
-                (offset, pageSize) => new[] { 69 },
+                (offset, pageSize) =>
+                {
+                    Thread.Sleep(10);
+                    return new[] { 69 };
+                },
                 () => 23,
                 DefaultScheduler.Instance,
                 null);
@@ -160,7 +176,11 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
             new AsyncNonTaskBasedPage<int>(
                 0,
                 1,
-                (offset, pageSize) => new[] { 69 },
+                (offset, pageSize) =>
+                {
+                    Thread.Sleep(10);
+                    return new[] {69};
+                },
                 () => 23,
                 DefaultScheduler.Instance,
                 Observer.Create<(int Offset, int PageSize, int[] PreviousPage, int[] Page)>(_ => { }));
@@ -189,7 +209,11 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
             new AsyncTaskBasedPage<int>(
                 0,
                 1,
-                (offset, pageSize) => Task.FromResult(new[] { 69 }),
+                async (offset, pageSize) =>
+                {
+                    await Task.Delay(10);
+                    return new[] { 69 };
+                },
                 () => 23,
                 DefaultScheduler.Instance,
                 Observer.Create<(int Offset, int PageSize, int[] PreviousPage, int[] Page)>(_ => { }));
@@ -206,7 +230,11 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
             new AsyncTaskBasedPage<int>(
                 0,
                 1,
-                (offset, pageSize) => Task.FromResult(new[] { 69 }),
+                async (offset, pageSize) =>
+                {
+                    await Task.Delay(10);
+                    return new[] { 69 };
+                },
                 null,
                 DefaultScheduler.Instance,
                 Observer.Create<(int Offset, int PageSize, int[] PreviousPage, int[] Page)>(_ => { }));
@@ -215,7 +243,11 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
             new AsyncTaskBasedPage<int>(
                 0,
                 1,
-                (offset, pageSize) => Task.FromResult(new[] { 69 }),
+                async (offset, pageSize) =>
+                {
+                    await Task.Delay(10);
+                    return new[] { 69 };
+                },
                 () => 23,
                 null,
                 Observer.Create<(int Offset, int PageSize, int[] PreviousPage, int[] Page)>(_ => { }));
@@ -224,7 +256,11 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
             new AsyncTaskBasedPage<int>(
                 0,
                 1,
-                (offset, pageSize) => Task.FromResult(new[] { 69 }),
+                async (offset, pageSize) =>
+                {
+                    await Task.Delay(10);
+                    return new[] { 69 };
+                },
                 () => 23,
                 DefaultScheduler.Instance,
                 null);
