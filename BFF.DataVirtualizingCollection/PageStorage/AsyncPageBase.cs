@@ -17,8 +17,9 @@ namespace BFF.DataVirtualizingCollection.PageStorage
         protected bool IsDisposed;
 
         internal AsyncPageBase(
+            int pageKey,
             int pageSize,
-            [NotNull] Func<T> placeholderFactory,
+            [NotNull] Func<int, int, T> placeholderFactory,
             [NotNull] IScheduler scheduler)
         {
             placeholderFactory = placeholderFactory ?? throw new ArgumentNullException(nameof(placeholderFactory));
@@ -28,7 +29,7 @@ namespace BFF.DataVirtualizingCollection.PageStorage
             _scheduler = scheduler;
             Page = Enumerable
                 .Range(0, pageSize)
-                .Select(_ => placeholderFactory())
+                .Select(pageIndex => placeholderFactory(pageKey, pageIndex))
                 .ToArray();
         }
 
@@ -62,13 +63,14 @@ namespace BFF.DataVirtualizingCollection.PageStorage
     internal sealed class AsyncNonTaskBasedPage<T> : AsyncPageBase<T>
     {
         internal AsyncNonTaskBasedPage(
+            int pageKey,
             int offset,
             int pageSize,
             [NotNull] Func<int, int, T[]> pageFetcher,
-            [NotNull] Func<T> placeholderFactory,
+            [NotNull] Func<int, int, T> placeholderFactory,
             [NotNull] IScheduler scheduler,
             [NotNull] IObserver<(int Offset, int PageSize, T[] PreviousPage, T[] Page)> pageArrivalObservations) 
-            : base(pageSize, placeholderFactory, scheduler)
+            : base(pageKey, pageSize, placeholderFactory, scheduler)
         {
             pageFetcher = pageFetcher ?? throw new ArgumentNullException(nameof(pageFetcher));
             scheduler = scheduler ?? throw new ArgumentNullException(nameof(scheduler));
@@ -91,13 +93,14 @@ namespace BFF.DataVirtualizingCollection.PageStorage
     internal sealed class AsyncTaskBasedPage<T> : AsyncPageBase<T>
     {
         internal AsyncTaskBasedPage(
+            int pageKey,
             int offset,
             int pageSize,
             [NotNull] Func<int, int, Task<T[]>> pageFetcher,
-            [NotNull] Func<T> placeholderFactory,
+            [NotNull] Func<int, int, T> placeholderFactory,
             [NotNull] IScheduler scheduler,
             [NotNull] IObserver<(int Offset, int PageSize, T[] PreviousPage, T[] Page)> pageArrivalObservations)
-            : base(pageSize, placeholderFactory, scheduler)
+            : base(pageKey,pageSize, placeholderFactory, scheduler)
         {
             pageFetcher = pageFetcher ?? throw new ArgumentNullException(nameof(pageFetcher));
             scheduler = scheduler ?? throw new ArgumentNullException(nameof(scheduler));

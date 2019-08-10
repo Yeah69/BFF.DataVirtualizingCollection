@@ -21,8 +21,8 @@ namespace BFF.DataVirtualizingCollection.PageStorage
         private readonly int _count;
         private readonly int _pageCount;
         private readonly bool _isPreloadingActive;
-        private readonly Func<int, int, IPage<T>> _nonPreloadingPageFactory;
-        private readonly Func<int, int, IPage<T>> _preloadingPageFactory;
+        private readonly Func<int, int, int, IPage<T>> _nonPreloadingPageFactory;
+        private readonly Func<int, int, int, IPage<T>> _preloadingPageFactory;
         private readonly ConcurrentDictionary<int, IPage<T>> _pages = new ConcurrentDictionary<int, IPage<T>>();
         private readonly CompositeDisposable _compositeDisposable = new CompositeDisposable();
         private readonly ISubject<(int PageKey, int PageIndex)> _requests;
@@ -31,8 +31,8 @@ namespace BFF.DataVirtualizingCollection.PageStorage
             int pageSize,
             int count,
             bool isPreloadingActive,
-            [NotNull] Func<int, int, IPage<T>> nonPreloadingPageFactory,
-            [CanBeNull] Func<int, int, IPage<T>> preloadingPageFactory,
+            [NotNull] Func<int, int, int, IPage<T>> nonPreloadingPageFactory,
+            [CanBeNull] Func<int, int, int, IPage<T>> preloadingPageFactory,
             [NotNull] Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory)
         {
             nonPreloadingPageFactory = nonPreloadingPageFactory ?? throw new ArgumentNullException(nameof(nonPreloadingPageFactory));
@@ -105,11 +105,11 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                     return FetchPage(key, _preloadingPageFactory);
                 }
 
-                IPage<T> FetchPage(int key, Func<int, int, IPage<T>> fetcher)
+                IPage<T> FetchPage(int key, Func<int, int, int, IPage<T>> fetcher)
                 {
                     var offset = key * _pageSize;
                     var actualPageSize = Math.Min(_pageSize, _count - offset);
-                    return fetcher(offset, actualPageSize);
+                    return fetcher(key, offset, actualPageSize);
                 }
             }
         }

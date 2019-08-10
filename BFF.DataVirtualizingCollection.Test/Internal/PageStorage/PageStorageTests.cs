@@ -26,7 +26,7 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
                     1,
                     false,
                     null,
-                    (_, __) => Substitute.For<IPage<int>>(),
+                    (_, __, ___) => Substitute.For<IPage<int>>(),
                     _ => Observable.Never<IReadOnlyList<int>>());
             });
 
@@ -42,7 +42,7 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
                     1,
                     1,
                     true,
-                    (_, __) => Substitute.For<IPage<int>>(),
+                    (_, __, ___) => Substitute.For<IPage<int>>(),
                     null,
                     _ => Observable.Never<IReadOnlyList<int>>());
             });
@@ -59,8 +59,8 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
                     1,
                     1,
                     false,
-                    (_, __) => Substitute.For<IPage<int>>(),
-                    (_, __) => Substitute.For<IPage<int>>(),
+                    (_, __, ___) => Substitute.For<IPage<int>>(),
+                    (_, __, ___) => Substitute.For<IPage<int>>(),
                     null);
             });
 
@@ -77,8 +77,8 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
                 10,
                 10000,
                 false,
-                (_, __) => page,
-                (_, __) => page,
+                (_, __, ___) => page,
+                (_, __, ___) => page,
                 req =>
                 {
                     req.Subscribe(requests);
@@ -109,8 +109,8 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
                 10,
                 10000,
                 true,
-                (_, __) => page,
-                (_, __) => page,
+                (_, __, ___) => page,
+                (_, __, ___) => page,
                 req =>
                 {
                     req.Subscribe(requests);
@@ -154,8 +154,8 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
                 10,
                 10000,
                 false,
-                (_, __) => page,
-                (_, __) => page,
+                (_, __, ___) => page,
+                (_, __, ___) => page,
                 _ => Observable.Never<IReadOnlyList<int>>());
 
             // Act
@@ -178,8 +178,8 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
                 10,
                 10000,
                 true,
-                (_, __) => page,
-                (_, __) => page,
+                (_, __, ___) => page,
+                (_, __, ___) => page,
                 _ => Observable.Never<IReadOnlyList<int>>());
 
             // Act
@@ -203,8 +203,8 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
                 10,
                 10000,
                 false,
-                (_, __) => page,
-                (_, __) => page,
+                (_, __, ___) => page,
+                (_, __, ___) => page,
                 _ => subject);
 
             // Act
@@ -228,8 +228,8 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
                 10,
                 10000,
                 true,
-                (_, __) => page,
-                (_, __) => page,
+                (_, __, ___) => page,
+                (_, __, ___) => page,
                 _ => subject);
 
             // Act

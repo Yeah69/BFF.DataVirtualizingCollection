@@ -70,7 +70,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.DataAccess
 
             // Act
             var placeholder = ((IList<int>)collection)[69];
-            await Task.Delay(50);
+            await Task.Delay(500);
 
             // Assert
             Assert.Equal(-1, placeholder);
