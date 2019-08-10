@@ -28,9 +28,16 @@ namespace BFF.DataVirtualizingCollection
 
         /// <summary>
         /// Pages are loaded as soon as an item of the page is requested or as soon as a neighboring page is loaded.
+        /// Per default the TaskPoolScheduler is taken for the preloads.
         /// </summary>
         /// <returns>The builder itself.</returns>
         IPageHoldingBehaviorCollectionBuilder<T> Preloading();
+
+        /// <summary>
+        /// Pages are loaded as soon as an item of the page is requested or as soon as a neighboring page is loaded.
+        /// </summary>
+        /// <returns>The builder itself.</returns>
+        IPageHoldingBehaviorCollectionBuilder<T> Preloading(IScheduler scheduler);
     }
 
     /// <summary>
@@ -196,6 +203,8 @@ namespace BFF.DataVirtualizingCollection
 
         private IScheduler _backgroundScheduler;
 
+        private IScheduler _preloadingScheduler;
+
         private IScheduler _notificationScheduler;
 
         private DataVirtualizingCollectionBuilder(int pageSize = 100)
@@ -214,6 +223,15 @@ namespace BFF.DataVirtualizingCollection
         public IPageHoldingBehaviorCollectionBuilder<T> Preloading()
         {
             _pageLoadingBehavior = PageLoadingBehavior.Preloading;
+            _preloadingScheduler = TaskPoolScheduler.Default;
+            return this;
+        }
+
+        /// <inheritdoc />
+        public IPageHoldingBehaviorCollectionBuilder<T> Preloading(IScheduler scheduler)
+        {
+            _pageLoadingBehavior = PageLoadingBehavior.Preloading;
+            _preloadingScheduler = scheduler;
             return this;
         }
 
@@ -281,36 +299,36 @@ namespace BFF.DataVirtualizingCollection
                 {
                     return new SyncDataVirtualizingCollection<T>(PageStoreFactory, _countFetcher);
 
-                    IPage<T> NonPreloadingPageFetcher(int offset, int pageSize) =>
+                    IPage<T> NonPreloadingPageFetcherFactory(int offset, int pageSize) =>
                         new SyncNonPreloadingNonTaskBasedPage<T>(offset, pageSize, _pageFetcher);
-                    IPage<T> PreloadingPageFetcher(int offset, int pageSize) =>
-                        new SyncPreloadingNonTaskBasedPage<T>(offset, pageSize, _pageFetcher, TaskPoolScheduler.Default);
+                    IPage<T> PreloadingPageFetcherFactory(int offset, int pageSize) =>
+                        new SyncPreloadingNonTaskBasedPage<T>(offset, pageSize, _pageFetcher, _preloadingScheduler);
 
                     IPageStorage<T> PageStoreFactory(int count) =>
                         new PageStorage<T>(
                             _pageSize,
                             count,
                             _pageLoadingBehavior == PageLoadingBehavior.Preloading,
-                            NonPreloadingPageFetcher,
-                            PreloadingPageFetcher,
+                            NonPreloadingPageFetcherFactory,
+                            PreloadingPageFetcherFactory,
                             _pageHoldingBehavior);
                 }
                 case (IndexAccessBehavior.Synchronous, FetchersKind.TaskBased):
                 {
                     return new SyncDataVirtualizingCollection<T>(PageStoreFactory, () => _taskBasedCountFetcher().Result);
 
-                    IPage<T> NonPreloadingPageFetcher(int offset, int pageSize) =>
+                    IPage<T> NonPreloadingPageFetcherFactory(int offset, int pageSize) =>
                         new SyncNonPreloadingTaskBasedPage<T>(offset, pageSize, _taskBasedPageFetcher);
-                    IPage<T> PreloadingPageFetcher(int offset, int pageSize) =>
-                        new SyncPreloadingTaskBasedPage<T>(offset, pageSize, _taskBasedPageFetcher, TaskPoolScheduler.Default);
+                    IPage<T> PreloadingPageFetcherFactory(int offset, int pageSize) =>
+                        new SyncPreloadingTaskBasedPage<T>(offset, pageSize, _taskBasedPageFetcher, _preloadingScheduler);
 
                     IPageStorage<T> PageStoreFactory(int count) =>
                         new PageStorage<T>(
                             _pageSize,
                             count,
                             _pageLoadingBehavior == PageLoadingBehavior.Preloading,
-                            NonPreloadingPageFetcher,
-                            PreloadingPageFetcher,
+                            NonPreloadingPageFetcherFactory,
+                            PreloadingPageFetcherFactory,
                             _pageHoldingBehavior);
                 }
                 case (IndexAccessBehavior.Asynchronous, FetchersKind.NonTaskBased):
@@ -324,24 +342,35 @@ namespace BFF.DataVirtualizingCollection
                         pageFetchEvents,
                         _notificationScheduler);
 
-                    IPage<T> PageFetcherFactory(
-                        int offset, 
+                    IPage<T> NonPreloadingPageFetcherFactory(
+                        int offset,
                         int pageSize) =>
                         new AsyncNonTaskBasedPage<T>(
                             offset,
-                            pageSize, 
-                            _pageFetcher, 
+                            pageSize,
+                            _pageFetcher,
                             _placeholderFactory,
                             _backgroundScheduler,
                             pageFetchEvents.AsObserver());
 
-                    IPageStorage<T> PageStoreFactory(int count) =>
+                    IPage<T> PreloadingPageFetcherFactory(
+                        int offset,
+                        int pageSize) =>
+                        new AsyncNonTaskBasedPage<T>(
+                            offset,
+                            pageSize,
+                            _pageFetcher,
+                            _placeholderFactory,
+                            _preloadingScheduler,
+                            pageFetchEvents.AsObserver());
+
+                        IPageStorage<T> PageStoreFactory(int count) =>
                         new PageStorage<T>(
                             _pageSize,
                             count,
                             _pageLoadingBehavior == PageLoadingBehavior.Preloading,
-                            PageFetcherFactory,
-                            PageFetcherFactory,
+                            NonPreloadingPageFetcherFactory,
+                            PreloadingPageFetcherFactory,
                             _pageHoldingBehavior);
                 }
                 case (IndexAccessBehavior.Asynchronous, FetchersKind.TaskBased):
@@ -355,7 +384,7 @@ namespace BFF.DataVirtualizingCollection
                         pageFetchEvents,
                         _notificationScheduler);
 
-                    IPage<T> PageFetcherFactory(
+                    IPage<T> NonPreloadingPageFetcherFactory(
                         int offset,
                         int pageSize) =>
                         new AsyncTaskBasedPage<T>(
@@ -366,13 +395,24 @@ namespace BFF.DataVirtualizingCollection
                             _backgroundScheduler,
                             pageFetchEvents.AsObserver());
 
-                    IPageStorage<T> PageStoreFactory(int count) =>
+                    IPage<T> PreloadingPageFetcherFactory(
+                        int offset,
+                        int pageSize) =>
+                        new AsyncTaskBasedPage<T>(
+                            offset,
+                            pageSize,
+                            _taskBasedPageFetcher,
+                            _placeholderFactory,
+                            _backgroundScheduler,
+                            pageFetchEvents.AsObserver());
+
+                        IPageStorage<T> PageStoreFactory(int count) =>
                         new PageStorage<T>(
                             _pageSize,
                             count,
                             _pageLoadingBehavior == PageLoadingBehavior.Preloading,
-                            PageFetcherFactory,
-                            PageFetcherFactory,
+                            NonPreloadingPageFetcherFactory,
+                            PreloadingPageFetcherFactory,
                             _pageHoldingBehavior);
                     }
                 default: throw new ArgumentException("Can't build data-virtualizing collection with given input.");
