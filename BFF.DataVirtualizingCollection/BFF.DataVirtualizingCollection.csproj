@@ -3,17 +3,19 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>BFF.DataVirtualizingCollection</PackageId>
-    <PackageVersion>1.3.0</PackageVersion>
+    <PackageVersion>1.3.1</PackageVersion>
     <Authors>Dimitri Enns</Authors>
     <Description>This is an approach to data virtualizing collections intended to be used in WPF projects.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes>Putting back the implementations of IList, because else controls like DataGrid wouldn't support it.</PackageReleaseNotes>
+    <PackageReleaseNotes>- user may specify scheduler for preloading
+- user gets page key and page index to the placeholder factory
+- fix: placeholder are disposed of now</PackageReleaseNotes>
     <Copyright></Copyright>
     <PackageTags>data-virtualization wpf csharp</PackageTags>
-    <Version>1.3.0</Version>
+    <Version>1.3.1</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <AssemblyVersion>1.3.0.0</AssemblyVersion>
-    <FileVersion>1.3.0.0</FileVersion>
+    <AssemblyVersion>1.3.1.0</AssemblyVersion>
+    <FileVersion>1.3.1.0</FileVersion>
     <PackageProjectUrl>https://github.com/Yeah69/BFF.DataVirtualizingCollection</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Yeah69/BFF.DataVirtualizingCollection.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>

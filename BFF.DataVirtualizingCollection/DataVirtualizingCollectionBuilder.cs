@@ -123,7 +123,6 @@ namespace BFF.DataVirtualizingCollection
         /// <returns>The builder itself.</returns>
         IDataVirtualizingCollection<T> SyncIndexAccess();
 
-        [Obsolete("Please use the overload whose placeholderFactory gets the page key and index as parameters. Ignore these parameters if they are not necessary. This very overload will be removed in future releases.")]
         /// <summary>
         /// If item of requested index isn't loaded yet the collections will return a placeholder instead and emit a notification as soon as it arrives.
         /// </summary>
@@ -131,6 +130,7 @@ namespace BFF.DataVirtualizingCollection
         /// <param name="backgroundScheduler">Scheduler for all background operations.</param>
         /// <param name="notificationScheduler">Scheduler on which the notifications are emitted.</param>
         /// <returns></returns>
+        [Obsolete("Please use the overload whose placeholderFactory gets the page key and index as parameters. Ignore these parameters if they are not necessary. This very overload will be removed in future releases.")]
         IDataVirtualizingCollection<T> AsyncIndexAccess(Func<T> placeholderFactory, IScheduler backgroundScheduler, IScheduler notificationScheduler);
 
         /// <summary>
