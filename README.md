@@ -46,14 +46,17 @@ This data virtualizing collection virtualizes an `IList<int>` with a number sequ
 
 The `Build()`-function doesn't count as a decision. It is a necessity in order to create a new builder instance where onto the decisions are made. The `pageSize`-parameter is optional and its default is 100. This parameter determines the usual requested page size (the last page may have a different size).
 
-### The Page-Holding Decision
-
-First decision is how to hold the pages. At the moment of writing there is only one option: `Hoarding()`. This means that the pages are loaded on demand only. However, once loaded, they are hold in memory until the data virtualizing collection is disposed or garbage collected.
-There are plans to offer more options here. For example, a strategy which would discard and dispose pages based on the "most recently used"-principle would be interesting. But further options in this decision have to be implemented yet. Hence, for the moment this decision has placeholder character.
-
 ### The Page-Loading Decision
 
 This decides the loading process of the pages. The option here are `NonPreloading()` and `Preloading()`. If `NonPreloading()` is active a page is loaded as soon as the first item of this page is requested but not sooner. If `Preloading()` is active, then the neighboring pages (next and previous; if not done already) are loaded as soon as an item of the current page is requested. The assumption here is that given a certain starting point, the user is likely to scroll in any direction. Hence, the probability is high that one of the neighboring pages is requested soon. The preloading happens in background, so requests of the current page are not blocked.
+
+### The Page-Removal Decision
+
+The second decision sets the page-removal strategy. At the moment of writing there are three option: `Hoarding()`, `LeastRecentlyUsed(…)`, and `CustomPageRemovalStrategy(…)`.
+
+- __Hoarding__ The pages are never removed until the data virtualizing collection is disposed of.
+- __LeastRecentlyUsed__ As soon as the page limit (which you have to set) is reached the least recently used page or pages (you can set how many pages are removed at once) are removed.
+- __CustomPageRemovalStrategy__ You can define you own page removal strategy. In order to accomplish that you'll get an observable which streams the page key (index of all pages) and page index (index of element inside the page) of the indexer calls of the data virtualizing collection. The _LeastRecentlyUsed_-strategy was implemented the same way, I would recommend to look into its sources first if you would like to implement your own strategy.
 
 ### The Definition of the Fetchers
 
