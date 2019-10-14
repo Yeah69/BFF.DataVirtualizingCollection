@@ -20,7 +20,7 @@ namespace BFF.DataVirtualizingCollection.Sample
         public VirtualizingTilePanel()
         {
             // For use in the IScrollInfo implementation
-            this.RenderTransform = _trans;
+            RenderTransform = _trans;
         }
 
         /// <summary>
@@ -48,10 +48,10 @@ namespace BFF.DataVirtualizingCollection.Sample
               FrameworkPropertyMetadataOptions.AffectsArrange));
 
         /// <summary>
-        /// If setting is true, the component will calulcate the number
+        /// If setting is true, the component will calculate the number
         /// of children per row, the width of each item is set equal
         /// to the height. In this mode the columns property is ignored.
-        /// If the setting is false, the component will calulate the
+        /// If the setting is false, the component will calculate the
         /// width of each item by dividing the available size by the
         /// number of desired rows.
         /// </summary>
@@ -65,8 +65,8 @@ namespace BFF.DataVirtualizingCollection.Sample
         /// </summary>
         public double ChildHeight
         {
-            get { return (double)GetValue(ChildHeightProperty); }
-            set { SetValue(ChildHeightProperty, value); }
+            get => (double)GetValue(ChildHeightProperty);
+            set => SetValue(ChildHeightProperty, value);
         }
 
         /// <summary>
@@ -74,8 +74,8 @@ namespace BFF.DataVirtualizingCollection.Sample
         /// </summary>
         public double MinChildWidth
         {
-            get { return (double)GetValue(MinChildWidthProperty); }
-            set { SetValue(MinChildWidthProperty, value); }
+            get => (double)GetValue(MinChildWidthProperty);
+            set => SetValue(MinChildWidthProperty, value);
         }
 
         /// <summary>
@@ -83,24 +83,24 @@ namespace BFF.DataVirtualizingCollection.Sample
         /// </summary>
         public int Columns
         {
-            get { return (int)GetValue(ColumnsProperty); }
-            set { SetValue(ColumnsProperty, value); }
+            get => (int)GetValue(ColumnsProperty);
+            set => SetValue(ColumnsProperty, value);
         }
 
         /// <summary>
         /// Gets or sets whether the component is operating
         /// in tile mode.If set to true, the component 
-        /// will calulcate the number of children per row, 
+        /// will calculate the number of children per row, 
         /// the width of each item is set equal to the height. 
         /// In this mode the Columns property is ignored. If the 
-        /// setting is false, the component will calulate the 
+        /// setting is false, the component will calculate the 
         /// width of each item by dividing the available size 
         /// by the number of desired columns.
         /// </summary>
         public bool Tile
         {
-            get { return (bool)GetValue(TileProperty); }
-            set { SetValue(TileProperty, value); }
+            get => (bool)GetValue(TileProperty);
+            set => SetValue(TileProperty, value);
         }
 
         /// <summary>
@@ -113,39 +113,36 @@ namespace BFF.DataVirtualizingCollection.Sample
             UpdateScrollInfo(availableSize);
 
             // Figure out range that's visible based on layout algorithm
-            int firstVisibleItemIndex, lastVisibleItemIndex;
-            GetVisibleRange(out firstVisibleItemIndex, out lastVisibleItemIndex);
+            GetVisibleRange(out var firstVisibleItemIndex, out var lastVisibleItemIndex);
 
             // We need to access InternalChildren before the generator to work around a bug
-            UIElementCollection children = this.InternalChildren;
-            IItemContainerGenerator generator = this.ItemContainerGenerator;
+            var children = InternalChildren;
+            var generator = ItemContainerGenerator;
 
             // Get the generator position of the first visible data item
-            GeneratorPosition startPos = generator.GeneratorPositionFromIndex(firstVisibleItemIndex);
+            var startPos = generator.GeneratorPositionFromIndex(firstVisibleItemIndex);
 
             // Get index where we'd insert the child for this position. If the item is realized
             // (position.Offset == 0), it's just position.Index, otherwise we have to add one to
             // insert after the corresponding child
-            int childIndex = (startPos.Offset == 0) ? startPos.Index : startPos.Index + 1;
+            var childIndex = (startPos.Offset == 0) ? startPos.Index : startPos.Index + 1;
 
             using (generator.StartAt(startPos, GeneratorDirection.Forward, true))
             {
-                for (int itemIndex = firstVisibleItemIndex; itemIndex <= lastVisibleItemIndex; ++itemIndex, ++childIndex)
+                for (var itemIndex = firstVisibleItemIndex; itemIndex <= lastVisibleItemIndex; ++itemIndex, ++childIndex)
                 {
-                    bool newlyRealized;
-
                     // Get or create the child
-                    UIElement child = generator.GenerateNext(out newlyRealized) as UIElement;
+                    var child = generator.GenerateNext(out var newlyRealized) as UIElement ?? throw new Exception();
                     if (newlyRealized)
                     {
                         // Figure out if we need to insert the child at the end or somewhere in the middle
                         if (childIndex >= children.Count)
                         {
-                            base.AddInternalChild(child);
+                            AddInternalChild(child);
                         }
                         else
                         {
-                            base.InsertInternalChild(childIndex, child);
+                            InsertInternalChild(childIndex, child);
                         }
                         generator.PrepareItemContainer(child);
                     }
@@ -173,16 +170,16 @@ namespace BFF.DataVirtualizingCollection.Sample
         /// <returns>Size used</returns>
         protected override Size ArrangeOverride(Size finalSize)
         {
-            IItemContainerGenerator generator = this.ItemContainerGenerator;
+            var generator = ItemContainerGenerator;
 
             UpdateScrollInfo(finalSize);
 
-            for (int i = 0; i < this.Children.Count; i++)
+            for (var i = 0; i < Children.Count; i++)
             {
-                UIElement child = this.Children[i];
+                var child = Children[i];
 
                 // Map the child offset to an item offset
-                int itemIndex = generator.IndexFromGeneratorPosition(new GeneratorPosition(i, 0));
+                var itemIndex = generator.IndexFromGeneratorPosition(new GeneratorPosition(i, 0));
 
                 ArrangeChild(itemIndex, child, finalSize);
             }
@@ -197,13 +194,13 @@ namespace BFF.DataVirtualizingCollection.Sample
         /// <param name="maxDesiredGenerated">last item index that should be visible</param>
         private void CleanUpItems(int minDesiredGenerated, int maxDesiredGenerated)
         {
-            UIElementCollection children = this.InternalChildren;
-            IItemContainerGenerator generator = this.ItemContainerGenerator;
+            var children = InternalChildren;
+            var generator = ItemContainerGenerator;
 
-            for (int i = children.Count - 1; i >= 0; i--)
+            for (var i = children.Count - 1; i >= 0; i--)
             {
-                GeneratorPosition childGeneratorPos = new GeneratorPosition(i, 0);
-                int itemIndex = generator.IndexFromGeneratorPosition(childGeneratorPos);
+                var childGeneratorPos = new GeneratorPosition(i, 0);
+                var itemIndex = generator.IndexFromGeneratorPosition(childGeneratorPos);
                 if (itemIndex < minDesiredGenerated || itemIndex > maxDesiredGenerated)
                 {
                     generator.Remove(childGeneratorPos, 1);
@@ -215,7 +212,7 @@ namespace BFF.DataVirtualizingCollection.Sample
         /// <summary>
         /// When items are removed, remove the corresponding UI if necessary
         /// </summary>
-        /// <param name="sender">System.Object repersenting the source of the event.</param>
+        /// <param name="sender">System.Object representing the source of the event.</param>
         /// <param name="args">The arguments for the event.</param>
         protected override void OnItemsChanged(object sender, ItemsChangedEventArgs args)
         {
@@ -224,11 +221,8 @@ namespace BFF.DataVirtualizingCollection.Sample
                 case NotifyCollectionChangedAction.Remove:
                 case NotifyCollectionChangedAction.Replace:
                 case NotifyCollectionChangedAction.Reset:
-                    //Peform layout refreshment.
-                    if (_owner != null)
-                    {
-                        _owner.ScrollToTop();
-                    }
+                    //Perform layout refreshment.
+                    ScrollOwner?.ScrollToTop();
                     break;
                 case NotifyCollectionChangedAction.Move:
                     RemoveInternalChildRange(args.Position.Index, args.ItemUICount);
@@ -253,20 +247,20 @@ namespace BFF.DataVirtualizingCollection.Sample
             if (Tile)
             {
                 //Gets the number of children or items for each row.
-                int childrenPerRow = CalculateChildrenPerRow(availableSize);
+                var childrenPerRow = CalculateChildrenPerRow(availableSize);
 
                 // See how big we are
-                return new Size(childrenPerRow * (this.MinChildWidth > 0 ? this.MinChildWidth : this.ChildHeight),
-                    this.ChildHeight * Math.Ceiling((double)itemCount / childrenPerRow));
+                return new Size(childrenPerRow * (MinChildWidth > 0 ? MinChildWidth : ChildHeight),
+                    ChildHeight * Math.Ceiling((double)itemCount / childrenPerRow));
             }
             else
             {
                 //Gets the width of each child.
-                double childWidth = CalculateChildWidth(availableSize);
+                var childWidth = CalculateChildWidth(availableSize);
 
                 // See how big we are
-                return new Size(this.Columns * childWidth,
-                    this.ChildHeight * Math.Ceiling((double)itemCount / this.Columns));
+                return new Size(Columns * childWidth,
+                    ChildHeight * Math.Ceiling((double)itemCount / Columns));
             }
         }
 
@@ -275,31 +269,31 @@ namespace BFF.DataVirtualizingCollection.Sample
         /// </summary>
         /// <param name="firstVisibleItemIndex">The item index of the first visible item</param>
         /// <param name="lastVisibleItemIndex">The item index of the last visible item</param>
-        void GetVisibleRange(out int firstVisibleItemIndex, out int lastVisibleItemIndex)
+        private void GetVisibleRange(out int firstVisibleItemIndex, out int lastVisibleItemIndex)
         {
             //If tile mode.
             if (Tile)
             {
                 //Get the number of children 
-                int childrenPerRow = CalculateChildrenPerRow(_extent);
+                var childrenPerRow = CalculateChildrenPerRow(_extent);
 
-                firstVisibleItemIndex = (int)Math.Floor(_offset.Y / this.ChildHeight) * childrenPerRow;
-                lastVisibleItemIndex = (int)Math.Ceiling((_offset.Y + _viewport.Height) / this.ChildHeight) * childrenPerRow - 1;
+                firstVisibleItemIndex = (int)Math.Floor(_offset.Y / ChildHeight) * childrenPerRow;
+                lastVisibleItemIndex = (int)Math.Ceiling((_offset.Y + _viewport.Height) / ChildHeight) * childrenPerRow - 1;
 
-                ItemsControl itemsControl = ItemsControl.GetItemsOwner(this);
-                int itemCount = itemsControl.HasItems ? itemsControl.Items.Count : 0;
+                var itemsControl = ItemsControl.GetItemsOwner(this);
+                var itemCount = itemsControl.HasItems ? itemsControl.Items.Count : 0;
                 if (lastVisibleItemIndex >= itemCount)
                     lastVisibleItemIndex = itemCount - 1;
             }
             else
             {
-                firstVisibleItemIndex = (int)Math.Floor(_offset.Y / this.ChildHeight) * this.Columns;
-                lastVisibleItemIndex = (int)Math.Ceiling((_offset.Y + _viewport.Height) / this.ChildHeight) * this.Columns - 1;
+                firstVisibleItemIndex = (int)Math.Floor(_offset.Y / ChildHeight) * Columns;
+                lastVisibleItemIndex = (int)Math.Ceiling((_offset.Y + _viewport.Height) / ChildHeight) * Columns - 1;
 
-                ItemsControl _itemsControl = ItemsControl.GetItemsOwner(this);
-                int _itemCount = _itemsControl.HasItems ? _itemsControl.Items.Count : 0;
-                if (lastVisibleItemIndex >= _itemCount)
-                    lastVisibleItemIndex = _itemCount - 1;
+                var itemsControl = ItemsControl.GetItemsOwner(this);
+                var itemCount = itemsControl.HasItems ? itemsControl.Items.Count : 0;
+                if (lastVisibleItemIndex >= itemCount)
+                    lastVisibleItemIndex = itemCount - 1;
             }
 
         }
@@ -308,17 +302,17 @@ namespace BFF.DataVirtualizingCollection.Sample
         /// Get the size of the each child.
         /// </summary>
         /// <returns>The size of each child.</returns>
-        Size GetChildSize(Size availableSize)
+        private Size GetChildSize(Size availableSize)
         {
             if (Tile)
             {
                 //Gets the number of children or items for each row.
-                int childrenPerRow = CalculateChildrenPerRow(availableSize);
-                return new Size(availableSize.Width / childrenPerRow, this.ChildHeight);
+                var childrenPerRow = CalculateChildrenPerRow(availableSize);
+                return new Size(availableSize.Width / childrenPerRow, ChildHeight);
             }
             else
             {
-                return new Size(CalculateChildWidth(availableSize), this.ChildHeight);
+                return new Size(CalculateChildWidth(availableSize), ChildHeight);
             }
 
         }
@@ -329,30 +323,30 @@ namespace BFF.DataVirtualizingCollection.Sample
         /// <param name="itemIndex">The data item index of the child</param>
         /// <param name="child">The element to position</param>
         /// <param name="finalSize">The size of the panel</param>
-        void ArrangeChild(int itemIndex, UIElement child, Size finalSize)
+        private void ArrangeChild(int itemIndex, UIElement child, Size finalSize)
         {
             if (Tile)
             {
-                int childrenPerRow = CalculateChildrenPerRow(finalSize);
+                var childrenPerRow = CalculateChildrenPerRow(finalSize);
 
-                double childWidth = finalSize.Width / childrenPerRow;
+                var childWidth = finalSize.Width / childrenPerRow;
 
-                int row = itemIndex / childrenPerRow;
-                int column = itemIndex % childrenPerRow;
+                var row = itemIndex / childrenPerRow;
+                var column = itemIndex % childrenPerRow;
 
-                child.Arrange(new Rect(column * childWidth, row * this.ChildHeight,
-                    childWidth, this.ChildHeight));
+                child.Arrange(new Rect(column * childWidth, row * ChildHeight,
+                    childWidth, ChildHeight));
             }
             else
             {
                 //Get the width of each child.
-                double childWidth = CalculateChildWidth(finalSize);
+                var childWidth = CalculateChildWidth(finalSize);
 
-                int _row = itemIndex / this.Columns;
-                int _column = itemIndex % this.Columns;
+                var row = itemIndex / Columns;
+                var column = itemIndex % Columns;
 
-                child.Arrange(new Rect(_column * childWidth, _row * this.ChildHeight, 
-                    childWidth, this.ChildHeight));
+                child.Arrange(new Rect(column * childWidth, row * ChildHeight, 
+                    childWidth, ChildHeight));
             }
         }
 
@@ -363,9 +357,9 @@ namespace BFF.DataVirtualizingCollection.Sample
         /// </summary>
         /// <param name="availableSize">The total layout size available.</param>
         /// <returns>The width of each tile.</returns>
-        double CalculateChildWidth(Size availableSize)
+        private double CalculateChildWidth(Size availableSize)
         {
-            return availableSize.Width / this.Columns;
+            return availableSize.Width / Columns;
         }
 
         /// <summary>
@@ -373,14 +367,12 @@ namespace BFF.DataVirtualizingCollection.Sample
         /// </summary>
         /// <param name="availableSize">Size available</param>
         /// <returns>The number of tiles on each row.</returns>
-        int CalculateChildrenPerRow(Size availableSize)
+        private int CalculateChildrenPerRow(Size availableSize)
         {
             // Figure out how many children fit on each row
-            int childrenPerRow;
-            if (availableSize.Width == Double.PositiveInfinity)
-                childrenPerRow = this.Children.Count;
-            else
-                childrenPerRow = Math.Max(1, (int)Math.Floor(availableSize.Width / (this.MinChildWidth > 0 ? this.MinChildWidth : this.ChildHeight)));
+            var childrenPerRow = double.IsPositiveInfinity(availableSize.Width) 
+                ? Children.Count 
+                : Math.Max(1, (int)Math.Floor(availableSize.Width / (MinChildWidth > 0 ? MinChildWidth : ChildHeight)));
             return childrenPerRow;
         }
 
@@ -392,16 +384,16 @@ namespace BFF.DataVirtualizingCollection.Sample
         ///  See Ben Constable's series of posts at http://blogs.msdn.com/bencon/
         /// </summary>
         /// <param name="availableSize"></param>
-        void UpdateScrollInfo(Size availableSize)
+        private void UpdateScrollInfo(Size availableSize)
         {
             //Initialize items control.
-            ItemsControl itemsControl = ItemsControl.GetItemsOwner(this);
+            var itemsControl = ItemsControl.GetItemsOwner(this);
 
             //See how many items there are
-            int itemCount = itemsControl.HasItems ? itemsControl.Items.Count : 0;
+            var itemCount = itemsControl.HasItems ? itemsControl.Items.Count : 0;
 
             //Get the total size, visible and invisible.
-            Size extent = CalculateExtent(availableSize, itemCount);
+            var extent = CalculateExtent(availableSize, itemCount);
 
             // Update extent
             if (extent != _extent)
@@ -409,8 +401,8 @@ namespace BFF.DataVirtualizingCollection.Sample
                 //Store in class scope.
                 _extent = extent;
 
-                //Peform layout refreshment.
-                if (_owner != null) _owner.InvalidateScrollInfo();
+                //Perform layout refreshment.
+                ScrollOwner?.InvalidateScrollInfo();
             }
 
             // Update viewport
@@ -420,7 +412,7 @@ namespace BFF.DataVirtualizingCollection.Sample
                 _viewport = availableSize;
 
                 //Perform layout refreshment.
-                if (_owner != null) _owner.InvalidateScrollInfo();
+                ScrollOwner?.InvalidateScrollInfo();
             }
         }
 
@@ -429,81 +421,51 @@ namespace BFF.DataVirtualizingCollection.Sample
         /// <summary>
         /// 
         /// </summary>
-        public ScrollViewer ScrollOwner
-        {
-            get { return _owner; }
-            set { _owner = value; }
-        }
+        public ScrollViewer? ScrollOwner { get; set; }
 
         /// <summary>
         /// Gets or sets whether the viewer can 
         /// scroll content horizontally.
         /// </summary>
-        public bool CanHorizontallyScroll
-        {
-            get { return _canHScroll; }
-            set { _canHScroll = value; }
-        }
+        public bool CanHorizontallyScroll { get; set; } = false;
 
         /// <summary>
         /// Gets or sets whether the viewer can 
         /// scroll content vertically.
         /// </summary>
-        public bool CanVerticallyScroll
-        {
-            get { return _canVScroll; }
-            set { _canVScroll = value; }
-        }
+        public bool CanVerticallyScroll { get; set; } = false;
 
         /// <summary>
         /// Gets the horizontal offset value.
         /// </summary>
-        public double HorizontalOffset
-        {
-            get { return _offset.X; }
-        }
+        public double HorizontalOffset => _offset.X;
 
         /// <summary>
         /// Gets the vertical offset value.
         /// </summary>
-        public double VerticalOffset
-        {
-            get { return _offset.Y; }
-        }
+        public double VerticalOffset => _offset.Y;
 
         /// <summary>
         /// Gets the total height, visible
         /// and invisible.
         /// </summary>
-        public double ExtentHeight
-        {
-            get { return _extent.Height; }
-        }
+        public double ExtentHeight => _extent.Height;
 
         /// <summary>
         /// Gets the total width, visible
         /// and invisible.
         /// </summary>
-        public double ExtentWidth
-        {
-            get { return _extent.Width; }
-        }
+        public double ExtentWidth => _extent.Width;
 
         /// <summary>
         /// Gets the height of the viewable area.
         /// </summary>
-        public double ViewportHeight
-        {
-            get { return _viewport.Height; }
-        }
+        public double ViewportHeight => _viewport.Height;
 
         /// <summary>
         /// Gets the width of the viewable area.
         /// </summary>
-        public double ViewportWidth
-        {
-            get { return _viewport.Width; }
-        }
+        public double ViewportWidth => _viewport.Width;
 
         #endregion
 
@@ -514,7 +476,7 @@ namespace BFF.DataVirtualizingCollection.Sample
         /// </summary>
         public void LineUp()
         {
-            SetVerticalOffset(this.VerticalOffset - 10);
+            SetVerticalOffset(VerticalOffset - 10);
         }
 
         /// <summary>
@@ -522,7 +484,7 @@ namespace BFF.DataVirtualizingCollection.Sample
         /// </summary>
         public void LineDown()
         {
-            SetVerticalOffset(this.VerticalOffset + 10);
+            SetVerticalOffset(VerticalOffset + 10);
         }
 
         /// <summary>
@@ -530,7 +492,7 @@ namespace BFF.DataVirtualizingCollection.Sample
         /// </summary>
         public void PageUp()
         {
-            SetVerticalOffset(this.VerticalOffset - _viewport.Height);
+            SetVerticalOffset(VerticalOffset - _viewport.Height);
         }
 
         /// <summary>
@@ -538,7 +500,7 @@ namespace BFF.DataVirtualizingCollection.Sample
         /// </summary>
         public void PageDown()
         {
-            SetVerticalOffset(this.VerticalOffset + _viewport.Height);
+            SetVerticalOffset(VerticalOffset + _viewport.Height);
         }
 
         /// <summary>
@@ -546,7 +508,7 @@ namespace BFF.DataVirtualizingCollection.Sample
         /// </summary>
         public void MouseWheelUp()
         {
-            SetVerticalOffset(this.VerticalOffset - 10);
+            SetVerticalOffset(VerticalOffset - 10);
         }
 
         /// <summary>
@@ -554,7 +516,7 @@ namespace BFF.DataVirtualizingCollection.Sample
         /// </summary>
         public void MouseWheelDown()
         {
-            SetVerticalOffset(this.VerticalOffset + 10);
+            SetVerticalOffset(VerticalOffset + 10);
         }
 
         /// <summary>
@@ -661,8 +623,7 @@ namespace BFF.DataVirtualizingCollection.Sample
 
             _offset.Y = offset;
 
-            if (_owner != null)
-                _owner.InvalidateScrollInfo();
+            ScrollOwner?.InvalidateScrollInfo();
 
             _trans.Y = -offset;
 
@@ -674,13 +635,10 @@ namespace BFF.DataVirtualizingCollection.Sample
 
         #region Fields
 
-        TranslateTransform _trans = new TranslateTransform();
-        ScrollViewer _owner;
-        bool _canHScroll = false;
-        bool _canVScroll = false;
-        Size _extent = new Size(0, 0);
-        Size _viewport = new Size(0, 0);
-        Point _offset;
+        private readonly TranslateTransform _trans = new TranslateTransform();
+        private Size _extent = new Size(0, 0);
+        private Size _viewport = new Size(0, 0);
+        private Point _offset;
 
         #endregion
 

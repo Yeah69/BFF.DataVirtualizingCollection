@@ -6,7 +6,6 @@ using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 using BFF.DataVirtualizingCollection.Extensions;
 using BFF.DataVirtualizingCollection.PageRemoval;
-using JetBrains.Annotations;
 
 namespace BFF.DataVirtualizingCollection.PageStorage
 {
@@ -19,41 +18,32 @@ namespace BFF.DataVirtualizingCollection.PageStorage
     {
         private readonly int _pageSize;
         private readonly int _count;
-        private readonly int _pageCount;
-        private readonly bool _isPreloadingActive;
         private readonly Func<int, int, int, IPage<T>> _nonPreloadingPageFactory;
-        private readonly Func<int, int, int, IPage<T>> _preloadingPageFactory;
-        private readonly ConcurrentDictionary<int, IPage<T>> _pages = new ConcurrentDictionary<int, IPage<T>>();
         private readonly CompositeDisposable _compositeDisposable = new CompositeDisposable();
-        private readonly ISubject<(int PageKey, int PageIndex)> _requests;
+
+        protected readonly int PageCount;
+        protected readonly ConcurrentDictionary<int, IPage<T>> Pages = new ConcurrentDictionary<int, IPage<T>>();
+        protected readonly ISubject<(int PageKey, int PageIndex)> Requests;
 
         internal PageStorage(
             int pageSize,
             int count,
-            bool isPreloadingActive,
-            [NotNull] Func<int, int, int, IPage<T>> nonPreloadingPageFactory,
-            [CanBeNull] Func<int, int, int, IPage<T>> preloadingPageFactory,
-            [NotNull] Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory)
+            Func<int, int, int, IPage<T>> nonPreloadingPageFactory,
+            Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory)
         {
-            nonPreloadingPageFactory = nonPreloadingPageFactory ?? throw new ArgumentNullException(nameof(nonPreloadingPageFactory));
-            pageReplacementStrategyFactory = pageReplacementStrategyFactory ?? throw new ArgumentNullException(nameof(pageReplacementStrategyFactory));
-            if (isPreloadingActive && preloadingPageFactory is null) throw new ArgumentNullException(nameof(preloadingPageFactory));
-
             _pageSize = pageSize;
             _count = count;
-            _pageCount = count % pageSize == 0 
+            PageCount = count % pageSize == 0 
                 ? count / pageSize 
                 : count / pageSize + 1;
-            _isPreloadingActive = isPreloadingActive;
             _nonPreloadingPageFactory = nonPreloadingPageFactory;
-            _preloadingPageFactory = preloadingPageFactory;
-            _requests = new Subject<(int PageKey, int PageIndex)>().AddTo(_compositeDisposable);
-            pageReplacementStrategyFactory(_requests)
+            Requests = new Subject<(int PageKey, int PageIndex)>().AddTo(_compositeDisposable);
+            pageReplacementStrategyFactory(Requests)
                 .Subscribe(pageKeysToRemove =>
                     {
                         foreach (var pageKey in pageKeysToRemove)
                         {
-                            if (_pages.TryRemove(pageKey, out var page))
+                            if (Pages.TryRemove(pageKey, out var page))
                             {
                                 page.Dispose();
                             }
@@ -72,57 +62,41 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                 var pageKey = index / _pageSize;
                 var pageIndex = index % _pageSize;
 
-                _requests.OnNext((pageKey, pageIndex));
+                Requests.OnNext((pageKey, pageIndex));
 
-                var ret =_pages
+                var ret =Pages
                     .GetOrAdd(
                         pageKey,
                         FetchNonPreloadingPage)
                     [pageIndex];
 
-                if (_isPreloadingActive)
-                {
-                    var previousPageKey = pageKey - 1;
-                    if (previousPageKey >= 0)
-                        _pages.GetOrAdd(
-                            previousPageKey,
-                            FetchPreloadingPage);
-                    var nextPageKey = pageKey + 1;
-                    if (nextPageKey < _pageCount)
-                        _pages.GetOrAdd(
-                            nextPageKey,
-                            FetchPreloadingPage);
-                }
+                Preloading(pageKey);
 
                 return ret;
 
                 IPage<T> FetchNonPreloadingPage(int key) => FetchPage(key, _nonPreloadingPageFactory);
-
-                IPage<T> FetchPreloadingPage(int key)
-                {
-                    _requests.OnNext((key, -1));
-
-                    return FetchPage(key, _preloadingPageFactory);
-                }
-
-                IPage<T> FetchPage(int key, Func<int, int, int, IPage<T>> fetcher)
-                {
-                    var offset = key * _pageSize;
-                    var actualPageSize = Math.Min(_pageSize, _count - offset);
-                    return fetcher(key, offset, actualPageSize);
-                }
             }
+        }
+
+        protected virtual void Preloading(int pageKey)
+        { }
+
+        protected IPage<T> FetchPage(int key, Func<int, int, int, IPage<T>> fetcher)
+        {
+            var offset = key * _pageSize;
+            var actualPageSize = Math.Min(_pageSize, _count - offset);
+            return fetcher(key, offset, actualPageSize);
         }
 
         public void Dispose()
         {
-            var pages = _pages.Values.ToList();
-            _pages.Clear();
+            var pages = Pages.Values.ToList();
+            Pages.Clear();
             foreach (var page in pages)
             {
                 page.Dispose();
             }
-            _compositeDisposable?.Dispose();
+            _compositeDisposable.Dispose();
         }
     }
 }

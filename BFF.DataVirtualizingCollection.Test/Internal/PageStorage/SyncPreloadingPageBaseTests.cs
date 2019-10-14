@@ -8,39 +8,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using BFF.DataVirtualizingCollection.PageStorage;
 using Xunit;
-// ReSharper disable AssignNullToNotNullAttribute *** Testing exception on null passing
 
 namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
 {
     public abstract class SyncPreloadingPageBaseTestsBase : PageTestsBase
     {
-        internal abstract SyncPreloadingPageBase<int> PageConstructedWithNullPageFetcher { get; }
-        internal abstract SyncPreloadingPageBase<int> PageConstructedWithNullScheduler { get; }
         internal abstract SyncPreloadingPageBase<int> PageWithFirstEntry69 { get; }
 
         internal abstract SyncPreloadingPageBase<IDisposable> PageWithDisposable(IDisposable disposable);
-
-        [Fact]
-        internal void Constructor_PageFetcherNull_ThrowsArgumentNullException()
-        {
-            // Arrange + Act + Assert
-            Assert.Throws<ArgumentNullException>(() =>
-            {
-                using var sut = PageConstructedWithNullPageFetcher;
-                return sut;
-            });
-        }
-
-        [Fact]
-        internal void Constructor_SchedulerNull_ThrowsArgumentNullException()
-        {
-            // Arrange + Act + Assert
-            Assert.Throws<ArgumentNullException>(() =>
-            {
-                using var sut = PageConstructedWithNullScheduler;
-                return sut;
-            });
-        }
 
         [Fact]
         internal async Task Dispose_PageHasOneDisposable_Disposes()
@@ -76,11 +51,6 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
     {
         internal override IPage<int> PageWithPageSizeOne =>
             new SyncNonPreloadingNonTaskBasedPage<int>(0, 1, (offset, pageSize) => new[] { 69 });
-        internal override SyncPreloadingPageBase<int> PageConstructedWithNullPageFetcher =>
-            new SyncPreloadingNonTaskBasedPage<int>(0, 1, null, DefaultScheduler.Instance);
-
-        internal override SyncPreloadingPageBase<int> PageConstructedWithNullScheduler =>
-            new SyncPreloadingNonTaskBasedPage<int>(0, 1, (offset, pageSize) => new[] { 69 }, null);
 
         internal override SyncPreloadingPageBase<int> PageWithFirstEntry69 =>
             new SyncPreloadingNonTaskBasedPage<int>(0, 1, (offset, pageSize) => new[] { 69 }, DefaultScheduler.Instance);
@@ -104,12 +74,6 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
     {
         internal override IPage<int> PageWithPageSizeOne =>
             new SyncPreloadingTaskBasedPage<int>(0, 1, (offset, pageSize) => Task.FromResult(new[] { 69 }), DefaultScheduler.Instance);
-
-        internal override SyncPreloadingPageBase<int> PageConstructedWithNullScheduler =>
-            new SyncPreloadingTaskBasedPage<int>(0, 1, (offset, pageSize) => Task.FromResult(new[] { 69 }), null);
-
-        internal override SyncPreloadingPageBase<int> PageConstructedWithNullPageFetcher =>
-            new SyncPreloadingTaskBasedPage<int>(0, 1, null, DefaultScheduler.Instance);
 
         internal override SyncPreloadingPageBase<int> PageWithFirstEntry69 =>
             new SyncPreloadingTaskBasedPage<int>(0, 1, (offset, pageSize) => Task.FromResult(new[] { 69 }), DefaultScheduler.Instance);

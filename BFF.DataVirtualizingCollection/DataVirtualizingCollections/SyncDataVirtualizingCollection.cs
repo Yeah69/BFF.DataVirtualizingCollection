@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using BFF.DataVirtualizingCollection.Extensions;
 using BFF.DataVirtualizingCollection.PageStorage;
-using JetBrains.Annotations;
 
 namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
 {
@@ -11,8 +10,8 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
         private readonly IPageStorage<T> _pageStorage;
 
         internal SyncDataVirtualizingCollection(
-            [NotNull] Func<int, IPageStorage<T>> pageStoreFactory,
-            [NotNull] Func<int> countFetcher)
+            Func<int, IPageStorage<T>> pageStoreFactory,
+            Func<int> countFetcher)
         {
             pageStoreFactory = pageStoreFactory ?? throw new ArgumentNullException(nameof(pageStoreFactory));
             countFetcher = countFetcher ?? throw new ArgumentNullException(nameof(countFetcher));

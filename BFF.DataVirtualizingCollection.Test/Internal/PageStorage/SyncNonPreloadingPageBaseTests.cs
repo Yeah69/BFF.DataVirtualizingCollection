@@ -3,27 +3,14 @@ using System.Reactive.Disposables;
 using System.Threading.Tasks;
 using BFF.DataVirtualizingCollection.PageStorage;
 using Xunit;
-// ReSharper disable AssignNullToNotNullAttribute *** Testing exception on null passing
 
 namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
 {
     public abstract class SyncNonPreloadingPageBaseTestsBase : PageTestsBase
     {
-        internal abstract SyncNonPreloadingPageBase<int> PageConstructedWithNullPageFetcher { get; }
         internal abstract SyncNonPreloadingPageBase<int> PageWithFirstEntry69 { get; }
 
         internal abstract SyncNonPreloadingPageBase<IDisposable> PageWithDisposable(IDisposable disposable);
-
-        [Fact]
-        internal void Constructor_PageFetcherNull_ThrowsArgumentNullException()
-        {
-            // Arrange + Act + Assert
-            Assert.Throws<ArgumentNullException>(() =>
-            {
-                using var sut = PageConstructedWithNullPageFetcher;
-                return sut;
-            });
-        }
 
         [Fact]
         internal void Dispose_PageHasOneDisposable_DisposesImmediately()
@@ -59,8 +46,6 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
     {
         internal override IPage<int> PageWithPageSizeOne =>
             new SyncNonPreloadingNonTaskBasedPage<int>(0, 1, (offset, pageSize) => new[] { 69 });
-        internal override SyncNonPreloadingPageBase<int> PageConstructedWithNullPageFetcher =>
-            new SyncNonPreloadingNonTaskBasedPage<int>(0, 1, null);
 
         internal override SyncNonPreloadingPageBase<int> PageWithFirstEntry69 =>
             new SyncNonPreloadingNonTaskBasedPage<int>(0, 1, (offset, pageSize) => new[] { 69 });
@@ -76,8 +61,6 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
     {
         internal override IPage<int> PageWithPageSizeOne =>
             new SyncNonPreloadingTaskBasedPage<int>(0, 1, (offset, pageSize) => Task.FromResult(new[] { 69 }));
-        internal override SyncNonPreloadingPageBase<int> PageConstructedWithNullPageFetcher =>
-            new SyncNonPreloadingTaskBasedPage<int>(0, 1, null);
 
         internal override SyncNonPreloadingPageBase<int> PageWithFirstEntry69 =>
             new SyncNonPreloadingTaskBasedPage<int>(0, 1, (offset, pageSize) => Task.FromResult(new[] { 69 }));

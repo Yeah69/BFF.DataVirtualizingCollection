@@ -5,7 +5,6 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 
 namespace BFF.DataVirtualizingCollection.PageStorage
 {
@@ -13,18 +12,16 @@ namespace BFF.DataVirtualizingCollection.PageStorage
     {
         private readonly int _pageSize;
         private readonly IScheduler _scheduler;
-        protected AsyncSubject<T[]> PageContent;
 
         internal SyncPreloadingPageBase(
             int pageSize,
-            [NotNull] IScheduler scheduler)
+            IScheduler scheduler)
         {
-            scheduler = scheduler ?? throw new ArgumentNullException(nameof(scheduler));
-
             _pageSize = pageSize;
             _scheduler = scheduler;
-
         }
+
+        protected abstract AsyncSubject<T[]> PageContent { get; }
 
         public T this[int index] =>
             index >= _pageSize || index < 0
@@ -52,16 +49,15 @@ namespace BFF.DataVirtualizingCollection.PageStorage
         internal SyncPreloadingNonTaskBasedPage(
             int offset,
             int pageSize,
-            [NotNull] Func<int, int, T[]> pageFetcher,
-            [NotNull] IScheduler scheduler) : base(pageSize, scheduler)
+            Func<int, int, T[]> pageFetcher,
+            IScheduler scheduler) : base(pageSize, scheduler)
         {
-            pageFetcher = pageFetcher ?? throw new ArgumentNullException(nameof(pageFetcher));
-            scheduler = scheduler ?? throw new ArgumentNullException(nameof(scheduler));
-
             PageContent = Observable
                 .Start(() => pageFetcher(offset, pageSize), scheduler)
                 .RunAsync(CancellationToken.None);
         }
+
+        protected override AsyncSubject<T[]> PageContent { get; }
     }
 
     internal sealed class SyncPreloadingTaskBasedPage<T> : SyncPreloadingPageBase<T>
@@ -69,15 +65,14 @@ namespace BFF.DataVirtualizingCollection.PageStorage
         internal SyncPreloadingTaskBasedPage(
             int offset,
             int pageSize,
-            [NotNull] Func<int, int, Task<T[]>> pageFetcher,
-            [NotNull] IScheduler scheduler) : base(pageSize, scheduler)
+            Func<int, int, Task<T[]>> pageFetcher,
+            IScheduler scheduler) : base(pageSize, scheduler)
         {
-            pageFetcher = pageFetcher ?? throw new ArgumentNullException(nameof(pageFetcher));
-            scheduler = scheduler ?? throw new ArgumentNullException(nameof(scheduler));
-
             PageContent = Observable
                 .StartAsync(() => pageFetcher(offset, pageSize), scheduler)
                 .RunAsync(CancellationToken.None);
         }
+
+        protected override AsyncSubject<T[]> PageContent { get; }
     }
 }

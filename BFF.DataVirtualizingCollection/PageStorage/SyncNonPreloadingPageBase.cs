@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 
 namespace BFF.DataVirtualizingCollection.PageStorage
 {
     internal abstract class SyncNonPreloadingPageBase<T> : IPage<T>
     {
         private readonly int _pageSize;
-        protected T[] PageContent;
 
         internal SyncNonPreloadingPageBase(
             int pageSize)
         {
             _pageSize = pageSize;
         }
+
+        protected abstract T[] PageContent { get; }
 
         public T this[int index] =>
             index >= _pageSize || index < 0
@@ -36,12 +36,12 @@ namespace BFF.DataVirtualizingCollection.PageStorage
         internal SyncNonPreloadingNonTaskBasedPage(
             int offset,
             int pageSize,
-            [NotNull] Func<int, int, T[]> pageFetcher) : base(pageSize)
+            Func<int, int, T[]> pageFetcher) : base(pageSize)
         {
-            pageFetcher = pageFetcher ?? throw new ArgumentNullException(nameof(pageFetcher));
-
             PageContent = pageFetcher(offset, pageSize);
         }
+
+        protected override T[] PageContent { get; }
     }
 
     internal sealed class SyncNonPreloadingTaskBasedPage<T> : SyncNonPreloadingPageBase<T>
@@ -49,12 +49,12 @@ namespace BFF.DataVirtualizingCollection.PageStorage
         internal SyncNonPreloadingTaskBasedPage(
             int offset,
             int pageSize,
-            [NotNull] Func<int, int, Task<T[]>> pageFetcher) : base(pageSize)
+            Func<int, int, Task<T[]>> pageFetcher) : base(pageSize)
         {
-            pageFetcher = pageFetcher ?? throw new ArgumentNullException(nameof(pageFetcher));
-
             // The blocking call to Result is accepted because this is the sync access mode
             PageContent = pageFetcher(offset, pageSize).Result;
         }
+
+        protected override T[] PageContent { get; }
     }
 }

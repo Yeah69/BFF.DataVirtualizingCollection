@@ -234,7 +234,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration
                 {
                 IndexAccessBehavior.Synchronous => indexAccessBehaviorCollectionBuilder.SyncIndexAccess(),
                 IndexAccessBehavior.Asynchronous => indexAccessBehaviorCollectionBuilder.AsyncIndexAccess(
-                    placeholderFactory,
+                    (_, __) => placeholderFactory(),
                     new EventLoopScheduler(),
                     new EventLoopScheduler()),
                 _ => throw new Exception("Test configuration failed!")

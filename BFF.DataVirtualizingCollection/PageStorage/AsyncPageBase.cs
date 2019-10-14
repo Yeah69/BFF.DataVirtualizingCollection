@@ -4,7 +4,6 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 
 namespace BFF.DataVirtualizingCollection.PageStorage
 {
@@ -12,19 +11,15 @@ namespace BFF.DataVirtualizingCollection.PageStorage
     {
         private readonly int _pageSize;
         private readonly IScheduler _scheduler;
-        protected Task PageFetchCompletion;
         protected T[] Page;
         protected bool IsDisposed;
 
         internal AsyncPageBase(
             int pageKey,
             int pageSize,
-            [NotNull] Func<int, int, T> placeholderFactory,
-            [NotNull] IScheduler scheduler)
+            Func<int, int, T> placeholderFactory,
+            IScheduler scheduler)
         {
-            placeholderFactory = placeholderFactory ?? throw new ArgumentNullException(nameof(placeholderFactory));
-            scheduler = scheduler ?? throw new ArgumentNullException(nameof(scheduler));
-
             _pageSize = pageSize;
             _scheduler = scheduler;
             Page = Enumerable
@@ -32,6 +27,8 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                 .Select(pageIndex => placeholderFactory(pageKey, pageIndex))
                 .ToArray();
         }
+
+        protected abstract Task PageFetchCompletion { get; }
 
         public T this[int index] =>
             index >= _pageSize || index < 0
@@ -66,16 +63,12 @@ namespace BFF.DataVirtualizingCollection.PageStorage
             int pageKey,
             int offset,
             int pageSize,
-            [NotNull] Func<int, int, T[]> pageFetcher,
-            [NotNull] Func<int, int, T> placeholderFactory,
-            [NotNull] IScheduler scheduler,
-            [NotNull] IObserver<(int Offset, int PageSize, T[] PreviousPage, T[] Page)> pageArrivalObservations) 
+            Func<int, int, T[]> pageFetcher,
+            Func<int, int, T> placeholderFactory,
+            IScheduler scheduler,
+            IObserver<(int Offset, int PageSize, T[] PreviousPage, T[] Page)> pageArrivalObservations) 
             : base(pageKey, pageSize, placeholderFactory, scheduler)
         {
-            pageFetcher = pageFetcher ?? throw new ArgumentNullException(nameof(pageFetcher));
-            scheduler = scheduler ?? throw new ArgumentNullException(nameof(scheduler));
-            pageArrivalObservations = pageArrivalObservations ?? throw new ArgumentNullException(nameof(pageArrivalObservations));
-
             PageFetchCompletion = Observable
                 .Start(() =>
                 {
@@ -87,6 +80,8 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                 }, scheduler)
                 .ToTask();
         }
+
+        protected override Task PageFetchCompletion { get; }
     }
 
 
@@ -96,16 +91,12 @@ namespace BFF.DataVirtualizingCollection.PageStorage
             int pageKey,
             int offset,
             int pageSize,
-            [NotNull] Func<int, int, Task<T[]>> pageFetcher,
-            [NotNull] Func<int, int, T> placeholderFactory,
-            [NotNull] IScheduler scheduler,
-            [NotNull] IObserver<(int Offset, int PageSize, T[] PreviousPage, T[] Page)> pageArrivalObservations)
+            Func<int, int, Task<T[]>> pageFetcher,
+            Func<int, int, T> placeholderFactory,
+            IScheduler scheduler,
+            IObserver<(int Offset, int PageSize, T[] PreviousPage, T[] Page)> pageArrivalObservations)
             : base(pageKey,pageSize, placeholderFactory, scheduler)
         {
-            pageFetcher = pageFetcher ?? throw new ArgumentNullException(nameof(pageFetcher));
-            scheduler = scheduler ?? throw new ArgumentNullException(nameof(scheduler));
-            pageArrivalObservations = pageArrivalObservations ?? throw new ArgumentNullException(nameof(pageArrivalObservations));
-
             PageFetchCompletion = Observable
                 .StartAsync(async () =>
                 {
@@ -117,5 +108,7 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                 }, scheduler)
                 .ToTask();
         }
+
+        protected override Task PageFetchCompletion { get; }
     }
 }

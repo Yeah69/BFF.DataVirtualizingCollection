@@ -8,65 +8,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using BFF.DataVirtualizingCollection.PageStorage;
 using Xunit;
-// ReSharper disable AssignNullToNotNullAttribute *** Testing exception on null passing
 
 namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
 {
     public abstract class AsyncPageBaseTestsBase : PageTestsBase
     {
-        internal abstract AsyncPageBase<int> PageConstructedWithNullPageFetcher { get; }
-        internal abstract AsyncPageBase<int> PageConstructedWithNullPlaceholderFactory { get; }
-        internal abstract AsyncPageBase<int> PageConstructedWithNullScheduler { get; }
-        internal abstract AsyncPageBase<int> PageConstructedWithNullObserverFactory { get; }
         internal abstract AsyncPageBase<int> PageWithFirstEntry69AndPlaceholder23 { get; }
 
         internal abstract AsyncPageBase<IDisposable> PageWithDisposable(IDisposable disposable);
 
         internal abstract AsyncPageBase<IDisposable> PageWithDisposablePlaceholder(IDisposable disposable);
-
-        [Fact]
-        internal void Constructor_PageFetcherNull_ThrowsArgumentNullException()
-        {
-            // Arrange + Act + Assert
-            Assert.Throws<ArgumentNullException>(() =>
-            {
-                using var sut = PageConstructedWithNullPageFetcher;
-                return sut;
-            });
-        }
-
-        [Fact]
-        internal void Constructor_PlaceholderFactoryNull_ThrowsArgumentNullException()
-        {
-            // Arrange + Act + Assert
-            Assert.Throws<ArgumentNullException>(() =>
-            {
-                using var sut = PageConstructedWithNullPlaceholderFactory;
-                return sut;
-            });
-        }
-
-        [Fact]
-        internal void Constructor_SchedulerNull_ThrowsArgumentNullException()
-        {
-            // Arrange + Act + Assert
-            Assert.Throws<ArgumentNullException>(() =>
-            {
-                using var sut = PageConstructedWithNullScheduler;
-                return sut;
-            });
-        }
-
-        [Fact]
-        internal void Constructor_ObserverNull_ThrowsArgumentNullException()
-        {
-            // Arrange + Act + Assert
-            Assert.Throws<ArgumentNullException>(() =>
-            {
-                using var sut = PageConstructedWithNullObserverFactory;
-                return sut;
-            });
-        }
 
         [Fact]
         internal async Task Dispose_PageHasOneDisposable_Disposes()
@@ -142,57 +93,6 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
                 (_, __) => 23, 
                 DefaultScheduler.Instance, 
                 Observer.Create<(int Offset, int PageSize, int[] PreviousPage, int[] Page)>(_ => { }));
-        internal override AsyncPageBase<int> PageConstructedWithNullPageFetcher =>
-            new AsyncNonTaskBasedPage<int>(
-                0,
-                0,
-                1,
-                null,
-                (_, __) => 23,
-                DefaultScheduler.Instance,
-                Observer.Create<(int Offset, int PageSize, int[] PreviousPage, int[] Page)>(_ => { }));
-
-        internal override AsyncPageBase<int> PageConstructedWithNullPlaceholderFactory =>
-            new AsyncNonTaskBasedPage<int>(
-                0,
-                0,
-                1,
-                (offset, pageSize) =>
-                {
-                    Thread.Sleep(10);
-                    return new[] { 69 };
-                },
-                null,
-                DefaultScheduler.Instance,
-                Observer.Create<(int Offset, int PageSize, int[] PreviousPage, int[] Page)>(_ => { }));
-
-        internal override AsyncPageBase<int> PageConstructedWithNullScheduler =>
-            new AsyncNonTaskBasedPage<int>(
-                0,
-                0,
-                1,
-                (offset, pageSize) =>
-                {
-                    Thread.Sleep(10);
-                    return new[] { 69 };
-                },
-                (_, __) => 23,
-                null,
-                Observer.Create<(int Offset, int PageSize, int[] PreviousPage, int[] Page)>(_ => { }));
-
-        internal override AsyncPageBase<int> PageConstructedWithNullObserverFactory =>
-            new AsyncNonTaskBasedPage<int>(
-                0,
-                0,
-                1,
-                (offset, pageSize) =>
-                {
-                    Thread.Sleep(10);
-                    return new[] { 69 };
-                },
-                (_, __) => 23,
-                DefaultScheduler.Instance,
-                null);
 
         internal override AsyncPageBase<int> PageWithFirstEntry69AndPlaceholder23 =>
             new AsyncNonTaskBasedPage<int>(
@@ -259,57 +159,6 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
                 (_, __) => 23,
                 DefaultScheduler.Instance,
                 Observer.Create<(int Offset, int PageSize, int[] PreviousPage, int[] Page)>(_ => { }));
-        internal override AsyncPageBase<int> PageConstructedWithNullPageFetcher =>
-            new AsyncTaskBasedPage<int>(
-                0,
-                0,
-                1,
-                null,
-                (_, __) => 23,
-                DefaultScheduler.Instance,
-                Observer.Create<(int Offset, int PageSize, int[] PreviousPage, int[] Page)>(_ => { }));
-
-        internal override AsyncPageBase<int> PageConstructedWithNullPlaceholderFactory =>
-            new AsyncTaskBasedPage<int>(
-                0,
-                0,
-                1,
-                async (offset, pageSize) =>
-                {
-                    await Task.Delay(10);
-                    return new[] { 69 };
-                },
-                null,
-                DefaultScheduler.Instance,
-                Observer.Create<(int Offset, int PageSize, int[] PreviousPage, int[] Page)>(_ => { }));
-
-        internal override AsyncPageBase<int> PageConstructedWithNullScheduler =>
-            new AsyncTaskBasedPage<int>(
-                0,
-                0,
-                1,
-                async (offset, pageSize) =>
-                {
-                    await Task.Delay(10);
-                    return new[] { 69 };
-                },
-                (_, __) => 23,
-                null,
-                Observer.Create<(int Offset, int PageSize, int[] PreviousPage, int[] Page)>(_ => { }));
-
-        internal override AsyncPageBase<int> PageConstructedWithNullObserverFactory =>
-            new AsyncTaskBasedPage<int>(
-                0,
-                0,
-                1,
-                async (offset, pageSize) =>
-                {
-                    await Task.Delay(10);
-                    return new[] { 69 };
-                },
-                (_, __) => 23,
-                DefaultScheduler.Instance,
-                null);
 
         internal override AsyncPageBase<int> PageWithFirstEntry69AndPlaceholder23 =>
             new AsyncTaskBasedPage<int>(

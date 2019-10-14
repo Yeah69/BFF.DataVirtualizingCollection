@@ -16,7 +16,7 @@ namespace BFF.DataVirtualizingCollection.Sample
     /// </summary>
     public partial class MainWindow
     {
-        private static readonly string PathToSimpleTestDb = $"{System.Reflection.Assembly.GetEntryAssembly().Location.Remove(System.Reflection.Assembly.GetEntryAssembly().Location.LastIndexOf(Path.DirectorySeparatorChar))}{Path.DirectorySeparatorChar}Databases{Path.DirectorySeparatorChar}BFF.DataVirtualizingCollection.MillionNumbers.sqlite" ;
+        private static readonly string PathToSimpleTestDb = $"{System.Reflection.Assembly.GetEntryAssembly()?.Location.Remove(System.Reflection.Assembly.GetEntryAssembly()?.Location.LastIndexOf(Path.DirectorySeparatorChar) ?? 0)}{Path.DirectorySeparatorChar}Databases{Path.DirectorySeparatorChar}BFF.DataVirtualizingCollection.MillionNumbers.sqlite" ;
 
         public MainWindow()
         {
@@ -269,7 +269,8 @@ namespace BFF.DataVirtualizingCollection.Sample
     public class MyObject : IDisposable
     {
         // Simulates workload
-        byte[] _workload = new byte[12500];
+        // ReSharper disable once UnusedMember.Local
+        private readonly byte[] _workload = new byte[12500];
 
         public MyObject(int number)
         {
@@ -292,7 +293,7 @@ namespace BFF.DataVirtualizingCollection.Sample
 
         public static IValueConverter ToCompanyText =
             LambdaConverters.ValueConverter.Create<ProfileViewModel, string>(
-                e => e.Value.IsFreelancer ? "Freelancer" : e.Value.CompanyName);
+                e => e.Value.IsFreelancer ? "Freelancer" : e.Value.CompanyName ?? string.Empty);
 
         public static IValueConverter ToCompanyIcon =
             LambdaConverters.ValueConverter.Create<ProfileViewModel, PackIconMaterialKind>(
@@ -313,7 +314,7 @@ namespace BFF.DataVirtualizingCollection.Sample
             string description,
             bool isAvailable,
             bool isFreelancer,
-            string companyName,
+            string? companyName,
             IReadOnlyList<string> abilities,
             int hiddenAbilitiesCount,
             ImageSource picture)
@@ -342,7 +343,7 @@ namespace BFF.DataVirtualizingCollection.Sample
 
         public bool IsFreelancer { get; }
 
-        public string CompanyName { get; }
+        public string? CompanyName { get; }
 
         public IReadOnlyList<string> Abilities { get; }
 

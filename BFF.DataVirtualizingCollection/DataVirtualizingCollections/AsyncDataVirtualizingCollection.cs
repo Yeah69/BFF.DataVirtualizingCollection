@@ -5,28 +5,22 @@ using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using BFF.DataVirtualizingCollection.Extensions;
 using BFF.DataVirtualizingCollection.PageStorage;
-using JetBrains.Annotations;
 
 namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
 {
     internal class AsyncDataVirtualizingCollection<T> : DataVirtualizingCollectionBase<T>
     {
-        private IPageStorage<T> _pageStorage;
+        private IPageStorage<T>? _pageStorage;
 
         private int _count;
 
         internal AsyncDataVirtualizingCollection(
-            [NotNull] Func<int, IPageStorage<T>> pageStoreFactory,
-            [NotNull] Func<Task<int>> countFetcher,
-            [NotNull] IObservable<(int Offset, int PageSize, T[] PreviousPage, T[] Page)> observePageFetches,
-            [CanBeNull] IDisposable disposeOnDisposal,
-            [NotNull] IScheduler observeScheduler)
+            Func<int, IPageStorage<T>> pageStoreFactory,
+            Func<Task<int>> countFetcher,
+            IObservable<(int Offset, int PageSize, T[] PreviousPage, T[] Page)> observePageFetches,
+            IDisposable? disposeOnDisposal,
+            IScheduler observeScheduler)
         {
-            pageStoreFactory = pageStoreFactory ?? throw new ArgumentNullException(nameof(pageStoreFactory));
-            countFetcher = countFetcher ?? throw new ArgumentNullException(nameof(countFetcher));
-            observePageFetches = observePageFetches ?? throw new ArgumentNullException(nameof(observePageFetches));
-            observeScheduler = observeScheduler ?? throw new ArgumentNullException(nameof(observeScheduler));
-
             _count = 0;
             InitializationCompleted = countFetcher()
                 .ToObservable()
@@ -58,7 +52,10 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
 
         protected override T GetItemInner(int index)
         {
-            return _pageStorage[index];
+            InitializationCompleted.Wait();
+            return _pageStorage is null
+                ? throw new Exception("Impossible")
+                : _pageStorage[index];
         }
 
         public override Task InitializationCompleted { get; }

@@ -11,19 +11,19 @@ using Xunit;
 
 namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
 {
-    public class PageStorageTests
+    public class PreloadingPageStorageTests
     {
-
         [Fact]
-        public void Index_RequestSeventhPage_SeventhPageRequested()
+        public void Index_RequestSeventhPage_SeventhSixthAndEighthPageRequested()
         {
             // Arrange
             var page = Substitute.For<IPage<int>>();
             page.ReturnsForAll(69);
             using var requests = new ReplaySubject<(int PageKey, int PageIndex)>();
-            using var sut = new PageStorage<int>(
+            using var sut = new PreloadingPageStorage<int>(
                 10,
                 10000,
+                (_, __, ___) => page,
                 (_, __, ___) => page,
                 req =>
                 {
@@ -36,23 +36,38 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
             requests.OnCompleted();
 
             // Assert
-            Assert.Collection(requests.ToEnumerable(), tuple =>
-            {
-                var (pageKey, pageIndex) = tuple;
-                Assert.Equal(6, pageKey);
-                Assert.Equal(9, pageIndex);
-            });
+            Assert.Collection(
+                requests.ToEnumerable(),
+                tuple =>
+                {
+                    var (pageKey, pageIndex) = tuple;
+                    Assert.Equal(6, pageKey);
+                    Assert.Equal(9, pageIndex);
+                },
+                tuple =>
+                {
+                    var (pageKey, pageIndex) = tuple;
+                    Assert.Equal(5, pageKey);
+                    Assert.Equal(-1, pageIndex);
+                },
+                tuple =>
+                {
+                    var (pageKey, pageIndex) = tuple;
+                    Assert.Equal(7, pageKey);
+                    Assert.Equal(-1, pageIndex);
+                });
         }
 
         [Fact]
-        public void Dispose_ThreePagesRequested_AllThreePagesDisposed()
+        public void Dispose_ThreePagesRequested_SevenPagesDisposed()
         {
             // Arrange
             var page = Substitute.For<IPage<int>>();
             page.ReturnsForAll(69);
-            var sut = new PageStorage<int>(
+            var sut = new PreloadingPageStorage<int>(
                 10,
                 10000,
+                (_, __, ___) => page,
                 (_, __, ___) => page,
                 _ => Observable.Never<IReadOnlyList<int>>());
 
@@ -63,19 +78,20 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
             sut.Dispose();
 
             // Assert
-            page.Received(Quantity.Exactly(3)).Dispose();
+            page.Received(Quantity.Exactly(7)).Dispose();
         }
 
         [Fact]
-        public void PageRemoval_RemoveAllExceptFirstRequestedPage_TwoPagesDisposed()
+        public void PageRemoval_RemoveAllExceptFirstRequestedPage_SixPagesDisposed()
         {
             // Arrange
             var page = Substitute.For<IPage<int>>();
             page.ReturnsForAll(69);
             var subject = new Subject<IReadOnlyList<int>>();
-            using var sut = new PageStorage<int>(
+            using var sut = new PreloadingPageStorage<int>(
                 10,
                 10000,
+                (_, __, ___) => page,
                 (_, __, ___) => page,
                 _ => subject);
 
@@ -83,10 +99,10 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
             var i = sut[69];
             var i1 = sut[23];
             var i2 = sut[3];
-            subject.OnNext(new []{ 0, 2 });
+            subject.OnNext(new[] { 0, 1, 2, 3, 5, 7 });
 
             // Assert
-            page.Received(Quantity.Exactly(2)).Dispose();
+            page.Received(Quantity.Exactly(6)).Dispose();
         }
     }
 }
