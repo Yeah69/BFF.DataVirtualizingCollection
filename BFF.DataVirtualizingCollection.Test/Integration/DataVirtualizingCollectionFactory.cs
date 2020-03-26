@@ -3,35 +3,11 @@ using System.Linq;
 using System.Reactive.Concurrency;
 using System.Threading;
 using System.Threading.Tasks;
-using BFF.DataVirtualizingCollection.DataVirtualizingCollections;
+using BFF.DataVirtualizingCollection.DataVirtualizingCollection;
 
 namespace BFF.DataVirtualizingCollection.Test.Integration
 {
-    public enum PageLoadingBehavior
-    {
-        Preloading,
-        NonPreloading
-    }
-
-    public enum PageRemovalBehavior
-    {
-        Hoarding,
-        LeastRecentlyUsed
-    }
-
-    public enum FetchersKind
-    {
-        NonTaskBased,
-        TaskBased
-    }
-
-    public enum IndexAccessBehavior
-    {
-        Asynchronous,
-        Synchronous
-    }
-
-    internal static class Factory
+    internal static class DataVirtualizingCollectionFactory
     {
         internal static IDataVirtualizingCollection<int> CreateCollectionWithIncrementalInteger(
             PageLoadingBehavior pageLoadingBehavior,
@@ -172,8 +148,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration
             return dataVirtualizingCollection;
         }
 
-        private static IPageHoldingBehaviorCollectionBuilder<T> StandardPageHoldingBehaviorCollectionBuilder<T>(
-            IPageLoadingBehaviorCollectionBuilder<T> pageLoadingBehaviorCollectionBuilder,
+        private static IPageHoldingBehaviorCollectionBuilder<T> StandardPageHoldingBehaviorCollectionBuilder<T>(IPageLoadingBehaviorCollectionBuilder<T> pageLoadingBehaviorCollectionBuilder,
             PageLoadingBehavior pageLoadingBehavior) =>
             pageLoadingBehavior switch
                 {
@@ -182,8 +157,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration
                 _ => throw new Exception("Test configuration failed!")
                 };
 
-        private static IFetchersKindCollectionBuilder<T> StandardFetcherKindCollectionBuilder<T>(
-            IPageHoldingBehaviorCollectionBuilder<T> pageHoldingBehaviorCollectionBuilder,
+        private static IFetchersKindCollectionBuilder<T> StandardFetcherKindCollectionBuilder<T>(IPageHoldingBehaviorCollectionBuilder<T> pageHoldingBehaviorCollectionBuilder,
             PageRemovalBehavior pageRemovalBehavior,
             int pageLimit,
             int removalCount) =>
@@ -194,8 +168,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration
                 _ => throw new Exception("Test configuration failed!")
                 };
 
-        private static IIndexAccessBehaviorCollectionBuilder<T> StandardIndexAccessBehaviorCollectionBuilder<T>(
-            IFetchersKindCollectionBuilder<T> fetchersKindCollectionBuilder,
+        private static IIndexAccessBehaviorCollectionBuilder<T> StandardIndexAccessBehaviorCollectionBuilder<T>(IFetchersKindCollectionBuilder<T> fetchersKindCollectionBuilder,
             FetchersKind fetchersKind,
             Func<int, int, T[]> pageFetcher,
             Func<int> countFetcher) =>
@@ -226,8 +199,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration
                 _ => throw new Exception("Test configuration failed!")
                 };
 
-        private static IDataVirtualizingCollection<T> StandardDataVirtualizingCollection<T>(
-            IIndexAccessBehaviorCollectionBuilder<T> indexAccessBehaviorCollectionBuilder,
+        private static IDataVirtualizingCollection<T> StandardDataVirtualizingCollection<T>(IIndexAccessBehaviorCollectionBuilder<T> indexAccessBehaviorCollectionBuilder,
             IndexAccessBehavior indexAccessBehavior,
             Func<T> placeholderFactory) =>
             indexAccessBehavior switch

@@ -8,11 +8,12 @@ using System.Reactive.Disposables;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
+namespace BFF.DataVirtualizingCollection
 {
     internal abstract class VirtualizationBase<T> :
         IList<T>,
         IList,
+        IReadOnlyList<T>,
         INotifyCollectionChanged,
         INotifyPropertyChanged,
         IDisposable
@@ -31,30 +32,28 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
 
         int ICollection<T>.Count => GetCountInner();
 
+        int IReadOnlyCollection<T>.Count => GetCountInner();
+
         bool ICollection<T>.IsReadOnly => true;
         object? IList.this[int index]
         {
-            get => index >= Count || index < 0
-                ? throw new IndexOutOfRangeException("Index was out of range. Must be non-negative and less than the size of the collection.")
-                : GetItemInner(index);
+            get => IndexerInnerGet(index);
             set => throw new NotSupportedException();
         }
 
-        protected abstract T GetItemInner(int index);
+        protected abstract T IndexerInnerGet(int index);
 
         public bool IsReadOnly => true;
 
         public T this[int index]
         {
-            get => index >= Count || index < 0 
-                ? throw new IndexOutOfRangeException("Index was out of range. Must be non-negative and less than the size of the collection.")
-                : GetItemInner(index);
+            get => IndexerInnerGet(index);
             set => throw new NotSupportedException();
         }
 
         private int GetCountInner() => Count;
 
-        public IEnumerator<T> GetEnumerator()
+        public virtual IEnumerator<T> GetEnumerator()
         {
             return Enumerable.Empty<T>().GetEnumerator();
         }
@@ -157,6 +156,21 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
         protected void OnCollectionChangedReplace(T newItem, T oldItem, int index)
         {
             CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, newItem, oldItem, index));
+        }
+
+        protected void OnCollectionChangedRemove(T oldItem, int index)
+        {
+            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, oldItem, index));
+        }
+
+        protected void OnCollectionChangedAdd(T newItem, int index)
+        {
+            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, newItem, index));
+        }
+
+        protected void OnCollectionChangedReset()
+        {
+            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
         protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)

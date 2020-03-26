@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Threading.Tasks;
+using MoreLinq.Extensions;
 using Xunit;
 
 namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
@@ -11,13 +12,11 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
     {
         // ReSharper disable once MemberCanBePrivate.Global
         public static IEnumerable<object[]> Combinations =>
-            new List<object[]>
-            {
-                new object[] { PageLoadingBehavior.NonPreloading, PageRemovalBehavior.LeastRecentlyUsed, FetchersKind.NonTaskBased, IndexAccessBehavior.Synchronous },
-                new object[] { PageLoadingBehavior.NonPreloading, PageRemovalBehavior.LeastRecentlyUsed, FetchersKind.TaskBased, IndexAccessBehavior.Synchronous },
-                new object[] { PageLoadingBehavior.Preloading, PageRemovalBehavior.LeastRecentlyUsed, FetchersKind.NonTaskBased, IndexAccessBehavior.Synchronous },
-                new object[] { PageLoadingBehavior.Preloading, PageRemovalBehavior.LeastRecentlyUsed, FetchersKind.TaskBased, IndexAccessBehavior.Synchronous }
-            };
+            Enum.GetValues(typeof(PageLoadingBehavior)).OfType<PageLoadingBehavior>()
+                .Cartesian(
+                    Enum.GetValues(typeof(FetchersKind)).OfType<FetchersKind>(),
+                    (first, second) =>
+                        new object[] {first, PageRemovalBehavior.LeastRecentlyUsed, second, IndexAccessBehavior.Synchronous});
 
         // ReSharper disable once MemberCanBePrivate.Global
         public static IEnumerable<object[]> CombinationsWherePreloading =>
@@ -41,7 +40,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
         {
             // Arrange
             var set = new HashSet<int>();
-            using var collection = Factory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
+            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -77,7 +76,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
         {
             // Arrange
             var set = new HashSet<int>();
-            using var collection = Factory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
+            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -113,7 +112,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
         {
             // Arrange
             var set = new HashSet<int>();
-            using var collection = Factory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
+            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -153,7 +152,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
         {
             // Arrange
             var set = new HashSet<int>();
-            using var collection = Factory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
+            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -194,7 +193,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
             // Arrange
             int[] expected = Enumerable.Range(0, 100).ToArray();
             var set = new HashSet<int>();
-            using var collection = Factory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
+            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -233,7 +232,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
             // Arrange
             int[] expected = Enumerable.Range(0, 100).ToArray();
             var set = new HashSet<int>();
-            using var collection = Factory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
+            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -272,7 +271,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
             // Arrange
             int[] expected = Enumerable.Range(0, 300).ToArray();
             var set = new HashSet<int>();
-            using var collection = Factory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
+            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -311,7 +310,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
             // Arrange
             int[] expected = Enumerable.Range(0, 100).ToArray();
             var set = new HashSet<int>();
-            using var collection = Factory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
+            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -350,7 +349,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
             // Arrange
             int[] expected = Enumerable.Range(0, 100).ToArray();
             var set = new HashSet<int>();
-            using var collection = Factory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
+            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,

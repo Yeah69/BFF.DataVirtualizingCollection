@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using BFF.DataVirtualizingCollection.DataVirtualizingCollection;
 using MahApps.Metro.IconPacks;
 using Microsoft.Data.Sqlite;
 

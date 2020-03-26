@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using BFF.DataVirtualizingCollection.Extensions;
 using BFF.DataVirtualizingCollection.PageStorage;
 
-namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
+namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
 {
     internal sealed class SyncDataVirtualizingCollection<T> : DataVirtualizingCollectionBase<T>
     {
@@ -13,9 +13,6 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
             Func<int, IPageStorage<T>> pageStoreFactory,
             Func<int> countFetcher)
         {
-            pageStoreFactory = pageStoreFactory ?? throw new ArgumentNullException(nameof(pageStoreFactory));
-            countFetcher = countFetcher ?? throw new ArgumentNullException(nameof(countFetcher));
-
             Count = countFetcher();
             _pageStorage = pageStoreFactory(Count).AddTo(CompositeDisposable);
         }

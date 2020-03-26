@@ -111,4 +111,18 @@ namespace BFF.DataVirtualizingCollection.PageStorage
 
         protected override Task PageFetchCompletion { get; }
     }
+
+    internal class PlaceholderOnlyPage<T> : AsyncPageBase<T>
+    {
+        public PlaceholderOnlyPage(
+            int pageKey, 
+            int pageSize, 
+            Func<int, int, T> placeholderFactory, 
+            IScheduler scheduler) 
+            : base(pageKey, pageSize, placeholderFactory, scheduler)
+        {
+        }
+
+        protected override Task PageFetchCompletion => Task.CompletedTask;
+    }
 }

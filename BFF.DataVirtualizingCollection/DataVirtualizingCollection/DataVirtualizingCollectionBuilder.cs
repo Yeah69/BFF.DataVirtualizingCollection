@@ -6,12 +6,11 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-using BFF.DataVirtualizingCollection.DataVirtualizingCollections;
 using BFF.DataVirtualizingCollection.PageRemoval;
 using BFF.DataVirtualizingCollection.PageStorage;
 using BFF.DataVirtualizingCollection.Utilities;
 
-namespace BFF.DataVirtualizingCollection
+namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
 {
     /// <summary>
     /// Lets you configure the page loading behavior.

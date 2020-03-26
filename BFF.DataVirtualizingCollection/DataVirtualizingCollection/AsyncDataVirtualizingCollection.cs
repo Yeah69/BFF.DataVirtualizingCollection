@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using BFF.DataVirtualizingCollection.Extensions;
 using BFF.DataVirtualizingCollection.PageStorage;
 
-namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
+namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
 {
     internal class AsyncDataVirtualizingCollection<T> : DataVirtualizingCollectionBase<T>
     {

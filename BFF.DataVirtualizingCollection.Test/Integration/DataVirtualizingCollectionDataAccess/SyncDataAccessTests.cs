@@ -1,36 +1,32 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Linq;
+using MoreLinq.Extensions;
 using Xunit;
 
-namespace BFF.DataVirtualizingCollection.Test.Integration.DataAccess
+namespace BFF.DataVirtualizingCollection.Test.Integration.DataVirtualizingCollectionDataAccess
 {
-    public class AsyncDataAccessTests
+    public class SyncDataAccessTests
     {
         // ReSharper disable once MemberCanBePrivate.Global
         public static IEnumerable<object[]> Combinations =>
-            new List<object[]>
-            {
-                new object[] { PageLoadingBehavior.NonPreloading, PageRemovalBehavior.Hoarding, FetchersKind.NonTaskBased, IndexAccessBehavior.Asynchronous },
-                new object[] { PageLoadingBehavior.NonPreloading, PageRemovalBehavior.Hoarding, FetchersKind.TaskBased, IndexAccessBehavior.Asynchronous },
-                new object[] { PageLoadingBehavior.NonPreloading, PageRemovalBehavior.LeastRecentlyUsed, FetchersKind.NonTaskBased, IndexAccessBehavior.Asynchronous },
-                new object[] { PageLoadingBehavior.NonPreloading, PageRemovalBehavior.LeastRecentlyUsed, FetchersKind.TaskBased, IndexAccessBehavior.Asynchronous },
-                new object[] { PageLoadingBehavior.Preloading, PageRemovalBehavior.Hoarding, FetchersKind.NonTaskBased, IndexAccessBehavior.Asynchronous },
-                new object[] { PageLoadingBehavior.Preloading, PageRemovalBehavior.Hoarding, FetchersKind.TaskBased, IndexAccessBehavior.Asynchronous },
-                new object[] { PageLoadingBehavior.Preloading, PageRemovalBehavior.LeastRecentlyUsed, FetchersKind.NonTaskBased, IndexAccessBehavior.Asynchronous },
-                new object[] { PageLoadingBehavior.Preloading, PageRemovalBehavior.LeastRecentlyUsed, FetchersKind.TaskBased, IndexAccessBehavior.Asynchronous }
-            };
+            Enum.GetValues(typeof(PageLoadingBehavior)).OfType<PageLoadingBehavior>()
+                .Cartesian(
+                    Enum.GetValues(typeof(PageRemovalBehavior)).OfType<PageRemovalBehavior>(), 
+                    Enum.GetValues(typeof(FetchersKind)).OfType<FetchersKind>(),
+                    (first, second, third) =>
+                        new object[] {first, second, third, IndexAccessBehavior.Synchronous});
 
         [Theory]
         [MemberData(nameof(Combinations))]
-        public async Task BuildingCollectionWith6969Elements_FirstEntry_0(
+        public void BuildingCollectionWith6969Elements_FirstEntry_0(
             PageLoadingBehavior pageLoadingBehavior,
             PageRemovalBehavior pageRemovalBehavior,
             FetchersKind fetchersKind,
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = Factory.CreateCollectionWithIncrementalInteger(
+            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -38,27 +34,20 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.DataAccess
                 6969,
                 100);
 
-            await collection.InitializationCompleted;
-
-            // Act
-            var placeholder = ((IList<int>)collection)[0];
-            await Task.Delay(50);
-
-            // Assert
-            Assert.Equal(-1, placeholder);
+            // Act + Assert
             Assert.Equal(0, ((IList<int>)collection)[0]);
         }
 
         [Theory]
         [MemberData(nameof(Combinations))]
-        public async Task BuildingCollectionWith6969Elements_70thEntry_69(
+        public void BuildingCollectionWith6969Elements_70thEntry_69(
             PageLoadingBehavior pageLoadingBehavior,
             PageRemovalBehavior pageRemovalBehavior,
             FetchersKind fetchersKind,
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = Factory.CreateCollectionWithIncrementalInteger(
+            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -66,27 +55,20 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.DataAccess
                 6969,
                 100);
 
-            await collection.InitializationCompleted;
-
-            // Act
-            var placeholder = ((IList<int>)collection)[69];
-            await Task.Delay(500);
-
-            // Assert
-            Assert.Equal(-1, placeholder);
+            // Act + Assert
             Assert.Equal(69, ((IList<int>)collection)[69]);
         }
 
         [Theory]
         [MemberData(nameof(Combinations))]
-        public async Task BuildingCollectionWith6969Elements_124thEntry_123(
+        public void BuildingCollectionWith6969Elements_124thEntry_123(
             PageLoadingBehavior pageLoadingBehavior,
             PageRemovalBehavior pageRemovalBehavior,
             FetchersKind fetchersKind,
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = Factory.CreateCollectionWithIncrementalInteger(
+            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -94,27 +76,20 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.DataAccess
                 6969,
                 100);
 
-            await collection.InitializationCompleted;
-
-            // Act
-            var placeholder = ((IList<int>)collection)[123];
-            await Task.Delay(50);
-
-            // Assert
-            Assert.Equal(-1, placeholder);
+            // Act + Assert
             Assert.Equal(123, ((IList<int>)collection)[123]);
         }
 
         [Theory]
         [MemberData(nameof(Combinations))]
-        public async Task BuildingCollectionWith6969Elements_6001thEntry_6000(
+        public void BuildingCollectionWith6969Elements_6001thEntry_6000(
             PageLoadingBehavior pageLoadingBehavior,
             PageRemovalBehavior pageRemovalBehavior,
             FetchersKind fetchersKind,
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = Factory.CreateCollectionWithIncrementalInteger(
+            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -122,27 +97,20 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.DataAccess
                 6969,
                 100);
 
-            await collection.InitializationCompleted;
-
-            // Act
-            var placeholder = ((IList<int>)collection)[6000];
-            await Task.Delay(50);
-
-            // Assert
-            Assert.Equal(-1, placeholder);
+            // Act + Assert
             Assert.Equal(6000, ((IList<int>)collection)[6000]);
         }
 
         [Theory]
         [MemberData(nameof(Combinations))]
-        public async Task BuildingCollectionWith6969Elements_6969thEntry_6968(
+        public void BuildingCollectionWith6969Elements_6969thEntry_6968(
             PageLoadingBehavior pageLoadingBehavior,
             PageRemovalBehavior pageRemovalBehavior,
             FetchersKind fetchersKind,
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = Factory.CreateCollectionWithIncrementalInteger(
+            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -150,35 +118,26 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.DataAccess
                 6969,
                 100);
 
-            await collection.InitializationCompleted;
-
-            // Act
-            var placeholder = ((IList<int>)collection)[6968];
-            await Task.Delay(50);
-
-            // Assert
-            Assert.Equal(-1, placeholder);
+            // Act + Assert
             Assert.Equal(6968, ((IList<int>)collection)[6968]);
         }
 
         [Theory]
         [MemberData(nameof(Combinations))]
-        public async Task BuildingCollectionWith6969Elements_6970thEntry_ThrowsIndexOutOfRangeException(
+        public void BuildingCollectionWith6969Elements_6970thEntry_ThrowsIndexOutOfRangeException(
             PageLoadingBehavior pageLoadingBehavior,
             PageRemovalBehavior pageRemovalBehavior,
             FetchersKind fetchersKind,
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = Factory.CreateCollectionWithIncrementalInteger(
+            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
                 100);
-
-            await collection.InitializationCompleted;
 
             // Act + Assert
             Assert.Throws<IndexOutOfRangeException>(() => ((IList<int>)collection)[6969]);
@@ -186,14 +145,14 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.DataAccess
 
         [Theory]
         [MemberData(nameof(Combinations))]
-        public async Task BuildingCollectionWith6969Elements_MinusFirstEntry_ThrowsIndexOutOfRangeException(
+        public void BuildingCollectionWith6969Elements_MinusFirstEntry_ThrowsIndexOutOfRangeException(
             PageLoadingBehavior pageLoadingBehavior,
             PageRemovalBehavior pageRemovalBehavior,
             FetchersKind fetchersKind,
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = Factory.CreateCollectionWithIncrementalInteger(
+            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -201,22 +160,20 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.DataAccess
                 6969,
                 100);
 
-            await collection.InitializationCompleted;
-
             // Act + Assert
             Assert.Throws<IndexOutOfRangeException>(() => ((IList<int>)collection)[-1]);
         }
 
         [Theory]
         [MemberData(nameof(Combinations))]
-        public async Task BuildingCollectionWherePageFetcherIgnoresGivenPageSize23_70thEntry_69(
+        public void BuildingCollectionWherePageFetcherIgnoresGivenPageSize23_70thEntry_69(
             PageLoadingBehavior pageLoadingBehavior,
             PageRemovalBehavior pageRemovalBehavior,
             FetchersKind fetchersKind,
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = Factory.CreateCollectionWithIncrementalIntegerWhereFetchersIgnorePageSize(
+            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalIntegerWhereFetchersIgnorePageSize(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -224,14 +181,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.DataAccess
                 6969,
                 23);
 
-            await collection.InitializationCompleted;
-
-            // Act
-            var placeholder = ((IList<int>)collection)[69];
-            await Task.Delay(50);
-
-            // Assert
-            Assert.Equal(-1, placeholder);
+            // Act + Assert
             Assert.Equal(69, ((IList<int>)collection)[69]);
         }
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Threading.Tasks;
+using MoreLinq.Extensions;
 using Xunit;
 
 namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
@@ -10,13 +11,11 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
     public class AsyncHoardingTests
     {
         public static IEnumerable<object[]> Combinations =>
-            new List<object[]>
-            {
-                new object[] { PageLoadingBehavior.NonPreloading, PageRemovalBehavior.Hoarding, FetchersKind.NonTaskBased, IndexAccessBehavior.Asynchronous },
-                new object[] { PageLoadingBehavior.NonPreloading, PageRemovalBehavior.Hoarding, FetchersKind.TaskBased, IndexAccessBehavior.Asynchronous },
-                new object[] { PageLoadingBehavior.Preloading, PageRemovalBehavior.Hoarding, FetchersKind.NonTaskBased, IndexAccessBehavior.Asynchronous },
-                new object[] { PageLoadingBehavior.Preloading, PageRemovalBehavior.Hoarding, FetchersKind.TaskBased, IndexAccessBehavior.Asynchronous }
-            };
+            Enum.GetValues(typeof(PageLoadingBehavior)).OfType<PageLoadingBehavior>()
+                .Cartesian(
+                    Enum.GetValues(typeof(FetchersKind)).OfType<FetchersKind>(),
+                    (first, second) =>
+                        new object[] {first, PageRemovalBehavior.Hoarding, second, IndexAccessBehavior.Asynchronous});
 
         [Theory]
         [MemberData(nameof(Combinations))]
@@ -28,7 +27,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
         {
             // Arrange
             var set = new HashSet<int>();
-            using var collection = Factory.CreateCollectionWithCustomPageFetchingLogic(
+            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogic(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -66,7 +65,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
             // Arrange
             const int expected = 69;
             var set = new HashSet<int>();
-            var collection = Factory.CreateCollectionWithCustomPageFetchingLogic(
+            var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogic(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,

@@ -5,7 +5,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Threading.Tasks;
 
-namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
+namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
 {
     // ReSharper disable once PossibleInterfaceMemberAmbiguity
     // Ambiguous Members should be implemented explicitly
@@ -18,6 +18,7 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollections
     public interface IDataVirtualizingCollection<T> :
         IList<T>,
         IList,
+        IReadOnlyList<T>,
         INotifyCollectionChanged,
         INotifyPropertyChanged,
         IDisposable
