@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
 
@@ -24,11 +25,11 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
         public void SlideLeft()
         {
             if (Offset <= 0) return;
+            var prev = this.Select(x => x).ToArray();
             Offset--;
             _observeScheduler.Schedule(Unit.Default, (_, __) =>
             {
-                OnCollectionChangedRemove(GetItemInner(Offset + Size), Size - 1);
-                OnCollectionChangedAdd(GetItemInner(Offset), 0);
+                OnCollectionChangedReplace(this.Select(x => x).ToArray(), prev, 0);
                 OnIndexerChanged();
             });
         }
@@ -36,21 +37,22 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
         public void SlideRight()
         {
             if (CountOfBackedDataSet - Size <= Offset) return;
+            var prev = this.Select(x => x).ToArray();
             Offset++;
             _observeScheduler.Schedule(Unit.Default, (_, __) =>
             {
-                OnCollectionChangedRemove(GetItemInner(Offset - 1), 0);
-                OnCollectionChangedAdd(GetItemInner(Offset + Size - 1), Size - 1);
+                OnCollectionChangedReplace(this.Select(x => x).ToArray(), prev, 0);
                 OnIndexerChanged();
             });
         }
 
         public void JumpTo(int index)
         {
+            var prev = this.Select(x => x).ToArray();
             Offset = Math.Max(0, Math.Min(CountOfBackedDataSet - Size, index));
             _observeScheduler.Schedule(Unit.Default, (_, __) =>
             {
-                OnCollectionChangedReset();
+                OnCollectionChangedReplace(this.Select(x => x).ToArray(), prev, 0);
                 OnIndexerChanged();
             });
         }
