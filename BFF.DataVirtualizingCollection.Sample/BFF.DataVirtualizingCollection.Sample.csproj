@@ -68,6 +68,8 @@
     <PackageReference Include="LambdaConverters" Version="3.0.0" />
     <PackageReference Include="MahApps.Metro.IconPacks" Version="2.3.0" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="3.0.0" />
+    <PackageReference Include="System.Reactive" Version="4.3.2" />
+    <PackageReference Include="System.Reactive.Windows.Threading" Version="4.3.2" />
   </ItemGroup>
 
   <ItemGroup>

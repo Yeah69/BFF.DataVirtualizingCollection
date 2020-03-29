@@ -16,7 +16,7 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
         private readonly Func<int, IPageStorage<T>> _placeholderPageStoreFactory;
         private readonly Func<Task<int>> _countFetcher;
         private readonly IScheduler _observeScheduler;
-        private IPageStorage<T>? _pageStorage;
+        private IPageStorage<T> _pageStorage;
         
         private readonly SerialDisposable _serialPageStore = new SerialDisposable();
 
@@ -35,6 +35,7 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
             _countFetcher = countFetcher;
             _observeScheduler = observeScheduler;
             CountOfBackedDataSet = 0;
+            _pageStorage = _placeholderPageStoreFactory(0);
             InitializationCompleted = ResetInner(initialOffset, initialSize);
 
             disposeOnDisposal?.AddTo(CompositeDisposable);
@@ -88,18 +89,11 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
                     OnPropertyChanged(nameof(Count));
                     OnCollectionChangedReset();
                     OnIndexerChanged();
-                    return Disposable.Empty;
                 });
             ResetInner(Offset, Size);
         }
 
-        protected override T GetItemInner(int index)
-        {
-            InitializationCompleted.Wait();
-            return _pageStorage is null
-                ? throw new Exception("Impossible")
-                : _pageStorage[index];
-        }
+        protected override T GetItemInner(int index) => _pageStorage[index];
 
         public override Task InitializationCompleted { get; }
     }

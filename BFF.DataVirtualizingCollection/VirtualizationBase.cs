@@ -144,13 +144,15 @@ namespace BFF.DataVirtualizingCollection
             throw new NotSupportedException();
         }
 
+        public abstract void Reset();
+
         public event NotifyCollectionChangedEventHandler? CollectionChanged;
         public event PropertyChangedEventHandler? PropertyChanged;
 
         public void Dispose()
         {
-            InitializationCompleted.Wait();
-            CompositeDisposable.Dispose();
+            InitializationCompleted
+                .ContinueWith(_ => CompositeDisposable.Dispose());
         }
 
         protected void OnCollectionChangedReplace(T newItem, T oldItem, int index)
@@ -176,6 +178,11 @@ namespace BFF.DataVirtualizingCollection
         protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        protected void OnIndexerChanged()
+        {
+            OnPropertyChanged("Item[]");
         }
 
         public abstract Task InitializationCompleted { get; }

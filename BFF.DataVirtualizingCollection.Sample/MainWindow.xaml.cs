@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Reactive.Concurrency;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -18,6 +20,7 @@ namespace BFF.DataVirtualizingCollection.Sample
     public partial class MainWindow
     {
         private static readonly string PathToSimpleTestDb = $"{System.Reflection.Assembly.GetEntryAssembly()?.Location.Remove(System.Reflection.Assembly.GetEntryAssembly()?.Location.LastIndexOf(Path.DirectorySeparatorChar) ?? 0)}{Path.DirectorySeparatorChar}Databases{Path.DirectorySeparatorChar}BFF.DataVirtualizingCollection.MillionNumbers.sqlite" ;
+        private static readonly IScheduler DispatcherScheduler = new DispatcherScheduler(Application.Current.Dispatcher);
 
         public MainWindow()
         {
@@ -74,7 +77,7 @@ namespace BFF.DataVirtualizingCollection.Sample
 
                     return ret;
                 })
-            .SyncIndexAccess();
+            .SyncIndexAccess(DispatcherScheduler);
 
         public IList<int> AllPositiveIntNumbers { get; } = DataVirtualizingCollectionBuilder<int>
             .Build(100)
@@ -91,7 +94,7 @@ namespace BFF.DataVirtualizingCollection.Sample
                     Console.WriteLine($"{nameof(AllPositiveIntNumbers)}: Loading count");
                     return int.MaxValue;
                 })
-            .SyncIndexAccess();
+            .SyncIndexAccess(DispatcherScheduler);
 
         public IList<MyObject> WorkloadObjects { get; } = DataVirtualizingCollectionBuilder<MyObject>
             .Build(100)
@@ -108,7 +111,7 @@ namespace BFF.DataVirtualizingCollection.Sample
                     Console.WriteLine($"{nameof(WorkloadObjects)}: Loading count");
                     return int.MaxValue;
                 })
-            .SyncIndexAccess();
+            .SyncIndexAccess(DispatcherScheduler);
 
         public IList<ProfileViewModel> Profiles { get; } = DataVirtualizingCollectionBuilder<ProfileViewModel>
             .Build(12)
@@ -125,7 +128,7 @@ namespace BFF.DataVirtualizingCollection.Sample
                     Console.WriteLine($"{nameof(Profiles)}: Loading count");
                     return 420420;
                 })
-            .SyncIndexAccess();
+            .SyncIndexAccess(DispatcherScheduler);
 
         private static IReadOnlyList<ProfileViewModel> ProfilePool { get; } =
             new ReadOnlyCollection<ProfileViewModel>(

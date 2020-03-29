@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Threading.Tasks;
 using BFF.DataVirtualizingCollection.Extensions;
 using BFF.DataVirtualizingCollection.PageStorage;
+using BFF.DataVirtualizingCollection.Utilities;
 
 namespace BFF.DataVirtualizingCollection.SlidingWindow
 {
@@ -11,6 +13,7 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
     {
         private readonly Func<int, IPageStorage<T>> _pageStoreFactory;
         private readonly Func<int> _countFetcher;
+        private readonly IScheduler _observeScheduler;
         private readonly SerialDisposable _serialPageStore = new SerialDisposable();
         private IPageStorage<T>? _pageStorage;
         
@@ -24,7 +27,8 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
         {
             _pageStoreFactory = pageStoreFactory;
             _countFetcher = countFetcher;
-            Disposable.Create(() => _serialPageStore?.Dispose()).AddTo(CompositeDisposable);
+            _observeScheduler = observeScheduler;
+            _serialPageStore.AddTo(CompositeDisposable);
             
             ResetInner(initialSize, initialOffset);
         }
@@ -42,14 +46,17 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
         public override void Reset()
         {
             ResetInner(Size, Offset);
-            OnPropertyChanged(nameof(Count));
-            OnCollectionChangedReset();
-            OnIndexerChanged();
+            _observeScheduler.Schedule(Unit.Default, (_, __) =>
+            {
+                OnPropertyChanged(nameof(Count));
+                OnCollectionChangedReset();
+                OnIndexerChanged();
+            });
         }
 
         protected override T GetItemInner(int index)
         {
-            if (_pageStorage is null) throw new Exception("Should be impossible"); 
+            if (_pageStorage is null) throw new Exception(ErrorMessage.ImpossibleExceptionMessage); 
             return _pageStorage[index];
         }
 

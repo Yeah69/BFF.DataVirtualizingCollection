@@ -204,7 +204,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration
             Func<T> placeholderFactory) =>
             indexAccessBehavior switch
                 {
-                IndexAccessBehavior.Synchronous => indexAccessBehaviorCollectionBuilder.SyncIndexAccess(),
+                IndexAccessBehavior.Synchronous => indexAccessBehaviorCollectionBuilder.SyncIndexAccess(new EventLoopScheduler()),
                 IndexAccessBehavior.Asynchronous => indexAccessBehaviorCollectionBuilder.AsyncIndexAccess(
                     (_, __) => placeholderFactory(),
                     new EventLoopScheduler(),

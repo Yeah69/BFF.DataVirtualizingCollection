@@ -87,8 +87,6 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
             });
         }
 
-        public abstract void Reset();
-
         public override IEnumerator<T> GetEnumerator()
         {
             return Enumeration().GetEnumerator();
@@ -108,10 +106,5 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
                 : GetItemInner(Offset + index);
 
         protected abstract T GetItemInner(int index);
-
-        protected void OnIndexerChanged()
-        {
-            OnPropertyChanged("Item[]");
-        }
     }
 }

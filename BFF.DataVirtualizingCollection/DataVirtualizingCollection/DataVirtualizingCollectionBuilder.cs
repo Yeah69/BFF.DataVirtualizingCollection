@@ -120,18 +120,16 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
         /// If item of requested index isn't loaded yet the collections will wait actively and return as soon as it arrives.
         /// </summary>
         /// <returns>The builder itself.</returns>
+        [Obsolete("Please use the overload on which you need to pass a scheduler for notifications. This very overload will be removed in future releases.")]
         IDataVirtualizingCollection<T> SyncIndexAccess();
-
+        
         /// <summary>
-        /// If item of requested index isn't loaded yet the collections will return a placeholder instead and emit a notification as soon as it arrives.
+        /// If item of requested index isn't loaded yet the collections will wait actively and return as soon as it arrives.
         /// </summary>
-        /// <param name="placeholderFactory">You have to provide a factory lambda function which returns a placeholder.</param>
-        /// <param name="backgroundScheduler">Scheduler for all background operations.</param>
         /// <param name="notificationScheduler">Scheduler on which the notifications are emitted.</param>
-        /// <returns></returns>
-        [Obsolete("Please use the overload whose placeholderFactory gets the page key and index as parameters. Ignore these parameters if they are not necessary. This very overload will be removed in future releases.")]
-        IDataVirtualizingCollection<T> AsyncIndexAccess(Func<T> placeholderFactory, IScheduler backgroundScheduler, IScheduler notificationScheduler);
-
+        /// <returns>The builder itself.</returns>
+        IDataVirtualizingCollection<T> SyncIndexAccess(IScheduler notificationScheduler);
+        
         /// <summary>
         /// If item of requested index isn't loaded yet the collections will return a placeholder instead and emit a notification as soon as it arrives.
         /// </summary>
@@ -299,11 +297,9 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
         }
 
         /// <inheritdoc />
-        public IDataVirtualizingCollection<T> AsyncIndexAccess(Func<T> placeholderFactory, IScheduler backgroundScheduler, IScheduler notificationScheduler)
+        public IDataVirtualizingCollection<T> SyncIndexAccess(IScheduler notificationScheduler)
         {
-            _indexAccessBehavior = IndexAccessBehavior.Asynchronous;
-            _placeholderFactory = (_, __) => placeholderFactory();
-            _backgroundScheduler = backgroundScheduler;
+            _indexAccessBehavior = IndexAccessBehavior.Synchronous;
             _notificationScheduler = notificationScheduler;
             return GenerateCollection();
         }
@@ -326,7 +322,8 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
                 {
                     return new SyncDataVirtualizingCollection<T>(
                         PageStoreFactory, 
-                        _countFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage));
+                        _countFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
+                        _notificationScheduler);
 
                     IPage<T> NonPreloadingPageFetcherFactory(int pageKey, int offset, int pageSize) =>
                         new SyncNonPreloadingNonTaskBasedPage<T>(
@@ -358,7 +355,8 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
                 {
                     return new SyncDataVirtualizingCollection<T>(
                         PageStoreFactory, 
-                        () => _taskBasedCountFetcher?.Invoke().Result ?? throw new NullReferenceException(UninitializedElementsExceptionMessage));
+                        () => _taskBasedCountFetcher?.Invoke().Result ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
+                        _notificationScheduler);
 
                     IPage<T> NonPreloadingPageFetcherFactory(int pageKey, int offset, int pageSize) =>
                         new SyncNonPreloadingTaskBasedPage<T>(
@@ -391,7 +389,8 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
                     var pageFetchEvents = new Subject<(int Offset, int PageSize, T[] PreviousPage, T[] Page)>();
 
                     return new AsyncDataVirtualizingCollection<T>(
-                        PageStoreFactory, 
+                        PageStoreFactory,
+                        PlaceholderOnlyPageStoreFactory,
                         () => Observable.Start(_countFetcher, _backgroundScheduler).ToTask(), 
                         pageFetchEvents.AsObservable(),
                         pageFetchEvents,
@@ -443,6 +442,7 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
 
                     return new AsyncDataVirtualizingCollection<T>(
                         PageStoreFactory,
+                        PlaceholderOnlyPageStoreFactory,
                         _taskBasedCountFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
                         pageFetchEvents.AsObservable(),
                         pageFetchEvents,
@@ -490,6 +490,13 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
                     }
                 default: throw new ArgumentException("Can't build data-virtualizing collection with given input.");
             }
+            
+            IPageStorage<T> PlaceholderOnlyPageStoreFactory(int count) =>
+                new PlaceholderOnlyPageStorage<T>(
+                    _pageSize,
+                    count,
+                    _placeholderFactory ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
+                    _backgroundScheduler);
         }
     }
 }

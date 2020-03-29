@@ -27,5 +27,7 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
         /// Task is successfully completed when initialization is completed
         /// </summary>
         Task InitializationCompleted { get; }
+
+        void Reset();
     }
 }
