@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
 {
@@ -10,5 +11,18 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
                 : GetItemInner(index);
 
         protected abstract T GetItemInner(int index);
+
+        public override IEnumerator<T> GetEnumerator()
+        {
+            return Iterate().GetEnumerator();
+
+            IEnumerable<T> Iterate()
+            {
+                for (var i = 0; i < Count; i++)
+                {
+                    yield return GetItemInner(i);
+                }
+            }
+        }
     }
 }

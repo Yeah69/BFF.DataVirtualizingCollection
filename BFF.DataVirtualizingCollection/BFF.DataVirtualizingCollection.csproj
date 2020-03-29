@@ -7,9 +7,8 @@
     <Authors>Dimitri Enns</Authors>
     <Description>This is an approach to data virtualizing collections intended to be used in WPF projects.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes>- user may specify scheduler for preloading
-- user gets page key and page index to the placeholder factory
-- fix: placeholder are disposed of now</PackageReleaseNotes>
+    <PackageReleaseNotes>- Sliding window feature
+- Reset-function</PackageReleaseNotes>
     <Copyright></Copyright>
     <PackageTags>data-virtualization wpf csharp</PackageTags>
     <Version>2.0.0</Version>
@@ -19,12 +18,13 @@
     <PackageProjectUrl>https://github.com/Yeah69/BFF.DataVirtualizingCollection</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Yeah69/BFF.DataVirtualizingCollection.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageIcon>Yeah69Logo.ico</PackageIcon>
+    <PackageIcon>Yeah69Logo_256.png</PackageIcon>
     <PackageLicenseExpression />
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <LangVersion>8</LangVersion>
     <Nullable>enable</Nullable>
     <WarningsAsErrors>CS8600;CS8602;CS8603;CS8604;CS8625</WarningsAsErrors>
+    <PackageIconUrl>../Icon/Yeah69_256.png</PackageIconUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -44,7 +44,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\Icon\Yeah69Logo.ico" Pack="true" PackagePath="" />
+      <None Include="..\Icon\Yeah69Logo.ico" Pack="true" PackagePath="" />
+      <None Include="..\Icon\Yeah69Logo_256.png" Pack="true" PackagePath="" />
   </ItemGroup>
 
 </Project>

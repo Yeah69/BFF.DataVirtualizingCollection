@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Linq;
 using System.Reactive.Disposables;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -53,10 +52,7 @@ namespace BFF.DataVirtualizingCollection
 
         private int GetCountInner() => Count;
 
-        public virtual IEnumerator<T> GetEnumerator()
-        {
-            return Enumerable.Empty<T>().GetEnumerator();
-        }
+        public abstract IEnumerator<T> GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator()
         {

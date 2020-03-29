@@ -28,6 +28,9 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
         /// </summary>
         Task InitializationCompleted { get; }
 
+        /// <summary>
+        /// Disposes of all current pages and notifies that possibly everything changed.
+        /// </summary>
         void Reset();
     }
 }

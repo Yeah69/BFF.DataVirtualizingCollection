@@ -127,7 +127,6 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
         /// </summary>
         /// <param name="placeholderFactory">You have to provide a factory lambda function which returns a placeholder.</param>
         /// <param name="backgroundScheduler">Scheduler for all background operations.</param>
-        /// <param name="notificationScheduler">Scheduler on which the notifications are emitted.</param>
         /// <returns></returns>
         [Obsolete("Please use the overload whose placeholderFactory gets the page key and index as parameters. Ignore these parameters if they are not necessary. This very overload will be removed in future releases.")]
         ISlidingWindow<T> AsyncIndexAccess(Func<T> placeholderFactory, IScheduler backgroundScheduler);
@@ -138,7 +137,6 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
         /// <param name="placeholderFactory">You have to provide a factory lambda function which returns a placeholder.
         /// The first parameter is the page key (index of pages) and the second is the page index (index of items inside the page).</param>
         /// <param name="backgroundScheduler">Scheduler for all background operations.</param>
-        /// <param name="notificationScheduler">Scheduler on which the notifications are emitted.</param>
         /// <returns></returns>
         ISlidingWindow<T> AsyncIndexAccess(Func<int, int, T> placeholderFactory, IScheduler backgroundScheduler);
     }
@@ -190,7 +188,6 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
         /// This call can be used to configure the maximum size of a single page. Hence, this configures how much data will be loaded at once.
         /// Further settings are applied via method chaining.
         /// </summary>
-        /// <param name="pageSize">Maximum size of a single page.</param>
         /// <returns>The builder itself.</returns>
         public static IPageLoadingBehaviorCollectionBuilder<T> Build(int windowSize, int initialOffset, IScheduler notificationScheduler, int pageSize) => 
             new SlidingWindowBuilder<T>(windowSize, initialOffset, notificationScheduler, pageSize);

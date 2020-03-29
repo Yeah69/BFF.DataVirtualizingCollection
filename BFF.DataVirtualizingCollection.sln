@@ -10,6 +10,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Icon", "Icon", "{2536F943-EEC8-4CF7-B0B2-E3569E164152}"
 	ProjectSection(SolutionItems) = preProject
 		Icon\Yeah69Logo.ico = Icon\Yeah69Logo.ico
+		Icon\Yeah69Logo_256.png = Icon\Yeah69Logo_256.png
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BFF.DataVirtualizingCollection.Sample", "BFF.DataVirtualizingCollection.Sample\BFF.DataVirtualizingCollection.Sample.csproj", "{5D3271CE-5571-4753-9514-124BEBA6DFEC}"
