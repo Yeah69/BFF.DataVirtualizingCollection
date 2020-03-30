@@ -17,29 +17,42 @@
                     <UniformGrid DockPanel.Dock="Top" Columns="2">
                         <Button Content="Slide Left" Command="{Binding SlideLeft}" HorizontalAlignment="Stretch" />
                         <Button Content="Slide Right" Command="{Binding SlideRight}" HorizontalAlignment="Stretch" />
+                        <Button Content="Increase Window Size" Command="{Binding IncreaseWindowSize}" HorizontalAlignment="Stretch" />
+                        <Button Content="Decrease Window Size" Command="{Binding DecreaseWindowSize}" HorizontalAlignment="Stretch" />
+                        <Button Content="Reset" Command="{Binding Reset}" HorizontalAlignment="Stretch" />
                     </UniformGrid>
-                    <hc:CoverView DockPanel.Dock="Bottom" 
-                                  ItemsSource="{Binding AllPositiveIntNumbers}" 
-                                  Background="BlueViolet" >
-                        <hc:CoverView.ItemHeaderTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding}" 
-                                           FontSize="69" 
-                                           Foreground="White"
-                                           HorizontalAlignment="Center" 
-                                           VerticalAlignment="Center" />
-                            </DataTemplate>
-                        </hc:CoverView.ItemHeaderTemplate>
-                        <hc:CoverView.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding}" 
-                                           FontSize="69" 
-                                           Foreground="BlueViolet"
-                                           HorizontalAlignment="Center" 
-                                           VerticalAlignment="Center" />
-                            </DataTemplate>
-                        </hc:CoverView.ItemTemplate>
-                    </hc:CoverView>
+                    <ScrollBar DockPanel.Dock="Top" 
+                               Minimum="0" 
+                               Maximum="{Binding AllPositiveIntNumbers.MaximumOffset}" 
+                               Orientation="Horizontal"
+                               Value="{Binding ScrollPosition}"/>
+                    <UniformGrid DockPanel.Dock="Bottom" Columns="2">
+                        <hc:CoverView DockPanel.Dock="Bottom" 
+                                      ItemWidth="69"
+                                      ItemHeight="69"
+                                      ItemsSource="{Binding AllPositiveIntNumbers}" 
+                                      Background="BlueViolet" >
+                            <hc:CoverView.ItemHeaderTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" 
+                                               FontSize="23" 
+                                               Foreground="White"
+                                               HorizontalAlignment="Center" 
+                                               VerticalAlignment="Center" />
+                                </DataTemplate>
+                            </hc:CoverView.ItemHeaderTemplate>
+                            <hc:CoverView.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" 
+                                               FontSize="23" 
+                                               Foreground="BlueViolet"
+                                               HorizontalAlignment="Center" 
+                                               VerticalAlignment="Center" />
+                                </DataTemplate>
+                            </hc:CoverView.ItemTemplate>
+                        </hc:CoverView>
+                        <ListBox DockPanel.Dock="Bottom" ItemsSource="{Binding AllPositiveIntNumbers}" />
+                    </UniformGrid>
                 </DockPanel>
             </TabItem>
         </TabControl>

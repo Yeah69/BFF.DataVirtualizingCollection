@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
@@ -45,11 +46,14 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
 
         public override void Reset()
         {
+            var prev = this.Select(x => x).ToArray();
             ResetInner(Size, Offset);
             _observeScheduler.Schedule(Unit.Default, (_, __) =>
             {
+                OnCollectionChangedReplace(this.Select(x => x).ToArray(), prev);
+                OnPropertyChanged(nameof(Offset));
+                OnPropertyChanged(nameof(MaximumOffset));
                 OnPropertyChanged(nameof(Count));
-                OnCollectionChangedReset();
                 OnIndexerChanged();
             });
         }

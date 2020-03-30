@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
@@ -36,7 +37,7 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
             _observeScheduler = observeScheduler;
             CountOfBackedDataSet = 0;
             _pageStorage = _placeholderPageStoreFactory(0);
-            InitializationCompleted = ResetInner(initialOffset, initialSize);
+            InitializationCompleted = ResetInner(initialOffset, initialSize, new T[0]);
 
             disposeOnDisposal?.AddTo(CompositeDisposable);
             _serialPageStore.AddTo(CompositeDisposable);
@@ -46,11 +47,13 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
                 .Subscribe(t =>
                 {
                     var ( pageOffset, pageSize, previousPage, page) = t;
-                    var start = Math.Max(Offset, pageOffset) - pageOffset;
-                    var end = Math.Min(Offset + Size, pageOffset + pageSize) - pageOffset;
+                    var diff = Offset - pageOffset;
+                    var start = Math.Max(0, Offset - pageOffset);
+                    var end = Math.Min(start + Size, pageSize);
                     for (var i = start; i < end; i++)
                     {
-                        OnCollectionChangedReplace(page[i], previousPage[i], i - start);
+                        if (i - diff >= Size) break;
+                        OnCollectionChangedReplace(page[i], previousPage[i], i - diff);
                     }
 
                     OnIndexerChanged();
@@ -60,7 +63,7 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
 
         protected override int Count => Size;
 
-        private Task ResetInner(int currentOffset, int currentSize)
+        private Task ResetInner(int currentOffset, int currentSize, T[] prev)
         {
             return _countFetcher()
                 .ToObservable()
@@ -74,8 +77,11 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
                 .ObserveOn(_observeScheduler)
                 .Do(count =>
                 {
+                    var now = this.Select(x => x).ToArray();
+                    OnCollectionChangedReplace(now, prev);
+                    OnPropertyChanged(nameof(Offset));
+                    OnPropertyChanged(nameof(MaximumOffset));
                     OnPropertyChanged(nameof(Count));
-                    OnCollectionChangedReset();
                     OnIndexerChanged();
                 })
                 .ToTask();
@@ -83,14 +89,18 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
 
         public override void Reset()
         {
+            var prevPrev = this.Select(x => x).ToArray();
             _pageStorage = _placeholderPageStoreFactory(CountOfBackedDataSet).AssignTo(_serialPageStore);
+            var prev = this.Select(x => x).ToArray();
             _observeScheduler.Schedule(Unit.Default, (_, __) =>
                 {
+                    OnCollectionChangedReplace(prev, prevPrev);
+                    OnPropertyChanged(nameof(Offset));
+                    OnPropertyChanged(nameof(MaximumOffset));
                     OnPropertyChanged(nameof(Count));
-                    OnCollectionChangedReset();
                     OnIndexerChanged();
                 });
-            ResetInner(Offset, Size);
+            ResetInner(Offset, Size, prev);
         }
 
         protected override T GetItemInner(int index) => _pageStorage[index];

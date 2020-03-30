@@ -28,6 +28,16 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
         /// Task is successfully completed when initialization is completed
         /// </summary>
         Task InitializationCompleted { get; }
+        
+        /// <summary>
+        /// Current offset of the window inside of the range of the items from the backend.
+        /// </summary>
+        int Offset { get; }
+        
+        /// <summary>
+        /// Current maximum possible offset.
+        /// </summary>
+        int MaximumOffset { get; }
 
         /// <summary>
         /// Slides the window to the backend one step to the left (bottom).

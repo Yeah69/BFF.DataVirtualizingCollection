@@ -3,18 +3,17 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>BFF.DataVirtualizingCollection</PackageId>
-    <PackageVersion>2.0.0</PackageVersion>
+    <PackageVersion>2.0.1</PackageVersion>
     <Authors>Dimitri Enns</Authors>
     <Description>This is an approach to data virtualizing collections intended to be used in WPF projects.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes>- Sliding window feature
-- Reset-function</PackageReleaseNotes>
+    <PackageReleaseNotes>- Bugfixes for sliding window</PackageReleaseNotes>
     <Copyright></Copyright>
     <PackageTags>data-virtualization wpf csharp</PackageTags>
-    <Version>2.0.0</Version>
+    <Version>2.0.1</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <AssemblyVersion>2.0.0.0</AssemblyVersion>
-    <FileVersion>2.0.0.0</FileVersion>
+    <AssemblyVersion>2.0.1.0</AssemblyVersion>
+    <FileVersion>2.0.1.0</FileVersion>
     <PackageProjectUrl>https://github.com/Yeah69/BFF.DataVirtualizingCollection</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Yeah69/BFF.DataVirtualizingCollection.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
