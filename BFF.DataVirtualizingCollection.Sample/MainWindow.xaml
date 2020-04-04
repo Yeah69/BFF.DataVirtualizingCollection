@@ -5,6 +5,7 @@
         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:sample="clr-namespace:BFF.DataVirtualizingCollection.Sample"
+        xmlns:controls="clr-namespace:WpfToolkit.Controls;assembly=VirtualizingWrapPanel"
         Title="MainWindow"
         Width="800"
         Height="450"
@@ -26,17 +27,20 @@
                 </DataGrid>
             </TabItem>
             <TabItem Header="All Positive Int32 Numbers">
-                <DataGrid AutoGenerateColumns="False" ItemsSource="{Binding AllPositiveIntNumbers}">
-                    <DataGrid.Columns>
-                        <DataGridTemplateColumn Header="Number">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding}" TextAlignment="Right" />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                    </DataGrid.Columns>
-                </DataGrid>
+                <DockPanel LastChildFill="True">
+                    <Button DockPanel.Dock="Top" Content="Reset" Command="{Binding Reset}" />
+                    <DataGrid ItemsSource="{Binding AllPositiveIntNumbers}" SelectedIndex="{Binding AllPositiveIntNumbers.SelectedIndex}" DockPanel.Dock="Bottom" AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Header="Number">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}" TextAlignment="Right" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
             </TabItem>
             <TabItem Header="Data with High Workload">
                 <DataGrid AutoGenerateColumns="False" ItemsSource="{Binding WorkloadObjects}">
@@ -79,7 +83,7 @@
                         </ListBox.ItemContainerStyle>
                         <ListBox.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <sample:VirtualizingTilePanel ChildHeight="529" MinChildWidth="374" />
+                                <controls:VirtualizingWrapPanel />
                             </ItemsPanelTemplate>
                         </ListBox.ItemsPanel>
                         <ListBox.ItemTemplate>

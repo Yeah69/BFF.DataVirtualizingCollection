@@ -166,7 +166,7 @@ namespace BFF.DataVirtualizingCollection
             CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, newItem, index));
         }
 
-        protected void OnCollectionChangedReset()
+        protected virtual void OnCollectionChangedReset()
         {
             CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }

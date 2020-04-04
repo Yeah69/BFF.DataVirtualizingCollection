@@ -4,8 +4,10 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reactive.Concurrency;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using BFF.DataVirtualizingCollection.DataVirtualizingCollection;
@@ -27,7 +29,11 @@ namespace BFF.DataVirtualizingCollection.Sample
             InitializeComponent();
 
             DataContext = this;
+            
+            Reset = new RxRelayCommand(() => AllPositiveIntNumbers.Reset());
         }
+        
+        public ICommand Reset { get; }
 
         public IList<long> MillionNumbers { get; } = DataVirtualizingCollectionBuilder<long>
             .Build(100)
@@ -79,22 +85,25 @@ namespace BFF.DataVirtualizingCollection.Sample
                 })
             .SyncIndexAccess(DispatcherScheduler);
 
-        public IList<int> AllPositiveIntNumbers { get; } = DataVirtualizingCollectionBuilder<int>
+        public IDataVirtualizingCollection<int> AllPositiveIntNumbers { get; } = DataVirtualizingCollectionBuilder<int>
             .Build(100)
             .NonPreloading()
             .Hoarding()
             .NonTaskBasedFetchers(
                 (offset, pageSize) =>
                 {
+                    //await Task.Delay(2000);
                     Console.WriteLine($"{nameof(AllPositiveIntNumbers)}: Loading page with offset {offset}");
                     return Enumerable.Range(offset, pageSize).ToArray();
                 },
                 () =>
                 {
+                    //await Task.Delay(2000);
                     Console.WriteLine($"{nameof(AllPositiveIntNumbers)}: Loading count");
                     return int.MaxValue;
                 })
             .SyncIndexAccess(DispatcherScheduler);
+            //.AsyncIndexAccess((_, __) => -1 , TaskPoolScheduler.Default, DispatcherScheduler);
 
         public IList<MyObject> WorkloadObjects { get; } = DataVirtualizingCollectionBuilder<MyObject>
             .Build(100)

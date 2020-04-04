@@ -70,6 +70,7 @@
     <PackageReference Include="Microsoft.Data.Sqlite" Version="3.0.0" />
     <PackageReference Include="System.Reactive" Version="4.3.2" />
     <PackageReference Include="System.Reactive.Windows.Threading" Version="4.3.2" />
+    <PackageReference Include="VirtualizingWrapPanel" Version="1.4.2" />
   </ItemGroup>
 
   <ItemGroup>
