@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace BFF.DataVirtualizingCollection.SlidingWindow
 {
@@ -16,19 +11,9 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
     /// makes it possible to go through the whole backend.
     /// </summary>
     /// <typeparam name="T">Type of the collection items.</typeparam>
-    public interface ISlidingWindow<T> :
-        IList<T>,
-        IReadOnlyList<T>,
-        IList,
-        INotifyCollectionChanged,
-        INotifyPropertyChanged,
-        IDisposable
+    public interface ISlidingWindow :
+        IVirtualizationBase
     {
-        /// <summary>
-        /// Task is successfully completed when initialization is completed
-        /// </summary>
-        Task InitializationCompleted { get; }
-        
         /// <summary>
         /// Current offset of the window inside of the range of the items from the backend.
         /// </summary>
@@ -73,10 +58,21 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
         /// Decreases windows size by given increment.
         /// </summary>
         void DecreaseWindowSizeBy(int sizeIncrement);
-        
-        /// <summary>
-        /// Disposes of all current pages and notifies that possibly everything changed.
-        /// </summary>
-        void Reset();
+    }
+    
+    
+    // ReSharper disable once PossibleInterfaceMemberAmbiguity
+    // Ambiguous Members should be implemented explicitly
+    /// <summary>
+    /// Defines a window to the backend (accessed by the page- and count-fetchers).
+    /// A window is intended to be a much smaller section of the backend. It is specified by an offset and a size.
+    /// Outwards it looks like a small list which contains only a few items of the whole backend. However, the sliding functionality
+    /// makes it possible to go through the whole backend.
+    /// </summary>
+    /// <typeparam name="T">Type of the collection items.</typeparam>
+    public interface ISlidingWindow<T> :
+        IVirtualizationBase<T>,
+        ISlidingWindow
+    {
     }
 }

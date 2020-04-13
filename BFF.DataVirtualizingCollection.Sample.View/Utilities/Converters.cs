@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Data;
 
-namespace BFF.DataVirtualizingCollection.Sample
+namespace BFF.DataVirtualizingCollection.Sample.View.Utilities
 {
     public static class Converters
     {

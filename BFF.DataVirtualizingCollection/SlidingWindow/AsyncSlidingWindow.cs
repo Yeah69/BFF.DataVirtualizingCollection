@@ -61,7 +61,7 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
                 .AddTo(CompositeDisposable);
         }
 
-        protected override int Count => Size;
+        public override int Count => Size;
 
         private Task ResetInner(int currentOffset, int currentSize, T[] prev)
         {

@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\BFF.DataVirtualizingCollection.Sample.Model\BFF.DataVirtualizingCollection.Sample.Model.csproj" />
+      <ProjectReference Include="..\BFF.DataVirtualizingCollection\BFF.DataVirtualizingCollection.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Autofac" Version="5.1.2" />
+      <PackageReference Include="System.Reactive" Version="4.3.2" />
+    </ItemGroup>
+
+</Project>

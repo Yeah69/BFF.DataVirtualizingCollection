@@ -30,7 +30,7 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
             _pageStorage = _pageStoreFactory(_count).AssignTo(_serialPageStorage);
         }
 
-        protected override int Count => _count;
+        public override int Count => _count;
 
         protected override T GetItemInner(int index)
         {

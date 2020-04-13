@@ -1,0 +1,27 @@
+﻿<Window x:Class="BFF.DataVirtualizingCollection.Sample.View.Views.MainWindowView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:view="clr-namespace:BFF.DataVirtualizingCollection.Sample.View"
+        xmlns:viewModels="clr-namespace:BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels;assembly=BFF.DataVirtualizingCollection.Sample.ViewModel"
+        xmlns:views="clr-namespace:BFF.DataVirtualizingCollection.Sample.View.Views"
+        d:DataContext="{d:DesignInstance viewModels:IMainWindowViewModel}"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <DockPanel LastChildFill="True">
+        <ProgressBar IsIndeterminate="True" Height="5" DockPanel.Dock="Bottom" Visibility="{x:Static view:App.IsDebug}" />
+        <TabControl DockPanel.Dock="Top" ItemsSource="{Binding DataVirtualizingCollections}" SelectedIndex="0">
+            <TabControl.ItemContainerStyle>
+                <Style TargetType="TabItem">
+                    <Setter Property="Header" Value="{Binding Name}"/>
+                </Style>
+            </TabControl.ItemContainerStyle>
+            <TabControl.ContentTemplate>
+                <DataTemplate>
+                    <views:DataVirtualizingCollectionView DataContext="{Binding}" />
+                </DataTemplate>
+            </TabControl.ContentTemplate>
+        </TabControl>
+    </DockPanel>
+</Window>

@@ -56,7 +56,7 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
                 .AddTo(CompositeDisposable);
         }
 
-        protected override int Count => _count;
+        public override int Count => _count;
 
         protected override T GetItemInner(int index) => _pageStorage[index];
 

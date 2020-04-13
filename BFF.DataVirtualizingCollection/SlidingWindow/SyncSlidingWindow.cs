@@ -34,7 +34,7 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
             ResetInner(initialSize, initialOffset);
         }
 
-        protected override int Count => Size;
+        public override int Count => Size;
 
         private void ResetInner(int currentSize, int currentOffset)
         {

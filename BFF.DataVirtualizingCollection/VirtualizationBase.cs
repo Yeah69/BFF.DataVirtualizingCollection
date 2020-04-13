@@ -10,12 +10,7 @@ using System.Threading.Tasks;
 namespace BFF.DataVirtualizingCollection
 {
     internal abstract class VirtualizationBase<T> :
-        IList<T>,
-        IList,
-        IReadOnlyList<T>,
-        INotifyCollectionChanged,
-        INotifyPropertyChanged,
-        IDisposable
+        IVirtualizationBase<T>
     {
         public void CopyTo(Array array, int index)
         {
@@ -25,8 +20,11 @@ namespace BFF.DataVirtualizingCollection
         int ICollection.Count => GetCountInner();
 
         public bool IsSynchronized => false;
+        
         public object SyncRoot { get; } = new object();
-        protected abstract int Count { get; }
+        
+        public abstract int Count { get; }
+        
         protected readonly CompositeDisposable CompositeDisposable = new CompositeDisposable();
 
         int ICollection<T>.Count => GetCountInner();
