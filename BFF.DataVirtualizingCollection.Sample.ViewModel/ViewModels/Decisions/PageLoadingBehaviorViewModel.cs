@@ -11,7 +11,13 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions
     public interface IPageLoadingBehaviorViewModel
     {
         PageLoadingBehavior PageLoadingBehavior { get; set; }
-        IPageHoldingBehaviorCollectionBuilder<T> Configure<T>(IPageLoadingBehaviorCollectionBuilder<T> builder);
+        
+        IPageHoldingBehaviorCollectionBuilder<T> Configure<T>(IPageLoadingBehaviorCollectionBuilder<T> builder)
+        {
+            return PageLoadingBehavior == PageLoadingBehavior.NonPreloading
+                ? builder.NonPreloading()
+                : builder.Preloading();
+        }
     }
 
     internal class PageLoadingBehaviorViewModel : ObservableObject, IPageLoadingBehaviorViewModel
@@ -27,13 +33,6 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions
                 _pageLoadingBehavior = value;
                 OnPropertyChanged();
             }
-        }
-
-        public IPageHoldingBehaviorCollectionBuilder<T> Configure<T>(IPageLoadingBehaviorCollectionBuilder<T> builder)
-        {
-            return _pageLoadingBehavior == PageLoadingBehavior.NonPreloading
-                ? builder.NonPreloading()
-                : builder.Preloading();
         }
     }
 }

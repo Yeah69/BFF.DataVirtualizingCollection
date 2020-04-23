@@ -11,7 +11,15 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions
     public interface IPageRemovalBehaviorViewModel
     {
         PageRemovalBehavior PageRemovalBehavior { get; set; }
-        IFetchersKindCollectionBuilder<T> Configure<T>(IPageHoldingBehaviorCollectionBuilder<T> builder);
+        
+        public int LeastRecentlyUsedPageLimit { get; set; }
+        
+        public int LeastRecentlyUsedRemovalCount { get; set; }
+        
+        IFetchersKindCollectionBuilder<T> Configure<T>(IPageHoldingBehaviorCollectionBuilder<T> builder) =>
+            PageRemovalBehavior == PageRemovalBehavior.LeastRecentlyUsed
+                ? builder.LeastRecentlyUsed(LeastRecentlyUsedPageLimit, LeastRecentlyUsedRemovalCount)
+                : builder.Hoarding();
     }
 
     internal class PageRemovalBehaviorViewModel : ObservableObject, IPageRemovalBehaviorViewModel
@@ -51,13 +59,6 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions
                 _leastRecentlyUsedRemovalCount = value;
                 OnPropertyChanged();
             }
-        }
-
-        public IFetchersKindCollectionBuilder<T> Configure<T>(IPageHoldingBehaviorCollectionBuilder<T> builder)
-        {
-            return _pageRemovalBehavior == PageRemovalBehavior.LeastRecentlyUsed
-                ? builder.LeastRecentlyUsed(_leastRecentlyUsedPageLimit, _leastRecentlyUsedRemovalCount)
-                : builder.Hoarding();
         }
     }
 }

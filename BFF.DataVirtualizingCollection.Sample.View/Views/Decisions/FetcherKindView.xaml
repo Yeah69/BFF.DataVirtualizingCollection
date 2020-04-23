@@ -1,0 +1,45 @@
+<UserControl x:Class="BFF.DataVirtualizingCollection.Sample.View.Views.Decisions.FetcherKindView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:decisions="clr-namespace:BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions;assembly=BFF.DataVirtualizingCollection.Sample.ViewModel"
+             xmlns:utilities="clr-namespace:BFF.DataVirtualizingCollection.Sample.View.Utilities"
+             d:DataContext="{d:DesignInstance decisions:IFetcherKindViewModel}"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <StackPanel Orientation="Horizontal">
+        <RadioButton Content="Non-Task-based" 
+                     Margin="5"
+                     IsChecked="{Binding FetcherKind, 
+                                         Mode=OneWay,
+                                         Converter={x:Static utilities:Converters.ValueEqualsToParameter},
+                                         ConverterParameter={x:Static decisions:FetcherKind.NonTaskBased}}"
+                     Checked="NonTaskBased_OnChecked" />
+        <RadioButton x:Name="TaskBased" Content="Task-based"
+                     Margin="5"
+                     IsChecked="{Binding FetcherKind, 
+                                         Mode=OneWay,
+                                         Converter={x:Static utilities:Converters.ValueEqualsToParameter},
+                                         ConverterParameter={x:Static decisions:FetcherKind.TaskBased}}"
+                     Checked="TaskBased_OnChecked"/>
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="Page-Fetcher Delay:" 
+                       Margin="5"  />
+            <TextBox Text="{Binding DelayPageFetcherInMilliseconds}" 
+                     MinWidth="50"
+                     TextAlignment="Right"
+                     Margin="5" />
+            <TextBlock Text="ms" 
+                       Margin="5"  />
+            <TextBlock Text="Count-Fetcher Delay:" 
+                       Margin="5" />
+            <TextBox Text="{Binding DelayCountFetcherInMilliseconds}" 
+                     MinWidth="50"
+                     TextAlignment="Right"
+                     Margin="5" />
+            <TextBlock Text="ms" 
+                       Margin="5"  />
+        </StackPanel>
+    </StackPanel>
+</UserControl>

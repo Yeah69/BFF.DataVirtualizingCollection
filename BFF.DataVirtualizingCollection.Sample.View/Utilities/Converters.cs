@@ -8,5 +8,9 @@ namespace BFF.DataVirtualizingCollection.Sample.View.Utilities
         public static IValueConverter BoolToVisibility =
             LambdaConverters.ValueConverter.Create<bool, Visibility>(
                 e => e.Value ? Visibility.Visible : Visibility.Collapsed);
+
+        public static IValueConverter ValueEqualsToParameter =
+            LambdaConverters.ValueConverter.Create<object, bool, object>(
+                e => Equals(e.Value, e.Parameter));
     }
 }

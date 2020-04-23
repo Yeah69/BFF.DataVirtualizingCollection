@@ -1,3 +1,4 @@
+using System.Reactive.Concurrency;
 using BFF.DataVirtualizingCollection.DataVirtualizingCollection;
 using BFF.DataVirtualizingCollection.Sample.Model.BackendAccesses;
 using BFF.DataVirtualizingCollection.Sample.ViewModel.Interfaces;
@@ -13,9 +14,20 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions
     public interface IIndexAccessBehaviorViewModel
     {
         IndexAccessBehavior IndexAccessBehavior { get; set; }
-        IDataVirtualizingCollection<T> Configure<T>(
+        
+        public IDataVirtualizingCollection<T> Configure<T>(
             IIndexAccessBehaviorCollectionBuilder<T> builder,
-            IBackendAccess<T> backendAccess);
+            IBackendAccess<T> backendAccess,
+            IScheduler notificationScheduler,
+            IScheduler backgroundScheduler)
+        {
+            return IndexAccessBehavior == IndexAccessBehavior.Synchronous
+                ? builder.SyncIndexAccess(notificationScheduler)
+                : builder.AsyncIndexAccess(
+                    backendAccess.PlaceholderFetch, 
+                    backgroundScheduler,
+                    notificationScheduler);
+        }
     }
 
     internal class IndexAccessBehaviorViewModel : ObservableObject, IIndexAccessBehaviorViewModel
@@ -38,18 +50,6 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions
                 _indexAccessBehavior = value;
                 OnPropertyChanged();
             }
-        }
-
-        public IDataVirtualizingCollection<T> Configure<T>(
-            IIndexAccessBehaviorCollectionBuilder<T> builder,
-            IBackendAccess<T> backendAccess)
-        {
-            return _indexAccessBehavior == IndexAccessBehavior.Synchronous
-                ? builder.SyncIndexAccess(_getSchedulers.NotificationScheduler)
-                : builder.AsyncIndexAccess(
-                    backendAccess.PlaceholderFetch, 
-                    _getSchedulers.BackgroundScheduler,
-                    _getSchedulers.NotificationScheduler);
         }
     }
 }

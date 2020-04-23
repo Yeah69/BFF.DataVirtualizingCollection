@@ -1,6 +1,7 @@
 using System.Linq;
 using BFF.DataVirtualizingCollection.Sample.Model.BackendAccesses;
 using BFF.DataVirtualizingCollection.Sample.Model.Models;
+using BFF.DataVirtualizingCollection.Sample.ViewModel.Interfaces;
 using BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions;
 
 namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.CollectionViewModels
@@ -16,13 +17,15 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.CollectionV
             IPageLoadingBehaviorViewModel pageLoadingBehaviorViewModel, 
             IPageRemovalBehaviorViewModel pageRemovalBehaviorViewModel, 
             IFetcherKindViewModel fetcherKindViewModel, 
-            IIndexAccessBehaviorViewModel indexAccessBehaviorViewModel) 
+            IIndexAccessBehaviorViewModel indexAccessBehaviorViewModel,
+            IGetSchedulers getSchedulers) 
             : base(
                 backendAccess, 
                 pageLoadingBehaviorViewModel, 
                 pageRemovalBehaviorViewModel, 
                 fetcherKindViewModel, 
-                indexAccessBehaviorViewModel)
+                indexAccessBehaviorViewModel,
+                getSchedulers)
         {
         }
 

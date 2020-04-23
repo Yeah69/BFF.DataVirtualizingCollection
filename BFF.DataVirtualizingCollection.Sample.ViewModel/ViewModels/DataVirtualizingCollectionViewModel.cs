@@ -1,7 +1,9 @@
 using System;
 using System.Reactive.Disposables;
+using System.Windows.Input;
 using BFF.DataVirtualizingCollection.DataVirtualizingCollection;
 using BFF.DataVirtualizingCollection.Sample.Model.BackendAccesses;
+using BFF.DataVirtualizingCollection.Sample.ViewModel.Interfaces;
 using BFF.DataVirtualizingCollection.Sample.ViewModel.Utility;
 using BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions;
 
@@ -15,6 +17,8 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels
         IFetcherKindViewModel FetcherKindViewModel { get; }
         IIndexAccessBehaviorViewModel IndexAccessBehaviorViewModel { get; }
         int PageSize { get; set; }
+        
+        ICommand CreateNew { get; }
     }
 
     public interface IDataVirtualizingCollectionViewModel<T> : IDataVirtualizingCollectionViewModel
@@ -24,10 +28,12 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels
 
     public abstract class DataVirtualizingCollectionViewModel<TModel, TViewModel> : ObservableObject, IDisposable, IDataVirtualizingCollectionViewModel<TViewModel>
     {
+        private readonly IGetSchedulers _getSchedulers;
         private readonly IBackendAccess<TViewModel> _backendAccess;
         private int _pageSize = 100;
         private IDataVirtualizingCollection<TViewModel>? _items;
-        private readonly SerialDisposable _serialItems = new SerialDisposable();
+        private readonly SerialDisposable _serialItems;
+        private readonly CompositeDisposable _compositeDisposable = new CompositeDisposable();
 
         public DataVirtualizingCollectionViewModel(
             // parameters
@@ -37,8 +43,10 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels
             IPageLoadingBehaviorViewModel pageLoadingBehaviorViewModel,
             IPageRemovalBehaviorViewModel pageRemovalBehaviorViewModel,
             IFetcherKindViewModel fetcherKindViewModel,
-            IIndexAccessBehaviorViewModel indexAccessBehaviorViewModel)
+            IIndexAccessBehaviorViewModel indexAccessBehaviorViewModel,
+            IGetSchedulers getSchedulers)
         {
+            _getSchedulers = getSchedulers;
             PageLoadingBehaviorViewModel = pageLoadingBehaviorViewModel;
             PageRemovalBehaviorViewModel = pageRemovalBehaviorViewModel;
             FetcherKindViewModel = fetcherKindViewModel;
@@ -47,6 +55,13 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels
                 backendAccess, 
                 TransformPage,
                 TransformPlaceholder);
+            
+            _serialItems = new SerialDisposable();
+            _compositeDisposable.Add(_serialItems);
+
+            var createNew = new RxRelayCommand(SetItems);
+            CreateNew = createNew;
+            _compositeDisposable.Add(createNew);
             
             SetItems();
         }
@@ -81,6 +96,8 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels
             }
         }
 
+        public ICommand CreateNew { get; }
+
         protected abstract TViewModel[] TransformPage(TModel[] page);
 
         protected abstract TViewModel TransformPlaceholder(TModel item);
@@ -95,13 +112,17 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels
                 PageRemovalBehaviorViewModel.Configure(afterPageLoadingDecision);
             var afterFetcherKindDecision = 
                 FetcherKindViewModel.Configure(afterPageRemovalDecision, _backendAccess);
-            var collection = IndexAccessBehaviorViewModel.Configure(afterFetcherKindDecision, _backendAccess);
+            var collection = IndexAccessBehaviorViewModel.Configure(
+                afterFetcherKindDecision, 
+                _backendAccess, 
+                _getSchedulers.NotificationScheduler,
+                _getSchedulers.BackgroundScheduler);
             Items = collection;
         }
 
         public void Dispose()
         {
-            _serialItems.Dispose();
+            _compositeDisposable.Dispose();
         }
     }
 }

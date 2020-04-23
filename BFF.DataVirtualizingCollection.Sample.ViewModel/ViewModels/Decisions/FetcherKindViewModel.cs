@@ -1,7 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using BFF.DataVirtualizingCollection.DataVirtualizingCollection;
-using BFF.DataVirtualizingCollection.Sample.Model;
 using BFF.DataVirtualizingCollection.Sample.Model.BackendAccesses;
 
 namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions
@@ -15,9 +14,39 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions
     public interface IFetcherKindViewModel
     {
         FetcherKind FetcherKind { get; set; }
+        
+        public int DelayPageFetcherInMilliseconds { get; set; }
+        
+        public int DelayCountFetcherInMilliseconds { get; set; }
+        
         IIndexAccessBehaviorCollectionBuilder<T> Configure<T>(
             IFetchersKindCollectionBuilder<T> builder, 
-            IBackendAccess<T> backendAccess);
+            IBackendAccess<T> backendAccess)
+        {
+            return FetcherKind == FetcherKind.NonTaskBased
+                ? builder.NonTaskBasedFetchers(
+                    (offset, size) =>
+                    {
+                        Thread.Sleep(DelayPageFetcherInMilliseconds);
+                        return backendAccess.PageFetch(offset, size);
+                    },
+                    () =>
+                    {
+                        Thread.Sleep(DelayCountFetcherInMilliseconds);
+                        return backendAccess.CountFetch();
+                    })
+                : builder.TaskBasedFetchers(
+                    async (offset, size) =>
+                    {
+                        await Task.Delay(DelayPageFetcherInMilliseconds);
+                        return backendAccess.PageFetch(offset, size);
+                    },
+                    async () =>
+                    {
+                        await Task.Delay(DelayCountFetcherInMilliseconds);
+                        return backendAccess.CountFetch();
+                    });
+        }
     }
 
     internal class FetcherKindViewModel : ObservableObject, IFetcherKindViewModel
@@ -57,35 +86,6 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions
                 _delayCountFetcherInMilliseconds = value;
                 OnPropertyChanged();
             }
-        }
-
-        public IIndexAccessBehaviorCollectionBuilder<T> Configure<T>(
-            IFetchersKindCollectionBuilder<T> builder, 
-            IBackendAccess<T> backendAccess)
-        {
-            return _fetcherKind == FetcherKind.NonTaskBased
-                ? builder.NonTaskBasedFetchers(
-                    (offset, size) =>
-                    {
-                        Thread.Sleep(_delayPageFetcherInMilliseconds);
-                        return backendAccess.PageFetch(offset, size);
-                    },
-                    () =>
-                    {
-                        Thread.Sleep(_delayCountFetcherInMilliseconds);
-                        return backendAccess.CountFetch();
-                    })
-                : builder.TaskBasedFetchers(
-                    async (offset, size) =>
-                    {
-                        await Task.Delay(_delayPageFetcherInMilliseconds);
-                        return backendAccess.PageFetch(offset, size);
-                    },
-                    async () =>
-                    {
-                        await Task.Delay(_delayCountFetcherInMilliseconds);
-                        return backendAccess.CountFetch();
-                    });
         }
     }
 }

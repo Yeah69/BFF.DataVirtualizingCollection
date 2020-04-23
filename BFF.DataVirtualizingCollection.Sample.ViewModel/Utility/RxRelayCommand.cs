@@ -3,7 +3,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace BFF.DataVirtualizingCollection.Sample
+namespace BFF.DataVirtualizingCollection.Sample.ViewModel.Utility
 {
     public interface IRxRelayCommand<T> : ICommand, IDisposable
     {
@@ -43,7 +43,7 @@ namespace BFF.DataVirtualizingCollection.Sample
 
         public void Execute(object parameter) => ExecuteAction((T) parameter);
 
-        public event EventHandler CanExecuteChanged;
+        public event EventHandler? CanExecuteChanged;
 
         public void Dispose() => _canExecuteSubscription.Dispose();
     }
@@ -63,12 +63,17 @@ namespace BFF.DataVirtualizingCollection.Sample
 
     internal class AsyncRxRelayCommand<T> : IRxRelayCommand<T>
     {
-        protected Func<T, Task> ExecuteAction;
+        private readonly Func<T, Task> _executeAction;
         private readonly IDisposable _canExecuteSubscription;
         private bool _canExecute;
 
-        protected AsyncRxRelayCommand(IObservable<bool> canExecute, bool initialCanExecute = true)
+        public AsyncRxRelayCommand(Func<T, Task> executeAction, bool initialCanExecute = true) : this(executeAction, Observable.Never<bool>(), initialCanExecute)
         {
+        }
+
+        public AsyncRxRelayCommand(Func<T, Task> executeAction, IObservable<bool> canExecute, bool initialCanExecute = true)
+        {
+            _executeAction = executeAction;
             _canExecute = initialCanExecute;
 
             _canExecuteSubscription = canExecute
@@ -80,18 +85,11 @@ namespace BFF.DataVirtualizingCollection.Sample
                 });
         }
 
-        public AsyncRxRelayCommand(Func<T, Task> executeAction, bool initialCanExecute = true) : this(executeAction, Observable.Never<bool>(), initialCanExecute)
-        {
-        }
-
-        public AsyncRxRelayCommand(Func<T, Task> executeAction, IObservable<bool> canExecute, bool initialCanExecute = true) : this(canExecute, initialCanExecute) 
-            => ExecuteAction = executeAction;
-
         public bool CanExecute(object parameter) => _canExecute;
 
-        public void Execute(object parameter) => ExecuteAction((T) parameter);
+        public void Execute(object parameter) => _executeAction((T) parameter);
 
-        public event EventHandler CanExecuteChanged;
+        public event EventHandler? CanExecuteChanged;
 
         public void Dispose() => _canExecuteSubscription.Dispose();
     }

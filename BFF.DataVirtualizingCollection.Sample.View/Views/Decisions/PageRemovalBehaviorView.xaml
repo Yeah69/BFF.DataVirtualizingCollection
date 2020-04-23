@@ -1,0 +1,43 @@
+<UserControl x:Class="BFF.DataVirtualizingCollection.Sample.View.Views.Decisions.PageRemovalBehaviorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:utilities="clr-namespace:BFF.DataVirtualizingCollection.Sample.View.Utilities"
+             xmlns:decisions="clr-namespace:BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions;assembly=BFF.DataVirtualizingCollection.Sample.ViewModel"
+             d:DataContext="{d:DesignInstance decisions:IPageRemovalBehaviorViewModel}"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <StackPanel Orientation="Horizontal">
+        <RadioButton Content="Hoarding"  
+                     Margin="5"
+                     IsChecked="{Binding PageRemovalBehavior, 
+                                         Mode=OneWay,
+                                         Converter={x:Static utilities:Converters.ValueEqualsToParameter},
+                                         ConverterParameter={x:Static decisions:PageRemovalBehavior.Hoarding}}"
+                     Checked="Hoarding_OnChecked" />
+        <RadioButton x:Name="LeastRecentlyUsed" 
+                     Margin="5"
+                     Content="Least Recently Used" 
+                     IsChecked="{Binding PageRemovalBehavior, 
+                                         Mode=OneWay,
+                                         Converter={x:Static utilities:Converters.ValueEqualsToParameter},
+                                         ConverterParameter={x:Static decisions:PageRemovalBehavior.LeastRecentlyUsed}}"
+                     Checked="LeastRecentlyUsed_OnChecked"/>
+        <StackPanel Orientation="Horizontal"
+                    Visibility="{Binding IsChecked, ElementName=LeastRecentlyUsed, Converter={x:Static utilities:Converters.BoolToVisibility}}">
+            <TextBlock Text="Page Limit:" 
+                       Margin="5"  />
+            <TextBox Text="{Binding LeastRecentlyUsedPageLimit}" 
+                     MinWidth="50"
+                     TextAlignment="Right"
+                     Margin="5" />
+            <TextBlock Text="Removal Count:" 
+                       Margin="5" />
+            <TextBox Text="{Binding LeastRecentlyUsedRemovalCount}" 
+                     MinWidth="50"
+                     TextAlignment="Right"
+                     Margin="5" />
+        </StackPanel>
+    </StackPanel>
+</UserControl>

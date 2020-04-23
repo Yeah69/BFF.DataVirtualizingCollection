@@ -4,14 +4,25 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModels="clr-namespace:BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels;assembly=BFF.DataVirtualizingCollection.Sample.ViewModel"
+             xmlns:decisions="clr-namespace:BFF.DataVirtualizingCollection.Sample.View.Views.Decisions"
              mc:Ignorable="d"
              x:Name="RootRoot"
              d:DataContext="{d:DesignInstance viewModels:IDataVirtualizingCollectionViewModel}"
              d:DesignHeight="300" 
              d:DesignWidth="300">
-    <ContentControl Content="{Binding}">
-        <ContentControl.Resources>
-            <ResourceDictionary Source="../Resources/BackendCollectionDataTemplates.xaml" />
-        </ContentControl.Resources>
-    </ContentControl>
+    <DockPanel LastChildFill="True">
+        <StackPanel DockPanel.Dock="Top" HorizontalAlignment="Stretch">
+            <TextBlock HorizontalAlignment="Center" Text="{Binding Name}" FontSize="23" FontWeight="Bold" />
+            <decisions:PageLoadingBehaviorView DataContext="{Binding PageLoadingBehaviorViewModel}" />
+            <decisions:PageRemovalBehaviorView DataContext="{Binding PageRemovalBehaviorViewModel}" />
+            <decisions:FetcherKindView DataContext="{Binding FetcherKindViewModel}" />
+            <decisions:IndexAccessBehaviorView DataContext="{Binding IndexAccessBehaviorViewModel}" />
+            <Button Content="Create New" HorizontalAlignment="Stretch" Command="{Binding CreateNew}" />
+        </StackPanel>
+        <ContentControl DockPanel.Dock="Bottom" Content="{Binding}">
+            <ContentControl.Resources>
+                <ResourceDictionary Source="../Resources/BackendCollectionDataTemplates.xaml" />
+            </ContentControl.Resources>
+        </ContentControl>
+    </DockPanel>
 </UserControl>
