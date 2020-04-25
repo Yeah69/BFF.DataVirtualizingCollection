@@ -104,7 +104,7 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
         /// <param name="pageFetcher">First parameter is the offset, second parameter is the size. You have to provide a lambda function which given the parameters returns the expected page.</param>
         /// <param name="countFetcher">You have to provide a lambda function which gets the count of all elements in the data virtualized collection.</param>
         /// <returns>The builder itself.</returns>
-        IIndexAccessBehaviorCollectionBuilder<T> TaskBasedFetchers(Func<int, int, Task<T[]>> pageFetcher, Func<Task<int>> countFetcher);
+        IAsyncOnlyIndexAccessBehaviorCollectionBuilder<T> TaskBasedFetchers(Func<int, int, Task<T[]>> pageFetcher, Func<Task<int>> countFetcher);
     }
 
 
@@ -114,22 +114,8 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
     /// Asynchronous meas the if the page still needs to be loaded a placeholder for the indexed access is provided, as soon as the page is loaded a notification is emitted which states that the entry of the index arrived.  
     /// </summary>
     /// <typeparam name="T">Type of the collection items.</typeparam>
-    public interface IIndexAccessBehaviorCollectionBuilder<T>
+    public interface IAsyncOnlyIndexAccessBehaviorCollectionBuilder<T>
     {
-        /// <summary>
-        /// If item of requested index isn't loaded yet the collections will wait actively and return as soon as it arrives.
-        /// </summary>
-        /// <returns>The builder itself.</returns>
-        [Obsolete("Please use the overload on which you need to pass a scheduler for notifications. This very overload will be removed in future releases.")]
-        IDataVirtualizingCollection<T> SyncIndexAccess();
-        
-        /// <summary>
-        /// If item of requested index isn't loaded yet the collections will wait actively and return as soon as it arrives.
-        /// </summary>
-        /// <param name="notificationScheduler">Scheduler on which the notifications are emitted.</param>
-        /// <returns>The builder itself.</returns>
-        IDataVirtualizingCollection<T> SyncIndexAccess(IScheduler notificationScheduler);
-        
         /// <summary>
         /// If item of requested index isn't loaded yet the collections will return a placeholder instead and emit a notification as soon as it arrives.
         /// </summary>
@@ -139,6 +125,23 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
         /// <param name="notificationScheduler">Scheduler on which the notifications are emitted.</param>
         /// <returns></returns>
         IDataVirtualizingCollection<T> AsyncIndexAccess(Func<int, int, T> placeholderFactory, IScheduler backgroundScheduler, IScheduler notificationScheduler);
+    }
+
+
+    /// <summary>
+    /// Lets you configure whether the index access should be synchronous or asynchronous.
+    /// Synchronous means that if the index access will wait actively until the entry is provided even if the page still has to be loaded.
+    /// Asynchronous meas the if the page still needs to be loaded a placeholder for the indexed access is provided, as soon as the page is loaded a notification is emitted which states that the entry of the index arrived.  
+    /// </summary>
+    /// <typeparam name="T">Type of the collection items.</typeparam>
+    public interface IIndexAccessBehaviorCollectionBuilder<T> : IAsyncOnlyIndexAccessBehaviorCollectionBuilder<T>
+    {
+        /// <summary>
+        /// If item of requested index isn't loaded yet the collections will wait actively and return as soon as it arrives.
+        /// </summary>
+        /// <param name="notificationScheduler">Scheduler on which the notifications are emitted.</param>
+        /// <returns>The builder itself.</returns>
+        IDataVirtualizingCollection<T> SyncIndexAccess(IScheduler notificationScheduler);
     }
 
     internal enum PageLoadingBehavior
@@ -281,7 +284,7 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
         }
 
         /// <inheritdoc />
-        public IIndexAccessBehaviorCollectionBuilder<T> TaskBasedFetchers(Func<int, int, Task<T[]>> pageFetcher, Func<Task<int>> countFetcher)
+        public IAsyncOnlyIndexAccessBehaviorCollectionBuilder<T> TaskBasedFetchers(Func<int, int, Task<T[]>> pageFetcher, Func<Task<int>> countFetcher)
         {
             _fetchersKind = FetchersKind.TaskBased;
             _taskBasedPageFetcher = pageFetcher;
@@ -351,39 +354,6 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
                             NonPreloadingPageFetcherFactory,
                             _pageHoldingBehavior);
                 }
-                case (IndexAccessBehavior.Synchronous, FetchersKind.TaskBased):
-                {
-                    return new SyncDataVirtualizingCollection<T>(
-                        PageStoreFactory, 
-                        () => _taskBasedCountFetcher?.Invoke().Result ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
-                        _notificationScheduler);
-
-                    IPage<T> NonPreloadingPageFetcherFactory(int pageKey, int offset, int pageSize) =>
-                        new SyncNonPreloadingTaskBasedPage<T>(
-                            offset,
-                            pageSize, 
-                            _taskBasedPageFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage));
-                    IPage<T> PreloadingPageFetcherFactory(int pageKey, int offset, int pageSize) =>
-                        new SyncPreloadingTaskBasedPage<T>(
-                            offset, 
-                            pageSize, 
-                            _taskBasedPageFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage), 
-                            _preloadingScheduler);
-
-                    IPageStorage<T> PageStoreFactory(int count) =>
-                        _pageLoadingBehavior == PageLoadingBehavior.Preloading
-                            ? new PreloadingPageStorage<T>(
-                                _pageSize,
-                                count,
-                                NonPreloadingPageFetcherFactory,
-                                PreloadingPageFetcherFactory,
-                                _pageHoldingBehavior)
-                            : new PageStorage<T>(
-                                _pageSize,
-                                count,
-                                NonPreloadingPageFetcherFactory,
-                                _pageHoldingBehavior);
-                    }
                 case (IndexAccessBehavior.Asynchronous, FetchersKind.NonTaskBased):
                 {
                     var pageFetchEvents = new Subject<(int Offset, int PageSize, T[] PreviousPage, T[] Page)>();

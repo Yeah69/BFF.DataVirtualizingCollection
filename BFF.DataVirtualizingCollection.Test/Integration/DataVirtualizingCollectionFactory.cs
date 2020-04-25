@@ -168,7 +168,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration
                 _ => throw new Exception("Test configuration failed!")
                 };
 
-        private static IIndexAccessBehaviorCollectionBuilder<T> StandardIndexAccessBehaviorCollectionBuilder<T>(IFetchersKindCollectionBuilder<T> fetchersKindCollectionBuilder,
+        private static IAsyncOnlyIndexAccessBehaviorCollectionBuilder<T> StandardIndexAccessBehaviorCollectionBuilder<T>(IFetchersKindCollectionBuilder<T> fetchersKindCollectionBuilder,
             FetchersKind fetchersKind,
             Func<int, int, T[]> pageFetcher,
             Func<int> countFetcher) =>
@@ -199,12 +199,12 @@ namespace BFF.DataVirtualizingCollection.Test.Integration
                 _ => throw new Exception("Test configuration failed!")
                 };
 
-        private static IDataVirtualizingCollection<T> StandardDataVirtualizingCollection<T>(IIndexAccessBehaviorCollectionBuilder<T> indexAccessBehaviorCollectionBuilder,
+        private static IDataVirtualizingCollection<T> StandardDataVirtualizingCollection<T>(IAsyncOnlyIndexAccessBehaviorCollectionBuilder<T> indexAccessBehaviorCollectionBuilder,
             IndexAccessBehavior indexAccessBehavior,
             Func<T> placeholderFactory) =>
             indexAccessBehavior switch
                 {
-                IndexAccessBehavior.Synchronous => indexAccessBehaviorCollectionBuilder.SyncIndexAccess(new EventLoopScheduler()),
+                IndexAccessBehavior.Synchronous => (indexAccessBehaviorCollectionBuilder as IIndexAccessBehaviorCollectionBuilder<T>)?.SyncIndexAccess(new EventLoopScheduler()) ?? throw new Exception("Task-based fetchers and synchronous access is not allowed."),
                 IndexAccessBehavior.Asynchronous => indexAccessBehaviorCollectionBuilder.AsyncIndexAccess(
                     (_, __) => placeholderFactory(),
                     new EventLoopScheduler(),

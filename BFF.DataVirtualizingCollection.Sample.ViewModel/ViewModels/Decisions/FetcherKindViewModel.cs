@@ -11,6 +11,11 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions
         TaskBased
     }
 
+    public interface IFetcherKindViewModelInternal : IFetcherKindViewModel
+    {
+        IIndexAccessBehaviorViewModel IndexAccessBehaviorViewModel { get; }
+    }
+
     public interface IFetcherKindViewModel
     {
         FetcherKind FetcherKind { get; set; }
@@ -19,7 +24,7 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions
         
         public int DelayCountFetcherInMilliseconds { get; set; }
         
-        IIndexAccessBehaviorCollectionBuilder<T> Configure<T>(
+        IAsyncOnlyIndexAccessBehaviorCollectionBuilder<T> Configure<T>(
             IFetchersKindCollectionBuilder<T> builder, 
             IBackendAccess<T> backendAccess)
         {
@@ -49,11 +54,18 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions
         }
     }
 
-    internal class FetcherKindViewModel : ObservableObject, IFetcherKindViewModel
+    internal class FetcherKindViewModel : ObservableObject, IFetcherKindViewModelInternal
     {
+        private readonly IIndexAccessBehaviorViewModelInternal _indexAccessBehaviorViewModelInternal;
         private FetcherKind _fetcherKind = FetcherKind.TaskBased;
         private int _delayPageFetcherInMilliseconds = 2000;
         private int _delayCountFetcherInMilliseconds = 2000;
+
+        public FetcherKindViewModel(
+            IIndexAccessBehaviorViewModelInternal indexAccessBehaviorViewModelInternal)
+        {
+            _indexAccessBehaviorViewModelInternal = indexAccessBehaviorViewModelInternal;
+        }
 
         public FetcherKind FetcherKind
         {
@@ -63,6 +75,8 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions
                 if (_fetcherKind == value) return;
                 _fetcherKind = value;
                 OnPropertyChanged();
+
+                _indexAccessBehaviorViewModelInternal.SetIsSyncEnabled(_fetcherKind == FetcherKind.NonTaskBased);
             }
         }
 
@@ -87,5 +101,7 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions
                 OnPropertyChanged();
             }
         }
+
+        public IIndexAccessBehaviorViewModel IndexAccessBehaviorViewModel => _indexAccessBehaviorViewModelInternal;
     }
 }

@@ -14,7 +14,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
         public static IEnumerable<object[]> Combinations =>
             Enum.GetValues(typeof(PageLoadingBehavior)).OfType<PageLoadingBehavior>()
                 .Cartesian(
-                    Enum.GetValues(typeof(FetchersKind)).OfType<FetchersKind>(),
+                    Enum.GetValues(typeof(FetchersKind)).OfType<FetchersKind>().Except(new [] { FetchersKind.TaskBased }),
                     (first, second) =>
                         new object[] {first, PageRemovalBehavior.LeastRecentlyUsed, second, IndexAccessBehavior.Synchronous});
 

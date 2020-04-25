@@ -42,15 +42,14 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels
             // dependencies
             IPageLoadingBehaviorViewModel pageLoadingBehaviorViewModel,
             IPageRemovalBehaviorViewModel pageRemovalBehaviorViewModel,
-            IFetcherKindViewModel fetcherKindViewModel,
-            IIndexAccessBehaviorViewModel indexAccessBehaviorViewModel,
+            IFetcherKindViewModelInternal fetcherKindViewModel,
             IGetSchedulers getSchedulers)
         {
             _getSchedulers = getSchedulers;
             PageLoadingBehaviorViewModel = pageLoadingBehaviorViewModel;
             PageRemovalBehaviorViewModel = pageRemovalBehaviorViewModel;
             FetcherKindViewModel = fetcherKindViewModel;
-            IndexAccessBehaviorViewModel = indexAccessBehaviorViewModel;
+            IndexAccessBehaviorViewModel = fetcherKindViewModel.IndexAccessBehaviorViewModel;
             _backendAccess = TransformingBackendAccess<TModel, TViewModel>.CreateTransformingBackendAccess(
                 backendAccess, 
                 TransformPage,

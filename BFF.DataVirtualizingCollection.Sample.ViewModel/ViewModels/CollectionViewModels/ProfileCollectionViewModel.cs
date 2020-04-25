@@ -16,15 +16,13 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.CollectionV
             IProfilesFakeBackendAccess backendAccess,
             IPageLoadingBehaviorViewModel pageLoadingBehaviorViewModel, 
             IPageRemovalBehaviorViewModel pageRemovalBehaviorViewModel, 
-            IFetcherKindViewModel fetcherKindViewModel, 
-            IIndexAccessBehaviorViewModel indexAccessBehaviorViewModel,
+            IFetcherKindViewModelInternal fetcherKindViewModel, 
             IGetSchedulers getSchedulers) 
             : base(
                 backendAccess, 
                 pageLoadingBehaviorViewModel, 
                 pageRemovalBehaviorViewModel, 
                 fetcherKindViewModel, 
-                indexAccessBehaviorViewModel,
                 getSchedulers)
         {
         }

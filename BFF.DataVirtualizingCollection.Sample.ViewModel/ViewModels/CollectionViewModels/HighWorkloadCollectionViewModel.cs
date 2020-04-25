@@ -19,8 +19,7 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.CollectionV
             IHighWorkloadFakeBackendAccess backendAccess,
             IPageLoadingBehaviorViewModel pageLoadingBehaviorViewModel, 
             IPageRemovalBehaviorViewModel pageRemovalBehaviorViewModel, 
-            IFetcherKindViewModel fetcherKindViewModel, 
-            IIndexAccessBehaviorViewModel indexAccessBehaviorViewModel,
+            IFetcherKindViewModelInternal fetcherKindViewModel, 
             Func<ISomeWorkloadObject, ISomeWorkloadObjectViewModel> someWorkloadObjectViewModelFactory,
             IGetSchedulers getSchedulers) 
             : base(
@@ -28,7 +27,6 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.CollectionV
                 pageLoadingBehaviorViewModel, 
                 pageRemovalBehaviorViewModel, 
                 fetcherKindViewModel, 
-                indexAccessBehaviorViewModel,
                 getSchedulers)
         {
             _someWorkloadObjectViewModelFactory = someWorkloadObjectViewModelFactory;

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reactive.Disposables;
-using System.Threading.Tasks;
 using BFF.DataVirtualizingCollection.PageStorage;
 using Xunit;
 
@@ -53,21 +52,6 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
         internal override SyncNonPreloadingPageBase<IDisposable> PageWithDisposable(IDisposable disposable)
         {
             return new SyncNonPreloadingNonTaskBasedPage<IDisposable>(0, 1, (offset, pageSize) => new[] {disposable});
-        }
-    }
-
-    // ReSharper disable once UnusedMember.Global
-    public class SyncNonPreloadingTaskBasedPageTests : SyncNonPreloadingPageBaseTestsBase
-    {
-        internal override IPage<int> PageWithPageSizeOne =>
-            new SyncNonPreloadingTaskBasedPage<int>(0, 1, (offset, pageSize) => Task.FromResult(new[] { 69 }));
-
-        internal override SyncNonPreloadingPageBase<int> PageWithFirstEntry69 =>
-            new SyncNonPreloadingTaskBasedPage<int>(0, 1, (offset, pageSize) => Task.FromResult(new[] { 69 }));
-
-        internal override SyncNonPreloadingPageBase<IDisposable> PageWithDisposable(IDisposable disposable)
-        {
-            return new SyncNonPreloadingTaskBasedPage<IDisposable>(0, 1, (offset, pageSize) => Task.FromResult(new[] { disposable }));
         }
     }
 }

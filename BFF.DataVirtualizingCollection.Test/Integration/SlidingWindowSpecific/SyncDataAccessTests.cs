@@ -13,7 +13,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowSpecific
             Enum.GetValues(typeof(PageLoadingBehavior)).OfType<PageLoadingBehavior>()
                 .Cartesian(
                     Enum.GetValues(typeof(PageRemovalBehavior)).OfType<PageRemovalBehavior>(), 
-                    Enum.GetValues(typeof(FetchersKind)).OfType<FetchersKind>(),
+                    Enum.GetValues(typeof(FetchersKind)).OfType<FetchersKind>().Except(new [] { FetchersKind.TaskBased }),
                     (first, second, third) =>
                         new object[] {first, second, third, IndexAccessBehavior.Synchronous});
 

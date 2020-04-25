@@ -193,7 +193,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration
             return dataVirtualizingCollection;
         }
 
-        private static SlidingWindow.IPageHoldingBehaviorCollectionBuilder<T> StandardPageHoldingBehaviorCollectionBuilder<T>(SlidingWindow.IPageLoadingBehaviorCollectionBuilder<T> pageLoadingBehaviorCollectionBuilder,
+        private static SlidingWindow.IPageHoldingBehaviorCollectionBuilder<T> StandardPageHoldingBehaviorCollectionBuilder<T>(IPageLoadingBehaviorCollectionBuilder<T> pageLoadingBehaviorCollectionBuilder,
             PageLoadingBehavior pageLoadingBehavior) =>
             pageLoadingBehavior switch
                 {
@@ -202,7 +202,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration
                 _ => throw new Exception("Test configuration failed!")
                 };
 
-        private static SlidingWindow.IFetchersKindCollectionBuilder<T> StandardFetcherKindCollectionBuilder<T>(SlidingWindow.IPageHoldingBehaviorCollectionBuilder<T> pageHoldingBehaviorCollectionBuilder,
+        private static SlidingWindow.IFetchersKindCollectionBuilder<T> StandardFetcherKindCollectionBuilder<T>(IPageHoldingBehaviorCollectionBuilder<T> pageHoldingBehaviorCollectionBuilder,
             PageRemovalBehavior pageRemovalBehavior,
             int pageLimit,
             int removalCount) =>
@@ -213,7 +213,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration
                 _ => throw new Exception("Test configuration failed!")
                 };
 
-        private static SlidingWindow.IIndexAccessBehaviorCollectionBuilder<T> StandardIndexAccessBehaviorCollectionBuilder<T>(SlidingWindow.IFetchersKindCollectionBuilder<T> fetchersKindCollectionBuilder,
+        private static SlidingWindow.IAsyncOnlyIndexAccessBehaviorCollectionBuilder<T> StandardIndexAccessBehaviorCollectionBuilder<T>(SlidingWindow.IFetchersKindCollectionBuilder<T> fetchersKindCollectionBuilder,
             FetchersKind fetchersKind,
             Func<int, int, T[]> pageFetcher,
             Func<int> countFetcher) =>
@@ -244,12 +244,12 @@ namespace BFF.DataVirtualizingCollection.Test.Integration
                 _ => throw new Exception("Test configuration failed!")
                 };
 
-        private static ISlidingWindow<T> StandardDataVirtualizingCollection<T>(SlidingWindow.IIndexAccessBehaviorCollectionBuilder<T> indexAccessBehaviorCollectionBuilder,
+        private static ISlidingWindow<T> StandardDataVirtualizingCollection<T>(IAsyncOnlyIndexAccessBehaviorCollectionBuilder<T> indexAccessBehaviorCollectionBuilder,
             IndexAccessBehavior indexAccessBehavior,
             Func<T> placeholderFactory) =>
             indexAccessBehavior switch
                 {
-                IndexAccessBehavior.Synchronous => indexAccessBehaviorCollectionBuilder.SyncIndexAccess(),
+                IndexAccessBehavior.Synchronous => (indexAccessBehaviorCollectionBuilder as IIndexAccessBehaviorCollectionBuilder<T>)?.SyncIndexAccess(new EventLoopScheduler()) ?? throw new Exception("Task-based fetchers and synchronous access is not allowed."),
                 IndexAccessBehavior.Asynchronous => indexAccessBehaviorCollectionBuilder.AsyncIndexAccess(
                     (_, __) => placeholderFactory(),
                     new EventLoopScheduler()),

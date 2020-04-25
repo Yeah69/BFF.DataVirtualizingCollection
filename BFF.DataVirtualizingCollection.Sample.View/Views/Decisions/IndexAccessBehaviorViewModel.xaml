@@ -15,6 +15,7 @@
                                          Mode=OneWay,
                                          Converter={x:Static utilities:Converters.ValueEqualsToParameter},
                                          ConverterParameter={x:Static decisions:IndexAccessBehavior.Synchronous}}"
+                     IsEnabled="{Binding IsSyncEnabled}"
                      Checked="Synchronous_OnChecked" />
         <RadioButton Content="Asynchronous"
                      Margin="5"

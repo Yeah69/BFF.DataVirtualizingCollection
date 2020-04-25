@@ -114,23 +114,8 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
     /// Asynchronous meas the if the page still needs to be loaded a placeholder for the indexed access is provided, as soon as the page is loaded a notification is emitted which states that the entry of the index arrived.  
     /// </summary>
     /// <typeparam name="T">Type of the collection items.</typeparam>
-    public interface IIndexAccessBehaviorCollectionBuilder<T>
+    public interface IAsyncOnlyIndexAccessBehaviorCollectionBuilder<T>
     {
-        /// <summary>
-        /// If item of requested index isn't loaded yet the collections will wait actively and return as soon as it arrives.
-        /// </summary>
-        /// <returns>The builder itself.</returns>
-        ISlidingWindow<T> SyncIndexAccess();
-
-        /// <summary>
-        /// If item of requested index isn't loaded yet the collections will return a placeholder instead and emit a notification as soon as it arrives.
-        /// </summary>
-        /// <param name="placeholderFactory">You have to provide a factory lambda function which returns a placeholder.</param>
-        /// <param name="backgroundScheduler">Scheduler for all background operations.</param>
-        /// <returns></returns>
-        [Obsolete("Please use the overload whose placeholderFactory gets the page key and index as parameters. Ignore these parameters if they are not necessary. This very overload will be removed in future releases.")]
-        ISlidingWindow<T> AsyncIndexAccess(Func<T> placeholderFactory, IScheduler backgroundScheduler);
-
         /// <summary>
         /// If item of requested index isn't loaded yet the collections will return a placeholder instead and emit a notification as soon as it arrives.
         /// </summary>
@@ -139,6 +124,22 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
         /// <param name="backgroundScheduler">Scheduler for all background operations.</param>
         /// <returns></returns>
         ISlidingWindow<T> AsyncIndexAccess(Func<int, int, T> placeholderFactory, IScheduler backgroundScheduler);
+    }
+
+
+    /// <summary>
+    /// Lets you configure whether the index access should be synchronous or asynchronous.
+    /// Synchronous means that if the index access will wait actively until the entry is provided even if the page still has to be loaded.
+    /// Asynchronous meas the if the page still needs to be loaded a placeholder for the indexed access is provided, as soon as the page is loaded a notification is emitted which states that the entry of the index arrived.  
+    /// </summary>
+    /// <typeparam name="T">Type of the collection items.</typeparam>
+    public interface IIndexAccessBehaviorCollectionBuilder<T> : IAsyncOnlyIndexAccessBehaviorCollectionBuilder<T>
+    {
+        /// <summary>
+        /// If item of requested index isn't loaded yet the collections will wait actively and return as soon as it arrives.
+        /// </summary>
+        /// <returns>The builder itself.</returns>
+        ISlidingWindow<T> SyncIndexAccess(IScheduler notificationScheduler);
     }
 
     internal enum PageLoadingBehavior
@@ -301,6 +302,13 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
             return GenerateCollection();
         }
 
+        public ISlidingWindow<T> SyncIndexAccess(IScheduler notificationScheduler)
+        {
+            _indexAccessBehavior = IndexAccessBehavior.Synchronous;
+            _notificationScheduler = notificationScheduler;
+            return GenerateCollection();
+        }
+
         /// <inheritdoc />
         public ISlidingWindow<T> AsyncIndexAccess(Func<T> placeholderFactory, IScheduler backgroundScheduler)
         {
@@ -358,41 +366,6 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
                             NonPreloadingPageFetcherFactory,
                             _pageHoldingBehavior);
                 }
-                case (IndexAccessBehavior.Synchronous, FetchersKind.TaskBased):
-                {
-                    return new SyncSlidingWindow<T>(
-                        _windowSize,
-                        _initialOffset,
-                        PageStoreFactory, 
-                        () => _taskBasedCountFetcher?.Invoke().Result ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
-                        _notificationScheduler);
-
-                    IPage<T> NonPreloadingPageFetcherFactory(int pageKey, int offset, int pageSize) =>
-                        new SyncNonPreloadingTaskBasedPage<T>(
-                            offset,
-                            pageSize, 
-                            _taskBasedPageFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage));
-                    IPage<T> PreloadingPageFetcherFactory(int pageKey, int offset, int pageSize) =>
-                        new SyncPreloadingTaskBasedPage<T>(
-                            offset, 
-                            pageSize, 
-                            _taskBasedPageFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage), 
-                            _preloadingScheduler);
-
-                    IPageStorage<T> PageStoreFactory(int count) =>
-                        _pageLoadingBehavior == PageLoadingBehavior.Preloading
-                            ? new PreloadingPageStorage<T>(
-                                _pageSize,
-                                count,
-                                NonPreloadingPageFetcherFactory,
-                                PreloadingPageFetcherFactory,
-                                _pageHoldingBehavior)
-                            : new PageStorage<T>(
-                                _pageSize,
-                                count,
-                                NonPreloadingPageFetcherFactory,
-                                _pageHoldingBehavior);
-                    }
                 case (IndexAccessBehavior.Asynchronous, FetchersKind.NonTaskBased):
                 {
                     var pageFetchEvents = new Subject<(int Offset, int PageSize, T[] PreviousPage, T[] Page)>();

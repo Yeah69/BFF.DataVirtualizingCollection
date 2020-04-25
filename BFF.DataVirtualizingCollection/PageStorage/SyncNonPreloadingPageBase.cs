@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace BFF.DataVirtualizingCollection.PageStorage
 {
@@ -39,20 +38,6 @@ namespace BFF.DataVirtualizingCollection.PageStorage
             Func<int, int, T[]> pageFetcher) : base(pageSize)
         {
             PageContent = pageFetcher(offset, pageSize);
-        }
-
-        protected override T[] PageContent { get; }
-    }
-
-    internal sealed class SyncNonPreloadingTaskBasedPage<T> : SyncNonPreloadingPageBase<T>
-    {
-        internal SyncNonPreloadingTaskBasedPage(
-            int offset,
-            int pageSize,
-            Func<int, int, Task<T[]>> pageFetcher) : base(pageSize)
-        {
-            // The blocking call to Result is accepted because this is the sync access mode
-            PageContent = pageFetcher(offset, pageSize).Result;
         }
 
         protected override T[] PageContent { get; }
