@@ -83,8 +83,7 @@ namespace BFF.DataVirtualizingCollection.PageStorage
 
         protected override Task PageFetchCompletion { get; }
     }
-
-
+    
     internal sealed class AsyncTaskBasedPage<T> : AsyncPageBase<T>
     {
         internal AsyncTaskBasedPage(

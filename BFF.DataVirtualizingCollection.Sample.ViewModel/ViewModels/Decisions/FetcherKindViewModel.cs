@@ -1,6 +1,5 @@
 using System.Threading;
 using System.Threading.Tasks;
-using BFF.DataVirtualizingCollection.DataVirtualizingCollection;
 using BFF.DataVirtualizingCollection.Sample.Model.BackendAccesses;
 
 namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions
@@ -24,8 +23,8 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions
         
         public int DelayCountFetcherInMilliseconds { get; set; }
         
-        IAsyncOnlyIndexAccessBehaviorCollectionBuilder<T> Configure<T>(
-            IFetchersKindCollectionBuilder<T> builder, 
+        IAsyncOnlyIndexAccessBehaviorCollectionBuilder<T, TVirtualizationKind> Configure<T, TVirtualizationKind>(
+            IFetchersKindCollectionBuilder<T, TVirtualizationKind> builder, 
             IBackendAccess<T> backendAccess)
         {
             return FetcherKind == FetcherKind.NonTaskBased

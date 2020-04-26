@@ -1,5 +1,3 @@
-using BFF.DataVirtualizingCollection.DataVirtualizingCollection;
-
 namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions
 {
     public enum PageRemovalBehavior
@@ -16,7 +14,8 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions
         
         public int LeastRecentlyUsedRemovalCount { get; set; }
         
-        IFetchersKindCollectionBuilder<T> Configure<T>(IPageHoldingBehaviorCollectionBuilder<T> builder) =>
+        IFetchersKindCollectionBuilder<T, TVirtualizationKind> Configure<T, TVirtualizationKind>(
+            IPageHoldingBehaviorCollectionBuilder<T, TVirtualizationKind> builder) =>
             PageRemovalBehavior == PageRemovalBehavior.LeastRecentlyUsed
                 ? builder.LeastRecentlyUsed(LeastRecentlyUsedPageLimit, LeastRecentlyUsedRemovalCount)
                 : builder.Hoarding();

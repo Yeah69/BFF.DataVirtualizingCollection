@@ -1,5 +1,4 @@
 using System;
-using BFF.DataVirtualizingCollection.Sample.Model;
 using BFF.DataVirtualizingCollection.Sample.Model.BackendAccesses;
 
 namespace BFF.DataVirtualizingCollection.Sample.ViewModel.Utility
@@ -40,6 +39,11 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.Utility
         public TViewModel PlaceholderFetch(int pageOffset, int indexInsidePage)
         {
             return _transformingPlaceholderFactory(_modelBackendAccess.PlaceholderFetch(pageOffset, indexInsidePage));
+        }
+
+        public TViewModel PreloadingPlaceholderFetch(int pageOffset, int indexInsidePage)
+        {
+            return _transformingPlaceholderFactory(_modelBackendAccess.PreloadingPlaceholderFetch(pageOffset, indexInsidePage));
         }
 
         public int CountFetch()

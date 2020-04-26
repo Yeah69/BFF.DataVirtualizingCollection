@@ -23,7 +23,7 @@ namespace BFF.DataVirtualizingCollection.PageStorage
 
         protected readonly int PageCount;
         protected bool IsDisposed;
-        protected readonly object _isDisposedLock = new object();
+        protected readonly object IsDisposedLock = new object();
         protected readonly ConcurrentDictionary<int, IPage<T>> Pages = new ConcurrentDictionary<int, IPage<T>>();
         protected readonly ISubject<(int PageKey, int PageIndex)> Requests;
 
@@ -64,7 +64,7 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                 var pageKey = index / _pageSize;
                 var pageIndex = index % _pageSize;
 
-                lock (_isDisposedLock)
+                lock (IsDisposedLock)
                 {
                     if (!IsDisposed) Requests.OnNext((pageKey, pageIndex));
                 }
@@ -102,7 +102,7 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                 page.Dispose();
             }
 
-            lock (_isDisposedLock)
+            lock (IsDisposedLock)
             {
                 _compositeDisposable.Dispose();
                 IsDisposed = true;

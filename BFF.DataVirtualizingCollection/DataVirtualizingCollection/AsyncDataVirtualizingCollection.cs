@@ -28,6 +28,7 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
             IObservable<(int Offset, int PageSize, T[] PreviousPage, T[] Page)> observePageFetches,
             IDisposable? disposeOnDisposal,
             IScheduler observeScheduler)
+        : base(observePageFetches, disposeOnDisposal, observeScheduler)
         {
             _pageStoreFactory = pageStoreFactory;
             _placeholderPageStoreFactory = placeholderPageStoreFactory;
@@ -39,21 +40,6 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
 
             _pageStorage = _placeholderPageStoreFactory(0);
             InitializationCompleted = ResetInner();
-
-            disposeOnDisposal?.AddTo(CompositeDisposable);
-            
-            observePageFetches
-                .ObserveOn(observeScheduler)
-                .Subscribe(t =>
-                {
-                    var (offset, pageSize, previousPage, page) = t;
-                    for (var i = 0; i < pageSize; i++)
-                    {
-                        OnCollectionChangedReplace(page[i], previousPage[i], i + offset);
-                    }
-                    OnIndexerChanged();
-                })
-                .AddTo(CompositeDisposable);
         }
 
         public override int Count => _count;

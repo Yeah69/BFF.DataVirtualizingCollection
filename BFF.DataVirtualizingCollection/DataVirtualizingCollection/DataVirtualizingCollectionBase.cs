@@ -1,11 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive.Concurrency;
+using System.Reactive.Linq;
+using BFF.DataVirtualizingCollection.Extensions;
 
 namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
 {
     internal abstract class DataVirtualizingCollectionBase<T> : VirtualizationBase<T>, IDataVirtualizingCollection<T>
     {
         private int _selectedIndex;
+        
+        protected DataVirtualizingCollectionBase(
+            IObservable<(int Offset, int PageSize, T[] PreviousPage, T[] Page)> observePageFetches,
+            IDisposable? disposeOnDisposal,
+            IScheduler observeScheduler)
+        {
+            disposeOnDisposal?.AddTo(CompositeDisposable);
+            
+            observePageFetches
+                .ObserveOn(observeScheduler)
+                .Subscribe(t =>
+                {
+                    var (offset, pageSize, previousPage, page) = t;
+                    for (var i = 0; i < pageSize; i++)
+                    {
+                        OnCollectionChangedReplace(page[i], previousPage[i], i + offset);
+                    }
+                    OnIndexerChanged();
+                })
+                .AddTo(CompositeDisposable);
+        }
         
         protected override T IndexerInnerGet(int index) =>
             index >= Count || index < 0

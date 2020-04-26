@@ -37,7 +37,7 @@ namespace BFF.DataVirtualizingCollection.PageStorage
 
             IPage<T> FetchPreloadingPage(int key)
             {
-                lock (_isDisposedLock)
+                lock (IsDisposedLock)
                 {
                     if (!IsDisposed) Requests.OnNext((key, -1));
                 }

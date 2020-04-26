@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -30,7 +28,7 @@ namespace BFF.DataVirtualizingCollection.Sample.HandyControl
             DataContext = this;
             
             _numberWindow  = SlidingWindowBuilder<int>
-                .Build(10, 0, DispatcherScheduler, 100)
+                .Build(10, 0, 100, DispatcherScheduler, TaskPoolScheduler.Default)
                 .NonPreloading()
                 .Hoarding()
                 /*.NonTaskBasedFetchers(
@@ -60,7 +58,7 @@ namespace BFF.DataVirtualizingCollection.Sample.HandyControl
                         return int.MaxValue;
                     })
                 //.SyncIndexAccess();
-                .AsyncIndexAccess((_, __) => -1, TaskPoolScheduler.Default);
+                .AsyncIndexAccess((_, __) => -1);
             
             SlideLeft = new RxRelayCommand(() => _numberWindow.SlideLeft());
             SlideRight = new RxRelayCommand(() => _numberWindow.SlideRight());

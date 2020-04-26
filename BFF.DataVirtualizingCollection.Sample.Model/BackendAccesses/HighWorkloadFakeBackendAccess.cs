@@ -9,7 +9,9 @@ namespace BFF.DataVirtualizingCollection.Sample.Model.BackendAccesses
 
     internal class HighWorkloadFakeBackendAccess : IHighWorkloadFakeBackendAccess
     {
-        private ISomeWorkloadObject Placeholder { get; } = (ISomeWorkloadObject) new LowWorkloadObject(-1);
+        private ISomeWorkloadObject Placeholder { get; } = (ISomeWorkloadObject) new LowWorkloadObject(-11);
+        
+        private ISomeWorkloadObject PreloadingPlaceholder { get; } = (ISomeWorkloadObject) new LowWorkloadObject(-11);
         
         public string Name => "High Workload Simulation";
 
@@ -24,6 +26,11 @@ namespace BFF.DataVirtualizingCollection.Sample.Model.BackendAccesses
         public ISomeWorkloadObject PlaceholderFetch(int _, int __)
         {
             return Placeholder;
+        }
+
+        public ISomeWorkloadObject PreloadingPlaceholderFetch(int _, int __)
+        {
+            return PreloadingPlaceholder;
         }
 
         public int CountFetch()

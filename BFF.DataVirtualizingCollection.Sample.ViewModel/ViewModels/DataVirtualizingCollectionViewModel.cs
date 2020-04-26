@@ -104,18 +104,19 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels
         private void SetItems()
         {
             var builder = DataVirtualizingCollectionBuilder<TViewModel>
-                .Build(_pageSize);
+                .Build(
+                    _pageSize, 
+                    _getSchedulers.NotificationScheduler,
+                    _getSchedulers.BackgroundScheduler);
             var afterPageLoadingDecision = 
-                PageLoadingBehaviorViewModel.Configure(builder);
+                PageLoadingBehaviorViewModel.Configure(builder, _backendAccess);
             var afterPageRemovalDecision = 
                 PageRemovalBehaviorViewModel.Configure(afterPageLoadingDecision);
             var afterFetcherKindDecision = 
                 FetcherKindViewModel.Configure(afterPageRemovalDecision, _backendAccess);
             var collection = IndexAccessBehaviorViewModel.Configure(
                 afterFetcherKindDecision, 
-                _backendAccess, 
-                _getSchedulers.NotificationScheduler,
-                _getSchedulers.BackgroundScheduler);
+                _backendAccess);
             Items = collection;
         }
 

@@ -20,7 +20,10 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
         internal SyncDataVirtualizingCollection(
             Func<int, IPageStorage<T>> pageStoreFactory,
             Func<int> countFetcher,
+            IObservable<(int Offset, int PageSize, T[] PreviousPage, T[] Page)> observePageFetches,
+            IDisposable? disposeOnDisposal,
             IScheduler observeScheduler)
+        : base (observePageFetches, disposeOnDisposal, observeScheduler)
         {
             _pageStoreFactory = pageStoreFactory;
             _countFetcher = countFetcher;

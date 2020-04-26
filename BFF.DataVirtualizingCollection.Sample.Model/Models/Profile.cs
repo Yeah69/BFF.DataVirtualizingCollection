@@ -158,6 +158,8 @@ namespace BFF.DataVirtualizingCollection.Sample.Model.Models
                 });
         
         public static IProfile Empty { get; } = new Profile();
+        
+        public static IProfile Preloading { get; } = new Profile();
     }
 
     internal class Profile : IProfile

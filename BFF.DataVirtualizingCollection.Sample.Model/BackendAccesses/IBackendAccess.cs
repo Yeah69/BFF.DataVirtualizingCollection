@@ -8,6 +8,8 @@ namespace BFF.DataVirtualizingCollection.Sample.Model.BackendAccesses
 
         T PlaceholderFetch(int pageOffset, int indexInsidePage);
 
+        T PreloadingPlaceholderFetch(int pageOffset, int indexInsidePage);
+
         int CountFetch();
     }
 }

@@ -1,8 +1,5 @@
 using System;
-using System.Reactive.Concurrency;
-using BFF.DataVirtualizingCollection.DataVirtualizingCollection;
 using BFF.DataVirtualizingCollection.Sample.Model.BackendAccesses;
-using BFF.DataVirtualizingCollection.Sample.ViewModel.Interfaces;
 
 namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions
 {
@@ -23,33 +20,23 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions
         
         bool IsSyncEnabled { get; }
         
-        public IDataVirtualizingCollection<T> Configure<T>(
-            IAsyncOnlyIndexAccessBehaviorCollectionBuilder<T> builder,
-            IBackendAccess<T> backendAccess,
-            IScheduler notificationScheduler,
-            IScheduler backgroundScheduler)
+        public TVirtualizationKind Configure<T, TVirtualizationKind>(
+            IAsyncOnlyIndexAccessBehaviorCollectionBuilder<T, TVirtualizationKind> builder,
+            IBackendAccess<T> backendAccess)
         {
             return IndexAccessBehavior == IndexAccessBehavior.Synchronous
-                ? (builder as IIndexAccessBehaviorCollectionBuilder<T>)?.SyncIndexAccess(notificationScheduler)
-                    ?? throw new ArgumentException("Cannot choose sync index access when chosen to use task-based fetchers.")
+                ? builder is IIndexAccessBehaviorCollectionBuilder<T, TVirtualizationKind> indexAccessBehaviorCollectionBuilder
+                    ? indexAccessBehaviorCollectionBuilder.SyncIndexAccess()
+                    : throw new ArgumentException("Cannot choose sync index access when chosen to use task-based fetchers.")
                 : builder.AsyncIndexAccess(
-                    backendAccess.PlaceholderFetch, 
-                    backgroundScheduler,
-                    notificationScheduler);
+                    backendAccess.PlaceholderFetch);
         }
     }
 
     internal class IndexAccessBehaviorViewModel : ObservableObject, IIndexAccessBehaviorViewModelInternal
     {
-        private readonly IGetSchedulers _getSchedulers;
         private IndexAccessBehavior _indexAccessBehavior = IndexAccessBehavior.Asynchronous;
         private bool _isSyncEnabled;
-
-        public IndexAccessBehaviorViewModel(
-            IGetSchedulers getSchedulers)
-        {
-            _getSchedulers = getSchedulers;
-        }
 
         public IndexAccessBehavior IndexAccessBehavior
         {

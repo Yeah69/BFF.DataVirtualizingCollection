@@ -1,4 +1,5 @@
-using BFF.DataVirtualizingCollection.DataVirtualizingCollection;
+using System;
+using BFF.DataVirtualizingCollection.Sample.Model.BackendAccesses;
 
 namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions
 {
@@ -12,11 +13,13 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions
     {
         PageLoadingBehavior PageLoadingBehavior { get; set; }
         
-        IPageHoldingBehaviorCollectionBuilder<T> Configure<T>(IPageLoadingBehaviorCollectionBuilder<T> builder)
+        IPageHoldingBehaviorCollectionBuilder<T, TVirtualizationKind> Configure<T, TVirtualizationKind>(
+            IPageLoadingBehaviorCollectionBuilder<T, TVirtualizationKind> builder, 
+            IBackendAccess<T> backendAccess)
         {
             return PageLoadingBehavior == PageLoadingBehavior.NonPreloading
                 ? builder.NonPreloading()
-                : builder.Preloading();
+                : builder.Preloading(backendAccess.PreloadingPlaceholderFetch);
         }
     }
 

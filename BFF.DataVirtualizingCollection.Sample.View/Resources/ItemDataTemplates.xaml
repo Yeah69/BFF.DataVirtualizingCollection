@@ -188,4 +188,14 @@
             <mah:ProgressRing IsActive="True" HorizontalAlignment="Center" VerticalAlignment="Center" />
         </Border>
     </DataTemplate>
+    <DataTemplate DataType="{x:Type viewModels:PreloadingProfileViewModel}">
+        <Border Width="360"
+                Height="515"
+                Margin="7"
+                Background="White"
+                BorderBrush="Gray"
+                BorderThickness="1,0,1,1">
+            <mah:ProgressRing IsActive="True" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Purple" />
+        </Border>
+    </DataTemplate>
 </ResourceDictionary>

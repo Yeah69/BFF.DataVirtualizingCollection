@@ -17,7 +17,11 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels
                     ProfileStatic
                         .ProfilePool
                         .Select(p => new KeyValuePair<IProfile, IProfileViewModel>(p, new ProfileViewModel(p)))
-                        .Concat(new []{ new KeyValuePair<IProfile, IProfileViewModel>(ProfileStatic.Empty, EmptyProfileViewModel.Instance) })));
+                        .Concat(new []
+                        {
+                            new KeyValuePair<IProfile, IProfileViewModel>(ProfileStatic.Empty, EmptyProfileViewModel.Instance),
+                            new KeyValuePair<IProfile, IProfileViewModel>(ProfileStatic.Preloading, PreloadingProfileViewModel.Instance)
+                        })));
     }
 
     public class EmptyProfileViewModel : IProfileViewModel
@@ -25,6 +29,13 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels
         public static EmptyProfileViewModel Instance { get; } = new EmptyProfileViewModel();
         
         private EmptyProfileViewModel(){}
+    }
+
+    public class PreloadingProfileViewModel : IProfileViewModel
+    {
+        public static PreloadingProfileViewModel Instance { get; } = new PreloadingProfileViewModel();
+        
+        private PreloadingProfileViewModel(){}
     }
 
     public class ProfileViewModel : IProfileViewModel

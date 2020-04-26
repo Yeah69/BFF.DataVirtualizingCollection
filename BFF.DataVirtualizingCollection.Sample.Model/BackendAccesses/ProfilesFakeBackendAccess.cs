@@ -25,6 +25,11 @@ namespace BFF.DataVirtualizingCollection.Sample.Model.BackendAccesses
             return ProfileStatic.Empty;
         }
 
+        public IProfile PreloadingPlaceholderFetch(int pageOffset, int indexInsidePage)
+        {
+            return ProfileStatic.Preloading;
+        }
+
         public int CountFetch()
         {
             return 420420;

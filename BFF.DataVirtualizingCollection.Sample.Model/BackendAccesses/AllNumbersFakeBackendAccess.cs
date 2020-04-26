@@ -17,7 +17,12 @@ namespace BFF.DataVirtualizingCollection.Sample.Model.BackendAccesses
 
         public int PlaceholderFetch(int _, int __)
         {
-            return -1;
+            return -11;
+        }
+
+        public int PreloadingPlaceholderFetch(int _, int __)
+        {
+            return -21;
         }
 
         public int CountFetch()

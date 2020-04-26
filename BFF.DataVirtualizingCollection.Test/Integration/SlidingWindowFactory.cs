@@ -19,9 +19,16 @@ namespace BFF.DataVirtualizingCollection.Test.Integration
             int initialWindowSize,
             int initialWindowOffset)
         {
-            var pageLoadingBehaviorCollectionBuilder = SlidingWindowBuilder<int>.Build(initialWindowSize, initialWindowOffset, new EventLoopScheduler(), pageSize);
+            var pageLoadingBehaviorCollectionBuilder = SlidingWindowBuilder<int>.Build(
+                initialWindowSize, 
+                initialWindowOffset,
+                pageSize, 
+                new EventLoopScheduler());
             var pageHoldingBehaviorCollectionBuilder =
-                StandardPageHoldingBehaviorCollectionBuilder(pageLoadingBehaviorCollectionBuilder, pageLoadingBehavior);
+                StandardPageHoldingBehaviorCollectionBuilder(
+                    pageLoadingBehaviorCollectionBuilder, 
+                    pageLoadingBehavior,
+                    (_, __) => -1);
             var fetchersKindCollectionBuilder =
                 StandardFetcherKindCollectionBuilder(
                     pageHoldingBehaviorCollectionBuilder,
@@ -55,9 +62,15 @@ namespace BFF.DataVirtualizingCollection.Test.Integration
             int initialWindowSize,
             int initialWindowOffset)
         {
-            var pageLoadingBehaviorCollectionBuilder = SlidingWindowBuilder<int>.Build(initialWindowSize, initialWindowOffset, new EventLoopScheduler(), pageSize);
+            var pageLoadingBehaviorCollectionBuilder = SlidingWindowBuilder<int>.Build(
+                initialWindowSize, 
+                initialWindowOffset, 
+                new EventLoopScheduler());
             var pageHoldingBehaviorCollectionBuilder =
-                StandardPageHoldingBehaviorCollectionBuilder(pageLoadingBehaviorCollectionBuilder, pageLoadingBehavior);
+                StandardPageHoldingBehaviorCollectionBuilder(
+                    pageLoadingBehaviorCollectionBuilder, 
+                    pageLoadingBehavior,
+                    (_, __) => -1);
             var fetchersKindCollectionBuilder =
                 StandardFetcherKindCollectionBuilder(
                     pageHoldingBehaviorCollectionBuilder,
@@ -94,9 +107,16 @@ namespace BFF.DataVirtualizingCollection.Test.Integration
             Func<int, int, T[]> pageFetchingLogic,
             T placeholder)
         {
-            var pageLoadingBehaviorCollectionBuilder = SlidingWindowBuilder<T>.Build(initialWindowSize, initialWindowOffset, new EventLoopScheduler(), pageSize);
+            var pageLoadingBehaviorCollectionBuilder = SlidingWindowBuilder<T>.Build(
+                initialWindowSize, 
+                initialWindowOffset, 
+                pageSize, 
+                new EventLoopScheduler());
             var pageHoldingBehaviorCollectionBuilder =
-                StandardPageHoldingBehaviorCollectionBuilder(pageLoadingBehaviorCollectionBuilder, pageLoadingBehavior);
+                StandardPageHoldingBehaviorCollectionBuilder(
+                    pageLoadingBehaviorCollectionBuilder, 
+                    pageLoadingBehavior,
+                    (_, __) => placeholder);
             var fetchersKindCollectionBuilder =
                 StandardFetcherKindCollectionBuilder(
                     pageHoldingBehaviorCollectionBuilder,
@@ -132,9 +152,16 @@ namespace BFF.DataVirtualizingCollection.Test.Integration
             int pageLimit,
             int removalCount)
         {
-            var pageLoadingBehaviorCollectionBuilder = SlidingWindowBuilder<T>.Build(initialWindowSize, initialWindowOffset, new EventLoopScheduler(), pageSize);
+            var pageLoadingBehaviorCollectionBuilder = SlidingWindowBuilder<T>.Build(
+                initialWindowSize,
+                initialWindowOffset,
+                pageSize,
+                new EventLoopScheduler());
             var pageHoldingBehaviorCollectionBuilder =
-                StandardPageHoldingBehaviorCollectionBuilder(pageLoadingBehaviorCollectionBuilder, pageLoadingBehavior);
+                StandardPageHoldingBehaviorCollectionBuilder(
+                    pageLoadingBehaviorCollectionBuilder,
+                    pageLoadingBehavior,
+                    (_, __) => placeholder);
             var fetchersKindCollectionBuilder =
                 StandardFetcherKindCollectionBuilder(
                     pageHoldingBehaviorCollectionBuilder, 
@@ -166,9 +193,15 @@ namespace BFF.DataVirtualizingCollection.Test.Integration
             int initialWindowSize,
             int initialWindowOffset)
         {
-            var pageLoadingBehaviorCollectionBuilder = SlidingWindowBuilder<int>.Build(initialWindowSize, initialWindowOffset, new EventLoopScheduler(), pageSize);
+            var pageLoadingBehaviorCollectionBuilder = SlidingWindowBuilder<int>.Build(
+                initialWindowSize, 
+                initialWindowOffset, pageSize, 
+                new EventLoopScheduler());
             var pageHoldingBehaviorCollectionBuilder =
-                StandardPageHoldingBehaviorCollectionBuilder(pageLoadingBehaviorCollectionBuilder, pageLoadingBehavior);
+                StandardPageHoldingBehaviorCollectionBuilder(
+                    pageLoadingBehaviorCollectionBuilder, 
+                    pageLoadingBehavior,
+                    (_, __) => -1);
             var fetchersKindCollectionBuilder =
                 StandardFetcherKindCollectionBuilder(
                     pageHoldingBehaviorCollectionBuilder,
@@ -193,16 +226,18 @@ namespace BFF.DataVirtualizingCollection.Test.Integration
             return dataVirtualizingCollection;
         }
 
-        private static SlidingWindow.IPageHoldingBehaviorCollectionBuilder<T> StandardPageHoldingBehaviorCollectionBuilder<T>(IPageLoadingBehaviorCollectionBuilder<T> pageLoadingBehaviorCollectionBuilder,
-            PageLoadingBehavior pageLoadingBehavior) =>
+        private static IPageHoldingBehaviorCollectionBuilder<T, ISlidingWindow<T>> StandardPageHoldingBehaviorCollectionBuilder<T>(
+            IPageLoadingBehaviorCollectionBuilder<T, ISlidingWindow<T>> pageLoadingBehaviorCollectionBuilder,
+            PageLoadingBehavior pageLoadingBehavior,
+            Func<int, int, T> preloadingPlaceholderFactory) =>
             pageLoadingBehavior switch
                 {
                 PageLoadingBehavior.NonPreloading => pageLoadingBehaviorCollectionBuilder.NonPreloading(),
-                PageLoadingBehavior.Preloading => pageLoadingBehaviorCollectionBuilder.Preloading(),
+                PageLoadingBehavior.Preloading => pageLoadingBehaviorCollectionBuilder.Preloading(preloadingPlaceholderFactory),
                 _ => throw new Exception("Test configuration failed!")
                 };
 
-        private static SlidingWindow.IFetchersKindCollectionBuilder<T> StandardFetcherKindCollectionBuilder<T>(IPageHoldingBehaviorCollectionBuilder<T> pageHoldingBehaviorCollectionBuilder,
+        private static IFetchersKindCollectionBuilder<T, ISlidingWindow<T>> StandardFetcherKindCollectionBuilder<T>(IPageHoldingBehaviorCollectionBuilder<T, ISlidingWindow<T>> pageHoldingBehaviorCollectionBuilder,
             PageRemovalBehavior pageRemovalBehavior,
             int pageLimit,
             int removalCount) =>
@@ -213,7 +248,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration
                 _ => throw new Exception("Test configuration failed!")
                 };
 
-        private static SlidingWindow.IAsyncOnlyIndexAccessBehaviorCollectionBuilder<T> StandardIndexAccessBehaviorCollectionBuilder<T>(SlidingWindow.IFetchersKindCollectionBuilder<T> fetchersKindCollectionBuilder,
+        private static IAsyncOnlyIndexAccessBehaviorCollectionBuilder<T, ISlidingWindow<T>> StandardIndexAccessBehaviorCollectionBuilder<T>(IFetchersKindCollectionBuilder<T, ISlidingWindow<T>> fetchersKindCollectionBuilder,
             FetchersKind fetchersKind,
             Func<int, int, T[]> pageFetcher,
             Func<int> countFetcher) =>
@@ -244,15 +279,16 @@ namespace BFF.DataVirtualizingCollection.Test.Integration
                 _ => throw new Exception("Test configuration failed!")
                 };
 
-        private static ISlidingWindow<T> StandardDataVirtualizingCollection<T>(IAsyncOnlyIndexAccessBehaviorCollectionBuilder<T> indexAccessBehaviorCollectionBuilder,
+        private static ISlidingWindow<T> StandardDataVirtualizingCollection<T>(IAsyncOnlyIndexAccessBehaviorCollectionBuilder<T, ISlidingWindow<T>> indexAccessBehaviorCollectionBuilder,
             IndexAccessBehavior indexAccessBehavior,
             Func<T> placeholderFactory) =>
             indexAccessBehavior switch
                 {
-                IndexAccessBehavior.Synchronous => (indexAccessBehaviorCollectionBuilder as IIndexAccessBehaviorCollectionBuilder<T>)?.SyncIndexAccess(new EventLoopScheduler()) ?? throw new Exception("Task-based fetchers and synchronous access is not allowed."),
+                IndexAccessBehavior.Synchronous => 
+                (indexAccessBehaviorCollectionBuilder as IIndexAccessBehaviorCollectionBuilder<T, ISlidingWindow<T>>)
+                    ?.SyncIndexAccess() ?? throw new Exception("Task-based fetchers and synchronous access is not allowed."),
                 IndexAccessBehavior.Asynchronous => indexAccessBehaviorCollectionBuilder.AsyncIndexAccess(
-                    (_, __) => placeholderFactory(),
-                    new EventLoopScheduler()),
+                    (_, __) => placeholderFactory()),
                 _ => throw new Exception("Test configuration failed!")
                 };
     }
