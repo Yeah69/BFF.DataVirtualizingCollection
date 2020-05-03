@@ -1,10 +1,8 @@
 using System;
-using System.Collections;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels;
-using BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.CollectionViewModels;
 using MahApps.Metro.IconPacks;
 
 namespace BFF.DataVirtualizingCollection.Sample.View.Utilities

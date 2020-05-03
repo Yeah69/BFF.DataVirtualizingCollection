@@ -1,0 +1,25 @@
+<UserControl x:Class="BFF.DataVirtualizingCollection.Sample.View.Views.Functions.SpecificFunctionsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:viewModels="clr-namespace:BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels;assembly=BFF.DataVirtualizingCollection.Sample.ViewModel"
+             xmlns:options="clr-namespace:BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Functions;assembly=BFF.DataVirtualizingCollection.Sample.ViewModel"
+             mc:Ignorable="d"
+             x:Name="This"
+             d:DataContext="{d:DesignInstance viewModels:IDataVirtualizingCollectionViewModelBase}"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <ContentControl Content="{Binding SpecificFunctionsViewModel}">
+        <ContentControl.Resources>
+            <DataTemplate DataType="{x:Type options:SlidingWindowFunctionsViewModel}">
+                <UniformGrid Columns="2">
+                    <Button Content="Slide Left" Command="{Binding SlideLeft}" CommandParameter="{Binding DataContext.Items, ElementName=This}" Margin="5" />
+                    <Button Content="Slide Right" Command="{Binding SlideRight}" CommandParameter="{Binding DataContext.Items, ElementName=This}" Margin="5" />
+                    <Button Content="Increase Window Size" Command="{Binding IncreaseWindowSize}" CommandParameter="{Binding DataContext.Items, ElementName=This}" Margin="5" />
+                    <Button Content="Decrease Window Size" Command="{Binding DecreaseWindowSize}" CommandParameter="{Binding DataContext.Items, ElementName=This}" Margin="5" />
+                </UniformGrid>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type options:SpecificFunctionsViewModel}" />
+        </ContentControl.Resources>
+    </ContentControl>
+</UserControl>

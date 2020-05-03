@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace BFF.DataVirtualizingCollection.SlidingWindow
+﻿namespace BFF.DataVirtualizingCollection.SlidingWindow
 {
     // ReSharper disable once PossibleInterfaceMemberAmbiguity
     // Ambiguous Members should be implemented explicitly

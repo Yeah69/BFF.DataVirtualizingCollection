@@ -1,9 +1,9 @@
-﻿﻿using System;
+﻿using System;
 using System.ComponentModel;
 using System.Reactive;
 using System.Reactive.Linq;
 
-namespace BFF.Core.Extensions
+namespace BFF.DataVirtualizingCollection.Sample.HandyControl
 {
     public static class NotifyPropertyChangedExtensions
     {

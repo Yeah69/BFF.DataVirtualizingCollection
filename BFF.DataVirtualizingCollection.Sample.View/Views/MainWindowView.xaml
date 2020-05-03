@@ -11,17 +11,53 @@
         Title="MainWindow" Height="450" Width="800">
     <DockPanel LastChildFill="True">
         <ProgressBar IsIndeterminate="True" Height="5" DockPanel.Dock="Bottom" Visibility="{x:Static view:App.IsDebug}" />
-        <TabControl DockPanel.Dock="Top" ItemsSource="{Binding DataVirtualizingCollections}" SelectedIndex="0">
-            <TabControl.ItemContainerStyle>
-                <Style TargetType="TabItem">
-                    <Setter Property="Header" Value="{Binding Name}"/>
+        <TabControl DockPanel.Dock="Top" TabStripPlacement="Left">
+            <TabControl.Resources>
+                <Style TargetType="{x:Type TabItem}">
+                    <Setter Property="HeaderTemplate">
+                        <Setter.Value>
+                            <DataTemplate>
+                                <ContentPresenter Content="{TemplateBinding Content}">
+                                    <ContentPresenter.LayoutTransform>
+                                        <RotateTransform Angle="270" />
+                                    </ContentPresenter.LayoutTransform>
+                                </ContentPresenter>
+                            </DataTemplate>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Padding" Value="3" />
                 </Style>
-            </TabControl.ItemContainerStyle>
-            <TabControl.ContentTemplate>
-                <DataTemplate>
-                    <views:DataVirtualizingCollectionView DataContext="{Binding}" />
-                </DataTemplate>
-            </TabControl.ContentTemplate>
+            </TabControl.Resources>
+            <TabControl.Items>
+                <TabItem Header="Data Virtualizing Collections">
+                    <TabControl ItemsSource="{Binding DataVirtualizingCollections}" SelectedIndex="0">
+                        <TabControl.ItemContainerStyle>
+                            <Style TargetType="TabItem">
+                                <Setter Property="Header" Value="{Binding Name}"/>
+                            </Style>
+                        </TabControl.ItemContainerStyle>
+                        <TabControl.ContentTemplate>
+                            <DataTemplate>
+                                <views:DataVirtualizingCollectionView DataContext="{Binding}" />
+                            </DataTemplate>
+                        </TabControl.ContentTemplate>
+                    </TabControl>
+                </TabItem>
+                <TabItem Header="Sliding Windows">
+                    <TabControl ItemsSource="{Binding SlidingWindows}" SelectedIndex="0">
+                        <TabControl.ItemContainerStyle>
+                            <Style TargetType="TabItem">
+                                <Setter Property="Header" Value="{Binding Name}"/>
+                            </Style>
+                        </TabControl.ItemContainerStyle>
+                        <TabControl.ContentTemplate>
+                            <DataTemplate>
+                                <views:DataVirtualizingCollectionView DataContext="{Binding}" />
+                            </DataTemplate>
+                        </TabControl.ContentTemplate>
+                    </TabControl>
+                </TabItem>
+            </TabControl.Items>
         </TabControl>
     </DockPanel>
 </Window>

@@ -5,24 +5,43 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModels="clr-namespace:BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels;assembly=BFF.DataVirtualizingCollection.Sample.ViewModel"
              xmlns:decisions="clr-namespace:BFF.DataVirtualizingCollection.Sample.View.Views.Decisions"
+             xmlns:options="clr-namespace:BFF.DataVirtualizingCollection.Sample.View.Views.Options"
+             xmlns:options1="clr-namespace:BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Options;assembly=BFF.DataVirtualizingCollection.Sample.ViewModel"
+             xmlns:functions="clr-namespace:BFF.DataVirtualizingCollection.Sample.View.Views.Functions"
              mc:Ignorable="d"
              x:Name="RootRoot"
-             d:DataContext="{d:DesignInstance viewModels:IDataVirtualizingCollectionViewModel}"
+             d:DataContext="{d:DesignInstance viewModels:IDataVirtualizingCollectionViewModelBase}"
              d:DesignHeight="300" 
              d:DesignWidth="300">
     <DockPanel LastChildFill="True">
         <StackPanel DockPanel.Dock="Top" HorizontalAlignment="Stretch">
             <TextBlock HorizontalAlignment="Center" Text="{Binding Name}" FontSize="23" FontWeight="Bold" />
+            <StackPanel Orientation="Horizontal">
+                <options:GeneralOptionsView DataContext="{Binding GeneralOptionsViewModel}" />
+                <ContentControl Content="{Binding SpecificOptionsViewModel}">
+                    <ContentControl.Resources>
+                        <DataTemplate DataType="{x:Type options1:SlidingWindowOptionsViewModel}">
+                            <options:SlidingWindowOptionsView DataContext="{Binding}" />
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type options1:SpecificOptionsViewModel}" />
+                    </ContentControl.Resources>
+                </ContentControl>
+            </StackPanel>
             <decisions:PageLoadingBehaviorView DataContext="{Binding PageLoadingBehaviorViewModel}" />
             <decisions:PageRemovalBehaviorView DataContext="{Binding PageRemovalBehaviorViewModel}" />
             <decisions:FetcherKindView DataContext="{Binding FetcherKindViewModel}" />
             <decisions:IndexAccessBehaviorView DataContext="{Binding IndexAccessBehaviorViewModel}" />
-            <Button Content="Create New" HorizontalAlignment="Stretch" Command="{Binding CreateNew}" />
+            <Button Content="Create New" HorizontalAlignment="Stretch" Command="{Binding CreateNew}" Margin="5" />
+            <functions:GeneralFunctionsView DataContext="{Binding}" />
+            <functions:SpecificFunctionsView DataContext="{Binding}" />
         </StackPanel>
-        <ContentControl DockPanel.Dock="Bottom" Content="{Binding}">
-            <ContentControl.Resources>
+        <Grid>
+            <Grid.Resources>
                 <ResourceDictionary Source="../Resources/BackendCollectionDataTemplates.xaml" />
-            </ContentControl.Resources>
-        </ContentControl>
+            </Grid.Resources>
+            <ContentControl DockPanel.Dock="Bottom" 
+                            Content="{Binding}" 
+                            ContentTemplateSelector="{StaticResource BackendAccessDataTemplateSelector}"/>
+        </Grid>
     </DockPanel>
 </UserControl>

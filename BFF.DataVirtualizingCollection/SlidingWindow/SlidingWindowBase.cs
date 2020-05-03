@@ -25,6 +25,8 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
         public int Offset { get; protected set; }
 
         public int MaximumOffset => CountOfBackedDataSet - Size;
+        
+        public override int SelectedIndex { get; set; }
 
         public void SlideLeft()
         {

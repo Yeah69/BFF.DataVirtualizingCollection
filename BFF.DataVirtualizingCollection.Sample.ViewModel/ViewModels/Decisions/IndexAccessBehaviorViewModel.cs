@@ -22,14 +22,16 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions
         
         public TVirtualizationKind Configure<T, TVirtualizationKind>(
             IAsyncOnlyIndexAccessBehaviorCollectionBuilder<T, TVirtualizationKind> builder,
-            IBackendAccess<T> backendAccess)
+            IBackendAccess<T> backendAccess,
+            FetcherKind fetcherDecision)
         {
             return IndexAccessBehavior == IndexAccessBehavior.Synchronous
-                ? builder is IIndexAccessBehaviorCollectionBuilder<T, TVirtualizationKind> indexAccessBehaviorCollectionBuilder
-                    ? indexAccessBehaviorCollectionBuilder.SyncIndexAccess()
+                ? fetcherDecision == FetcherKind.NonTaskBased
+                    ? builder is IIndexAccessBehaviorCollectionBuilder<T, TVirtualizationKind> indexAccessBehaviorCollectionBuilder
+                        ? indexAccessBehaviorCollectionBuilder.SyncIndexAccess() 
+                        : throw new ArgumentException("Builder should implement all builder interfaces", nameof(builder))
                     : throw new ArgumentException("Cannot choose sync index access when chosen to use task-based fetchers.")
-                : builder.AsyncIndexAccess(
-                    backendAccess.PlaceholderFetch);
+                : builder.AsyncIndexAccess(backendAccess.PlaceholderFetch);
         }
     }
 

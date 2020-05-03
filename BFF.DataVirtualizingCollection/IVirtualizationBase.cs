@@ -17,6 +17,11 @@ namespace BFF.DataVirtualizingCollection
         /// Task is successfully completed when initialization is completed
         /// </summary>
         Task InitializationCompleted { get; }
+        
+        /// <summary>
+        /// Can be bound to SelectedIndexProperty on Selector Controls in order to workaround issue with resets and selected items.
+        /// </summary>
+        int SelectedIndex { get; set; }
 
         /// <summary>
         /// Disposes of all current pages and notifies that possibly everything changed.

@@ -1,0 +1,18 @@
+<UserControl x:Class="BFF.DataVirtualizingCollection.Sample.View.Views.Options.GeneralOptionsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:options="clr-namespace:BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Options;assembly=BFF.DataVirtualizingCollection.Sample.ViewModel"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance options:IGeneralOptionsViewModel}"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <StackPanel Orientation="Horizontal">
+        <TextBlock Text="Page Size:" 
+                   Margin="5"  />
+        <TextBox Text="{Binding PageSize}" 
+                 MinWidth="50"
+                 TextAlignment="Right"
+                 Margin="5" />
+    </StackPanel>
+</UserControl>

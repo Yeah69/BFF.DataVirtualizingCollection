@@ -1,4 +1,3 @@
-using System;
 using BFF.DataVirtualizingCollection.Sample.Model.BackendAccesses;
 
 namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions

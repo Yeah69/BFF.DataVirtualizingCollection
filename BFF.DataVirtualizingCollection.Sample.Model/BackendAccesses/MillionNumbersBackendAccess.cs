@@ -1,4 +1,3 @@
-using System.Linq;
 using BFF.DataVirtualizingCollection.Sample.Model.PersistenceLink;
 
 namespace BFF.DataVirtualizingCollection.Sample.Model.BackendAccesses

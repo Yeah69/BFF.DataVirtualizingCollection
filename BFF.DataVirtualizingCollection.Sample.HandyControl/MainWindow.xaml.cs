@@ -7,8 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using BFF.Core.Extensions;
-using BFF.DataVirtualizingCollection.Sample.HandyControl.Annotations;
+using BFF.DataVirtualizingCollection.Sample.HandyControl.Properties;
 using BFF.DataVirtualizingCollection.SlidingWindow;
 
 namespace BFF.DataVirtualizingCollection.Sample.HandyControl

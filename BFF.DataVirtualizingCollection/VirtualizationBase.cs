@@ -180,5 +180,6 @@ namespace BFF.DataVirtualizingCollection
         }
 
         public abstract Task InitializationCompleted { get; }
+        public abstract int SelectedIndex { get; set; }
     }
 }

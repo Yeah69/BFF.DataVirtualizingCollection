@@ -1,32 +1,45 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.CollectionViewModels;
+using BFF.DataVirtualizingCollection.Sample.ViewModel.Adapters;
 
 namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels
 {
     public interface IMainWindowViewModel
     {
-        IReadOnlyCollection<IDataVirtualizingCollectionViewModel> DataVirtualizingCollections { get; }
+        IReadOnlyCollection<IDataVirtualizingCollectionViewModelBase> DataVirtualizingCollections { get; }
+        
+        IReadOnlyCollection<IDataVirtualizingCollectionViewModelBase> SlidingWindows { get; }
     }
 
     internal class MainWindowViewModel : ObservableObject, IMainWindowViewModel
     {
         public MainWindowViewModel(
-            IAllNumbersCollectionViewModel allNumbersCollectionViewModel,
-            IMillionNumbersCollectionViewModel millionNumbersCollectionViewModel,
-            IHighWorkloadCollectionViewModel highWorkloadCollectionViewModel,
-            IProfileCollectionViewModel profileCollectionViewModel)
+            IAllNumbersCollectionAdapter allNumbersCollectionAdapter,
+            IMillionNumbersCollectionAdapter millionNumbersCollectionAdapter,
+            IHighWorkloadCollectionAdapter highWorkloadCollectionAdapter,
+            IProfileCollectionAdapter profileCollectionAdapter,
+            IDataVirtualizingCollectionViewModelFactory dataVirtualizingCollectionViewModelFactory)
         {
-            DataVirtualizingCollections = new ReadOnlyCollection<IDataVirtualizingCollectionViewModel>(
-                new List<IDataVirtualizingCollectionViewModel>
+            DataVirtualizingCollections = new ReadOnlyCollection<IDataVirtualizingCollectionViewModelBase>(
+                new List<IDataVirtualizingCollectionViewModelBase>
                 {
-                    allNumbersCollectionViewModel,
-                    millionNumbersCollectionViewModel,
-                    highWorkloadCollectionViewModel,
-                    profileCollectionViewModel
+                    dataVirtualizingCollectionViewModelFactory.CreateDataVirtualizingCollection(allNumbersCollectionAdapter),
+                    dataVirtualizingCollectionViewModelFactory.CreateDataVirtualizingCollection(millionNumbersCollectionAdapter),
+                    dataVirtualizingCollectionViewModelFactory.CreateDataVirtualizingCollection(highWorkloadCollectionAdapter),
+                    dataVirtualizingCollectionViewModelFactory.CreateDataVirtualizingCollection(profileCollectionAdapter)
+                });
+            SlidingWindows = new ReadOnlyCollection<IDataVirtualizingCollectionViewModelBase>(
+                new List<IDataVirtualizingCollectionViewModelBase>
+                {
+                    dataVirtualizingCollectionViewModelFactory.CreateSlidingWindow(allNumbersCollectionAdapter),
+                    dataVirtualizingCollectionViewModelFactory.CreateSlidingWindow(millionNumbersCollectionAdapter),
+                    dataVirtualizingCollectionViewModelFactory.CreateSlidingWindow(highWorkloadCollectionAdapter),
+                    dataVirtualizingCollectionViewModelFactory.CreateSlidingWindow(profileCollectionAdapter)
                 });
         }
         
-        public IReadOnlyCollection<IDataVirtualizingCollectionViewModel> DataVirtualizingCollections { get; }
+        public IReadOnlyCollection<IDataVirtualizingCollectionViewModelBase> DataVirtualizingCollections { get; }
+        
+        public IReadOnlyCollection<IDataVirtualizingCollectionViewModelBase> SlidingWindows { get; }
     }
 }

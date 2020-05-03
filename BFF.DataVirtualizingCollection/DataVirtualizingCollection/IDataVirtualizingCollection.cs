@@ -9,11 +9,6 @@
     /// </summary>
     public interface IDataVirtualizingCollection : IVirtualizationBase
     {
-        
-        /// <summary>
-        /// Can be bound to SelectedIndexProperty on Selector Controls in order to workaround issue with resets and selected items.
-        /// </summary>
-        int SelectedIndex { get; set; }
     }
     
     // ReSharper disable once PossibleInterfaceMemberAmbiguity

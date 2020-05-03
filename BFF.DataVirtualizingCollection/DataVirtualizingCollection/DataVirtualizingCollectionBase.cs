@@ -61,7 +61,7 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
             }
         }
 
-        public int SelectedIndex
+        public override int SelectedIndex
         {
             get => _selectedIndex;
             set

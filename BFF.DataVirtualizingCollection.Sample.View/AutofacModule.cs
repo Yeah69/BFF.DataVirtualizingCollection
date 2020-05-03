@@ -1,3 +1,4 @@
+using System.Reactive.Disposables;
 using System.Reflection;
 using Autofac;
 using BFF.DataVirtualizingCollection.Sample.View.ViewModelInterfaceImplementations;
@@ -36,6 +37,11 @@ namespace BFF.DataVirtualizingCollection.Sample.View
                 .AsImplementedInterfaces()
                 .AsSelf()
                 .SingleInstance();
+
+            builder.RegisterType<CompositeDisposable>()
+                .AsSelf()
+                .UsingConstructor(() => new CompositeDisposable())
+                .InstancePerLifetimeScope();
             
             builder.RegisterModule(new BFF.DataVirtualizingCollection.Sample.ViewModel.AutofacModule());
             

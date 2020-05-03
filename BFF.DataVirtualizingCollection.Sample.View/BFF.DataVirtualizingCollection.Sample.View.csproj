@@ -60,4 +60,34 @@
       </Content>
     </ItemGroup>
 
+    <ItemGroup>
+      <Page Update="Views\Options\GeneralOptionsView.xaml">
+        <Generator></Generator>
+      </Page>
+      <Page Update="Views\Options\SlidingWindowOptionsView.xaml">
+        <Generator></Generator>
+      </Page>
+      <Page Update="Views\Functions\GeneralFunctionsView.xaml">
+        <Generator></Generator>
+      </Page>
+      <Page Update="Views\Functions\SpecificFunctionsView.xaml">
+        <Generator></Generator>
+      </Page>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Views\Options\GeneralOptionsView.xaml.cs">
+        <DependentUpon>GeneralOptionsView.xaml</DependentUpon>
+      </Compile>
+      <Compile Update="Views\Options\SlidingWindowOptionsView.xaml.cs">
+        <DependentUpon>SlidingWindowOptionsViewModel.xaml</DependentUpon>
+      </Compile>
+      <Compile Update="Views\Functions\GeneralFunctionsView.xaml.cs">
+        <DependentUpon>GeneralFunctionsView.xaml</DependentUpon>
+      </Compile>
+      <Compile Update="Views\Functions\SpecificFunctionsView.xaml.cs">
+        <DependentUpon>SpecificFunctionsView.xaml</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
 </Project>
