@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
@@ -61,6 +62,8 @@ namespace BFF.DataVirtualizingCollection
         protected readonly IScheduler BackgroundScheduler;
         protected IScheduler PreloadingScheduler;
         protected readonly IScheduler NotificationScheduler;
+        
+        
 
         protected DataVirtualizingCollectionBuilderBase(int pageSize, IScheduler notificationScheduler)
             : this (pageSize, notificationScheduler, TaskPoolScheduler.Default)
@@ -175,15 +178,6 @@ namespace BFF.DataVirtualizingCollection
             }
         }
 
-        protected abstract TVirtualizationKind GenerateTaskBasedAsynchronousCollection(
-            Subject<(int Offset, int PageSize, TItem[] PreviousPage, TItem[] Page)> pageFetchEvents);
-
-        protected abstract TVirtualizationKind GenerateNonTaskBasedAsynchronousCollection(
-            Subject<(int Offset, int PageSize, TItem[] PreviousPage, TItem[] Page)> pageFetchEvents);
-
-        protected abstract TVirtualizationKind GenerateNonTaskBasedSynchronousCollection(
-            Subject<(int Offset, int PageSize, TItem[] PreviousPage, TItem[] Page)> pageFetchEvents);
-
         internal IPageStorage<TItem> PlaceholderOnlyPageStoreFactory(int count) => 
             new PlaceholderOnlyPageStorage<TItem>(
                 PageSize, 
@@ -207,5 +201,109 @@ namespace BFF.DataVirtualizingCollection
                     count,
                     nonPreloadingPageFetcherFactory,
                     PageHoldingBehavior);
+        
+        internal Func<int, IPageStorage<TItem>> GenerateTaskBasedAsynchronousPageStorage(
+            Subject<(int Offset, int PageSize, TItem[] PreviousPage, TItem[] Page)> pageFetchEvents)
+        {
+            return PageStoreFactoryComposition;
+
+            IPage<TItem> NonPreloadingPageFetcherFactory(
+                int pageKey,
+                int offset,
+                int pageSize) =>
+                new AsyncTaskBasedPage<TItem>(
+                    pageKey,
+                    offset,
+                    pageSize,
+                    TaskBasedPageFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
+                    PlaceholderFactory ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
+                    BackgroundScheduler,
+                    pageFetchEvents.AsObserver());
+
+            IPage<TItem> PreloadingPageFetcherFactory(
+                int pageKey,
+                int offset,
+                int pageSize) =>
+                new AsyncTaskBasedPage<TItem>(
+                    pageKey,
+                    offset,
+                    pageSize,
+                    TaskBasedPageFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
+                    PreloadingPlaceholderFactory ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
+                    BackgroundScheduler,
+                    pageFetchEvents.AsObserver());
+
+            IPageStorage<TItem> PageStoreFactoryComposition(int count) => 
+                PageStoreFactory(count, NonPreloadingPageFetcherFactory, PreloadingPageFetcherFactory);
+        }
+
+        internal Func<int, IPageStorage<TItem>> GenerateNonTaskBasedAsynchronousPageStorage(
+            Subject<(int Offset, int PageSize, TItem[] PreviousPage, TItem[] Page)> pageFetchEvents)
+        {
+            return PageStoreFactoryComposition;
+
+            IPage<TItem> NonPreloadingPageFetcherFactory(
+                int pageKey,
+                int offset,
+                int pageSize) =>
+                new AsyncNonTaskBasedPage<TItem>(
+                    pageKey,
+                    offset,
+                    pageSize,
+                    PageFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
+                    PlaceholderFactory ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
+                    BackgroundScheduler,
+                    pageFetchEvents.AsObserver());
+
+            IPage<TItem> PreloadingPageFetcherFactory(
+                int pageKey,
+                int offset,
+                int pageSize) =>
+                new AsyncNonTaskBasedPage<TItem>(
+                    pageKey,
+                    offset,
+                    pageSize,
+                    PageFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
+                    PreloadingPlaceholderFactory ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
+                    PreloadingScheduler,
+                    pageFetchEvents.AsObserver());
+
+            IPageStorage<TItem> PageStoreFactoryComposition(int count) => 
+                PageStoreFactory(count, NonPreloadingPageFetcherFactory, PreloadingPageFetcherFactory);
+        }
+
+        internal Func<int, IPageStorage<TItem>> GenerateNonTaskBasedSynchronousPageStorage(
+            Subject<(int Offset, int PageSize, TItem[] PreviousPage, TItem[] Page)> pageFetchEvents)
+        {
+            return PageStoreFactoryComposition;
+
+            IPage<TItem> NonPreloadingPageFetcherFactory(int pageKey, int offset, int pageSize) =>
+                new SyncNonPreloadingNonTaskBasedPage<TItem>(
+                    offset,
+                    pageSize,
+                    PageFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage));
+
+            IPage<TItem> PreloadingPageFetcherFactory(int pageKey, int offset, int pageSize) =>
+                new AsyncNonTaskBasedPage<TItem>(
+                    pageKey,
+                    offset,
+                    pageSize,
+                    PageFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
+                    PreloadingPlaceholderFactory ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
+                    PreloadingScheduler,
+                    pageFetchEvents.AsObserver());
+
+            IPageStorage<TItem> PageStoreFactoryComposition(int count) => 
+                PageStoreFactory(count, NonPreloadingPageFetcherFactory, PreloadingPageFetcherFactory);
+        }
+
+        protected abstract TVirtualizationKind GenerateTaskBasedAsynchronousCollection(
+            Subject<(int Offset, int PageSize, TItem[] PreviousPage, TItem[] Page)> pageFetchEvents);
+
+        protected abstract TVirtualizationKind GenerateNonTaskBasedAsynchronousCollection(
+            Subject<(int Offset, int PageSize, TItem[] PreviousPage, TItem[] Page)> pageFetchEvents);
+
+        protected abstract TVirtualizationKind GenerateNonTaskBasedSynchronousCollection(
+            Subject<(int Offset, int PageSize, TItem[] PreviousPage, TItem[] Page)> pageFetchEvents);
     }
 }

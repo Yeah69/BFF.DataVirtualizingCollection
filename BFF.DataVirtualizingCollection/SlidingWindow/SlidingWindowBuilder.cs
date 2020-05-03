@@ -1,10 +1,8 @@
 using System;
-using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
-using BFF.DataVirtualizingCollection.PageStorage;
 
 namespace BFF.DataVirtualizingCollection.SlidingWindow
 {
@@ -76,107 +74,27 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
         protected override ISlidingWindow<TItem> GenerateTaskBasedAsynchronousCollection(Subject<(int Offset, int PageSize, TItem[] PreviousPage, TItem[] Page)> pageFetchEvents)
         {
             return new AsyncSlidingWindow<TItem>(
-                        _windowSize,
-                        _initialOffset,
-                        PageStoreFactory,
-                        PlaceholderOnlyPageStoreFactory,
-                        TaskBasedCountFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
-                        pageFetchEvents.AsObservable(),
-                        pageFetchEvents,
-                        NotificationScheduler);
-
-            IPage<TItem> NonPreloadingPageFetcherFactory(
-                int pageKey,
-                int offset,
-                int pageSize) =>
-                new AsyncTaskBasedPage<TItem>(
-                    pageKey,
-                    offset,
-                    pageSize,
-                    TaskBasedPageFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
-                    PlaceholderFactory ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
-                    BackgroundScheduler,
-                    pageFetchEvents.AsObserver());
-
-            IPage<TItem> PreloadingPageFetcherFactory(
-                int pageKey,
-                int offset,
-                int pageSize) =>
-                new AsyncTaskBasedPage<TItem>(
-                    pageKey,
-                    offset,
-                    pageSize,
-                    TaskBasedPageFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
-                    PlaceholderFactory ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
-                    BackgroundScheduler,
-                    pageFetchEvents.AsObserver());
-
-            IPageStorage<TItem> PageStoreFactory(int count) =>
-                PageLoadingBehavior == PageLoadingBehavior.Preloading
-                    ? new PreloadingPageStorage<TItem>(
-                        PageSize,
-                        count,
-                        NonPreloadingPageFetcherFactory,
-                        PreloadingPageFetcherFactory,
-                        PageHoldingBehavior)
-                    : new PageStorage<TItem>(
-                        PageSize,
-                        count,
-                        NonPreloadingPageFetcherFactory,
-                        PageHoldingBehavior);
+                _windowSize,
+                _initialOffset,
+                GenerateTaskBasedAsynchronousPageStorage(pageFetchEvents),
+                PlaceholderOnlyPageStoreFactory,
+                TaskBasedCountFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
+                pageFetchEvents.AsObservable(),
+                pageFetchEvents,
+                NotificationScheduler);
         }
 
         protected override ISlidingWindow<TItem> GenerateNonTaskBasedAsynchronousCollection(Subject<(int Offset, int PageSize, TItem[] PreviousPage, TItem[] Page)> pageFetchEvents)
         {
             return new AsyncSlidingWindow<TItem>(
-                        _windowSize,
-                        _initialOffset,
-                        PageStoreFactory, 
-                        PlaceholderOnlyPageStoreFactory,
-                        () => Observable.Start(CountFetcher, BackgroundScheduler).ToTask(), 
-                        pageFetchEvents.AsObservable(),
-                        pageFetchEvents,
-                        NotificationScheduler);
-
-            IPage<TItem> NonPreloadingPageFetcherFactory(
-                int pageKey,
-                int offset,
-                int pageSize) =>
-                new AsyncNonTaskBasedPage<TItem>(
-                    pageKey,
-                    offset,
-                    pageSize,
-                    PageFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
-                    PlaceholderFactory ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
-                    BackgroundScheduler,
-                    pageFetchEvents.AsObserver());
-
-            IPage<TItem> PreloadingPageFetcherFactory(
-                int pageKey,
-                int offset,
-                int pageSize) =>
-                new AsyncNonTaskBasedPage<TItem>(
-                    pageKey,
-                    offset,
-                    pageSize,
-                    PageFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
-                    PlaceholderFactory ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
-                    PreloadingScheduler,
-                    pageFetchEvents.AsObserver());
-
-            IPageStorage<TItem> PageStoreFactory(int count) =>
-                PageLoadingBehavior == PageLoadingBehavior.Preloading
-                    ? new PreloadingPageStorage<TItem>(
-                        PageSize,
-                        count,
-                        NonPreloadingPageFetcherFactory,
-                        PreloadingPageFetcherFactory,
-                        PageHoldingBehavior)
-                    : new PageStorage<TItem>(
-                        PageSize,
-                        count,
-                        NonPreloadingPageFetcherFactory,
-                        PageHoldingBehavior);
+                _windowSize,
+                _initialOffset,
+                GenerateNonTaskBasedAsynchronousPageStorage(pageFetchEvents), 
+                PlaceholderOnlyPageStoreFactory,
+                () => Observable.Start(CountFetcher, BackgroundScheduler).ToTask(), 
+                pageFetchEvents.AsObservable(),
+                pageFetchEvents,
+                NotificationScheduler);
         }
 
         protected override ISlidingWindow<TItem> GenerateNonTaskBasedSynchronousCollection(Subject<(int Offset, int PageSize, TItem[] PreviousPage, TItem[] Page)> pageFetchEvents)
@@ -184,38 +102,9 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
             return new SyncSlidingWindow<TItem>(
                 _windowSize,
                 _initialOffset,
-                PageStoreFactory, 
+                GenerateNonTaskBasedSynchronousPageStorage(pageFetchEvents), 
                 CountFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
                 NotificationScheduler);
-
-            IPage<TItem> NonPreloadingPageFetcherFactory(int pageKey, int offset, int pageSize) =>
-                new SyncNonPreloadingNonTaskBasedPage<TItem>(
-                    offset,
-                    pageSize,
-                    PageFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage));
-            IPage<TItem> PreloadingPageFetcherFactory(int pageKey, int offset, int pageSize) =>
-                new AsyncNonTaskBasedPage<TItem>(
-                    pageKey,
-                    offset,
-                    pageSize,
-                    PageFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
-                    PreloadingPlaceholderFactory ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
-                    PreloadingScheduler,
-                    pageFetchEvents.AsObserver());
-
-            IPageStorage<TItem> PageStoreFactory(int count) =>
-                PageLoadingBehavior == PageLoadingBehavior.Preloading
-                    ? new PreloadingPageStorage<TItem>(
-                        PageSize,
-                        count,
-                        NonPreloadingPageFetcherFactory,
-                        PreloadingPageFetcherFactory,
-                        PageHoldingBehavior)
-                    : new PageStorage<TItem>(
-                        PageSize,
-                        count,
-                        NonPreloadingPageFetcherFactory,
-                        PageHoldingBehavior);
         }
     }
 }
