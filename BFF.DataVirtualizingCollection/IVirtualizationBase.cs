@@ -29,11 +29,14 @@ namespace BFF.DataVirtualizingCollection
         void Reset();
     }
     
+    // ReSharper disable once PossibleInterfaceMemberAmbiguity *** the "new" members of this interface resolve the ambiguities
     public interface IVirtualizationBase<T> :
         IVirtualizationBase,
         IList<T>,
         IReadOnlyList<T>
     {
         new int Count { get; }
+        
+        new T this[int index] { get; }
     }
 }

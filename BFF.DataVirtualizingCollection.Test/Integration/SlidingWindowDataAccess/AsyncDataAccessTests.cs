@@ -40,12 +40,12 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowDataAcces
             await collection.InitializationCompleted;
 
             // Act
-            var placeholder = ((IList<int>)collection)[0];
+            var placeholder = collection[0];
             await Task.Delay(50);
 
             // Assert
             Assert.Equal(-1, placeholder);
-            Assert.Equal(0, ((IList<int>)collection)[0]);
+            Assert.Equal(0, collection[0]);
         }
 
         [Theory]
@@ -70,12 +70,12 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowDataAcces
             await collection.InitializationCompleted;
 
             // Act
-            var placeholder = ((IList<int>)collection)[9];
+            var placeholder = collection[9];
             await Task.Delay(500);
 
             // Assert
             Assert.Equal(-1, placeholder);
-            Assert.Equal(69, ((IList<int>)collection)[9]);
+            Assert.Equal(69, collection[9]);
         }
 
         [Theory]
@@ -100,12 +100,12 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowDataAcces
             await collection.InitializationCompleted;
 
             // Act
-            var placeholder = ((IList<int>)collection)[3];
+            var placeholder = collection[3];
             await Task.Delay(50);
 
             // Assert
             Assert.Equal(-1, placeholder);
-            Assert.Equal(123, ((IList<int>)collection)[3]);
+            Assert.Equal(123, collection[3]);
         }
 
         [Theory]
@@ -130,12 +130,12 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowDataAcces
             await collection.InitializationCompleted;
 
             // Act
-            var placeholder = ((IList<int>)collection)[0];
+            var placeholder = collection[0];
             await Task.Delay(50);
 
             // Assert
             Assert.Equal(-1, placeholder);
-            Assert.Equal(6000, ((IList<int>)collection)[0]);
+            Assert.Equal(6000, collection[0]);
         }
 
         [Theory]
@@ -160,12 +160,12 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowDataAcces
             await collection.InitializationCompleted;
 
             // Act
-            var placeholder = ((IList<int>)collection)[9];
+            var placeholder = collection[9];
             await Task.Delay(50);
 
             // Assert
             Assert.Equal(-1, placeholder);
-            Assert.Equal(6968, ((IList<int>)collection)[9]);
+            Assert.Equal(6968, collection[9]);
         }
 
         [Theory]
@@ -190,7 +190,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowDataAcces
             await collection.InitializationCompleted;
 
             // Act + Assert
-            Assert.Throws<IndexOutOfRangeException>(() => ((IList<int>)collection)[10]);
+            Assert.Throws<IndexOutOfRangeException>(() => collection[10]);
         }
 
         [Theory]
@@ -215,7 +215,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowDataAcces
             await collection.InitializationCompleted;
 
             // Act + Assert
-            Assert.Throws<IndexOutOfRangeException>(() => ((IList<int>)collection)[-1]);
+            Assert.Throws<IndexOutOfRangeException>(() => collection[-1]);
         }
 
         [Theory]
@@ -240,12 +240,12 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowDataAcces
             await collection.InitializationCompleted;
 
             // Act
-            var placeholder = ((IList<int>)collection)[9];
+            var placeholder = collection[9];
             await Task.Delay(50);
 
             // Assert
             Assert.Equal(-1, placeholder);
-            Assert.Equal(69, ((IList<int>)collection)[9]);
+            Assert.Equal(69, collection[9]);
         }
     }
 }

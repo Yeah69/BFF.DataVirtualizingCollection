@@ -46,7 +46,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
             // Act
             for (var i = 0; i <= 6900; i += 100)
             {
-                var _ = ((IList<IDisposable>)collection)[i];
+                var _ = collection[i];
             }
             await Task.Delay(50);
 
@@ -84,7 +84,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
             // Act
             for (var i = 0; i <= expected; i += 10)
             {
-                var _ = ((IList<IDisposable>)collection)[i];
+                var _ = collection[i];
                 await Task.Delay(50);
             }
             collection.Dispose();

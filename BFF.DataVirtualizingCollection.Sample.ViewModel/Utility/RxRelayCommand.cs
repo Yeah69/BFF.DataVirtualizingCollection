@@ -15,7 +15,7 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.Utility
 
     internal class RxRelayCommand<T> : IRxRelayCommand<T>
     {
-        protected Action<T> ExecuteAction;
+        protected Action<T> ExecuteAction = obj => { };
         private readonly IDisposable _canExecuteSubscription;
         private bool _canExecute;
 

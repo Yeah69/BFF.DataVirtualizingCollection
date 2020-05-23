@@ -40,7 +40,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowSpecific
             collection.SlideLeft();
 
             // Assert
-            Assert.Equal(68, ((IList<int>)collection)[0]);
+            Assert.Equal(68, collection[0]);
         }
 
         [Theory]
@@ -66,7 +66,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowSpecific
             collection.SlideLeft();
 
             // Assert
-            Assert.Equal(0, ((IList<int>)collection)[0]);
+            Assert.Equal(0, collection[0]);
         }
 
         [Theory]
@@ -92,7 +92,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowSpecific
             collection.SlideRight();
 
             // Assert
-            Assert.Equal(70, ((IList<int>)collection)[0]);
+            Assert.Equal(70, collection[0]);
         }
 
         [Theory]
@@ -118,7 +118,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowSpecific
             collection.SlideRight();
 
             // Assert
-            Assert.Equal(6959, ((IList<int>)collection)[0]);
+            Assert.Equal(6959, collection[0]);
         }
 
         [Theory]
@@ -144,7 +144,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowSpecific
             collection.JumpTo(169);
 
             // Assert
-            Assert.Equal(169, ((IList<int>)collection)[0]);
+            Assert.Equal(169, collection[0]);
         }
 
         [Theory]
@@ -170,7 +170,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowSpecific
             collection.JumpTo(-1);
 
             // Assert
-            Assert.Equal(0, ((IList<int>)collection)[0]);
+            Assert.Equal(0, collection[0]);
         }
 
         [Theory]
@@ -196,7 +196,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowSpecific
             collection.JumpTo(6970);
 
             // Assert
-            Assert.Equal(6959, ((IList<int>)collection)[0]);
+            Assert.Equal(6959, collection[0]);
         }
 
         [Theory]
@@ -222,8 +222,8 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowSpecific
             collection.IncreaseWindowSize();
 
             // Assert
-            Assert.Equal(11, ((IList<int>)collection).Count);
-            Assert.Equal(79, ((IList<int>)collection)[10]);
+            Assert.Equal(11, collection.Count);
+            Assert.Equal(79, collection[10]);
         }
 
         [Theory]
@@ -249,8 +249,8 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowSpecific
             collection.IncreaseWindowSizeBy(2);
 
             // Assert
-            Assert.Equal(12, ((IList<int>)collection).Count);
-            Assert.Equal(80, ((IList<int>)collection)[11]);
+            Assert.Equal(12, collection.Count);
+            Assert.Equal(80, collection[11]);
         }
 
         [Theory]
@@ -276,8 +276,8 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowSpecific
             collection.IncreaseWindowSize();
 
             // Assert
-            Assert.Equal(11, ((IList<int>)collection).Count);
-            Assert.Equal(6968, ((IList<int>)collection)[10]);
+            Assert.Equal(11, collection.Count);
+            Assert.Equal(6968, collection[10]);
         }
 
         [Theory]
@@ -303,9 +303,9 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowSpecific
             collection.DecreaseWindowSize();
 
             // Assert
-            Assert.Equal(9, ((IList<int>)collection).Count);
-            Assert.Equal(77, ((IList<int>)collection)[8]);
-            Assert.Throws<IndexOutOfRangeException>(() => ((IList<int>) collection)[9]);
+            Assert.Equal(9, collection.Count);
+            Assert.Equal(77, collection[8]);
+            Assert.Throws<IndexOutOfRangeException>(() => collection[9]);
         }
 
         [Theory]
@@ -331,9 +331,9 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowSpecific
             collection.DecreaseWindowSizeBy(2);
 
             // Assert
-            Assert.Equal(8, ((IList<int>)collection).Count);
-            Assert.Equal(76, ((IList<int>)collection)[7]);
-            Assert.Throws<IndexOutOfRangeException>(() => ((IList<int>) collection)[8]);
+            Assert.Equal(8, collection.Count);
+            Assert.Equal(76, collection[7]);
+            Assert.Throws<IndexOutOfRangeException>(() => collection[8]);
         }
 
         [Theory]
@@ -359,7 +359,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowSpecific
             collection.Reset();
 
             // Assert
-            Assert.Equal(69, ((IList<int>)collection)[0]);
+            Assert.Equal(69, collection[0]);
         }
 
         [Theory]
@@ -390,7 +390,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowSpecific
                 PageFetcher,
                 -1);
             
-            var previous = ((IList<int>)collection)[0];
+            var previous = collection[0];
             switched = true;
 
             // Act
@@ -398,7 +398,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowSpecific
 
             // Assert
             Assert.Equal(69, previous);
-            Assert.Equal(70, ((IList<int>)collection)[0]);
+            Assert.Equal(70, collection[0]);
         }
 
         [Theory]
@@ -427,7 +427,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowSpecific
                 10,
                 69);
             
-            var previous = ((IList<int>)collection)[0];
+            var previous = collection[0];
             switched = true;
 
             // Act
@@ -435,7 +435,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowSpecific
 
             // Assert
             Assert.Equal(69, previous);
-            Assert.Equal(60, ((IList<int>)collection)[0]);
+            Assert.Equal(60, collection[0]);
         }
 
         [Theory]
@@ -464,7 +464,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowSpecific
                 10,
                 69);
             
-            var previous = ((IList<int>)collection)[0];
+            var previous = collection[0];
             switched = true;
 
             // Act
@@ -472,8 +472,8 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowSpecific
 
             // Assert
             Assert.Equal(69, previous);
-            Assert.Equal(0, ((IList<int>)collection)[0]);
-            Assert.Equal(9, ((IList<int>)collection).Count);
+            Assert.Equal(0, collection[0]);
+            Assert.Equal(9, collection.Count);
         }
     }
 }

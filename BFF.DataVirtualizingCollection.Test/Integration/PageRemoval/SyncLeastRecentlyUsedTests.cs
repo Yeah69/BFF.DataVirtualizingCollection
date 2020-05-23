@@ -59,7 +59,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
             // Act
             for (var i = 0; i <= 900; i += 100)
             {
-                var _ = ((IList<IDisposable>)collection)[i];
+                var _ = collection[i];
             }
 
             // Assert
@@ -95,7 +95,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
             // Act
             for (var i = 0; i <= 800; i += 100)
             {
-                var _ = ((IList<IDisposable>)collection)[i];
+                var _ = collection[i];
             }
 
             // Assert
@@ -131,11 +131,11 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
             // Act
             for (var i = 0; i <= 900; i += 100)
             {
-                var _ = ((IList<IDisposable>)collection)[i];
+                var _ = collection[i];
             }
             for (var i = 0; i <= 900; i += 100)
             {
-                var _ = ((IList<IDisposable>)collection)[i];
+                var _ = collection[i];
             }
 
             // Assert
@@ -171,11 +171,11 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
             // Act
             for (var i = 0; i <= 800; i += 100)
             {
-                var _ = ((IList<IDisposable>)collection)[i];
+                var _ = collection[i];
             }
             for (var i = 0; i <= 800; i += 100)
             {
-                var _ = ((IList<IDisposable>)collection)[i];
+                var _ = collection[i];
             }
 
             // Assert
@@ -212,7 +212,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
             // Act
             for (var i = 0; i <= 1000; i += 100)
             {
-                var _ = ((IList<IDisposable>)collection)[i];
+                var _ = collection[i];
             }
 
             // Assert
@@ -251,7 +251,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
             // Act
             for (var i = 0; i <= 900; i += 100)
             {
-                var _ = ((IList<IDisposable>)collection)[i];
+                var _ = collection[i];
             }
 
             // Assert
@@ -290,7 +290,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
             // Act
             for (var i = 0; i <= 1000; i += 100)
             {
-                var _ = ((IList<IDisposable>)collection)[i];
+                var _ = collection[i];
             }
 
             // Assert
@@ -329,7 +329,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
             // Act
             for (var i = 0; i <= 300; i += 100)
             {
-                var _ = ((IList<IDisposable>)collection)[i];
+                var _ = collection[i];
                 await Task.Delay(50);
             }
 
@@ -368,7 +368,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
             // Act
             for (var i = 0; i <= 300; i += 100)
             {
-                var _ = ((IList<IDisposable>)collection)[i];
+                var _ = collection[i];
             }
 
             // Assert

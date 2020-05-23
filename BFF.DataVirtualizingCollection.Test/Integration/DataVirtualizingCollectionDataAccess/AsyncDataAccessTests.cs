@@ -38,12 +38,12 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.DataVirtualizingCollec
             await collection.InitializationCompleted;
 
             // Act
-            var placeholder = ((IList<int>)collection)[0];
+            var placeholder = collection[0];
             await Task.Delay(50);
 
             // Assert
             Assert.Equal(-1, placeholder);
-            Assert.Equal(0, ((IList<int>)collection)[0]);
+            Assert.Equal(0, collection[0]);
         }
 
         [Theory]
@@ -66,12 +66,12 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.DataVirtualizingCollec
             await collection.InitializationCompleted;
 
             // Act
-            var placeholder = ((IList<int>)collection)[69];
+            var placeholder = collection[69];
             await Task.Delay(500);
 
             // Assert
             Assert.Equal(-1, placeholder);
-            Assert.Equal(69, ((IList<int>)collection)[69]);
+            Assert.Equal(69, collection[69]);
         }
 
         [Theory]
@@ -94,12 +94,12 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.DataVirtualizingCollec
             await collection.InitializationCompleted;
 
             // Act
-            var placeholder = ((IList<int>)collection)[123];
+            var placeholder = collection[123];
             await Task.Delay(50);
 
             // Assert
             Assert.Equal(-1, placeholder);
-            Assert.Equal(123, ((IList<int>)collection)[123]);
+            Assert.Equal(123, collection[123]);
         }
 
         [Theory]
@@ -122,12 +122,12 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.DataVirtualizingCollec
             await collection.InitializationCompleted;
 
             // Act
-            var placeholder = ((IList<int>)collection)[6000];
+            var placeholder = collection[6000];
             await Task.Delay(50);
 
             // Assert
             Assert.Equal(-1, placeholder);
-            Assert.Equal(6000, ((IList<int>)collection)[6000]);
+            Assert.Equal(6000, collection[6000]);
         }
 
         [Theory]
@@ -150,12 +150,12 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.DataVirtualizingCollec
             await collection.InitializationCompleted;
 
             // Act
-            var placeholder = ((IList<int>)collection)[6968];
+            var placeholder = collection[6968];
             await Task.Delay(50);
 
             // Assert
             Assert.Equal(-1, placeholder);
-            Assert.Equal(6968, ((IList<int>)collection)[6968]);
+            Assert.Equal(6968, collection[6968]);
         }
 
         [Theory]
@@ -178,7 +178,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.DataVirtualizingCollec
             await collection.InitializationCompleted;
 
             // Act + Assert
-            Assert.Throws<IndexOutOfRangeException>(() => ((IList<int>)collection)[6969]);
+            Assert.Throws<IndexOutOfRangeException>(() => collection[6969]);
         }
 
         [Theory]
@@ -201,7 +201,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.DataVirtualizingCollec
             await collection.InitializationCompleted;
 
             // Act + Assert
-            Assert.Throws<IndexOutOfRangeException>(() => ((IList<int>)collection)[-1]);
+            Assert.Throws<IndexOutOfRangeException>(() => collection[-1]);
         }
 
         [Theory]
@@ -224,12 +224,12 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.DataVirtualizingCollec
             await collection.InitializationCompleted;
 
             // Act
-            var placeholder = ((IList<int>)collection)[69];
+            var placeholder = collection[69];
             await Task.Delay(50);
 
             // Assert
             Assert.Equal(-1, placeholder);
-            Assert.Equal(69, ((IList<int>)collection)[69]);
+            Assert.Equal(69, collection[69]);
         }
     }
 }
