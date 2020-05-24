@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
+using System.Threading;
 using System.Threading.Tasks;
 using MoreLinq.Extensions;
 using Xunit;
@@ -39,7 +41,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            var set = new HashSet<int>();
+            var set = new ConcurrentBag<int>();
             using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
@@ -75,7 +77,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            var set = new HashSet<int>();
+            var set = new ConcurrentBag<int>();
             using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
@@ -111,7 +113,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            var set = new HashSet<int>();
+            var set = new ConcurrentBag<int>();
             using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
@@ -151,7 +153,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            var set = new HashSet<int>();
+            var set = new ConcurrentBag<int>();
             using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
@@ -192,7 +194,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
         {
             // Arrange
             int[] expected = Enumerable.Range(0, 100).ToArray();
-            var set = new HashSet<int>();
+            var set = new ConcurrentBag<int>();
             using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
@@ -217,7 +219,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
 
             // Assert
             Assert.Equal(set.Count, expected.Length);
-            Assert.True(set.IsSubsetOf(expected));
+            Assert.True(set.All(i => expected.Contains(i)));
 
         }
 
@@ -231,7 +233,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
         {
             // Arrange
             int[] expected = Enumerable.Range(0, 100).ToArray();
-            var set = new HashSet<int>();
+            var set = new ConcurrentBag<int>();
             using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
@@ -256,7 +258,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
 
             // Assert
             Assert.Equal(set.Count, expected.Length);
-            Assert.True(set.IsSubsetOf(expected));
+            Assert.True(set.All(i => expected.Contains(i)));
 
         }
 
@@ -270,7 +272,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
         {
             // Arrange
             int[] expected = Enumerable.Range(0, 300).ToArray();
-            var set = new HashSet<int>();
+            var set = new ConcurrentBag<int>();
             using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
@@ -292,10 +294,12 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
             {
                 var _ = collection[i];
             }
+            
+            Thread.Sleep(500); // wait for preloading
 
             // Assert
             Assert.Equal(set.Count, expected.Length);
-            Assert.True(set.IsSubsetOf(expected));
+            Assert.True(set.All(i => expected.Contains(i)));
 
         }
 
@@ -309,7 +313,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
         {
             // Arrange
             int[] expected = Enumerable.Range(0, 100).ToArray();
-            var set = new HashSet<int>();
+            var set = new ConcurrentBag<int>();
             using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
@@ -335,7 +339,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
 
             // Assert
             Assert.Equal(set.Count, expected.Length);
-            Assert.True(set.IsSubsetOf(expected));
+            Assert.True(set.All(i => expected.Contains(i)));
         }
 
         [Theory]
@@ -348,7 +352,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
         {
             // Arrange
             int[] expected = Enumerable.Range(0, 100).ToArray();
-            var set = new HashSet<int>();
+            var set = new ConcurrentBag<int>();
             using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
@@ -373,7 +377,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
 
             // Assert
             Assert.Equal(set.Count, expected.Length);
-            Assert.True(set.IsSubsetOf(expected));
+            Assert.True(set.All(i => expected.Contains(i)));
         }
     }
 }

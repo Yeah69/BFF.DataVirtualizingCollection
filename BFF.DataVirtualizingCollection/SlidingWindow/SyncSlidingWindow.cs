@@ -14,7 +14,7 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
     {
         private readonly Func<int, IPageStorage<T>> _pageStoreFactory;
         private readonly Func<int> _countFetcher;
-        private readonly IScheduler _observeScheduler;
+        private readonly IScheduler _notificationScheduler;
         private readonly SerialDisposable _serialPageStore = new SerialDisposable();
         private IPageStorage<T>? _pageStorage;
         
@@ -24,11 +24,13 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
             int initialOffset,
             Func<int, IPageStorage<T>> pageStoreFactory,
             Func<int> countFetcher,
-            IScheduler observeScheduler) : base(observeScheduler)
+            IDisposable disposeOnDisposal,
+            IScheduler notificationScheduler) 
+            : base(disposeOnDisposal, notificationScheduler)
         {
             _pageStoreFactory = pageStoreFactory;
             _countFetcher = countFetcher;
-            _observeScheduler = observeScheduler;
+            _notificationScheduler = notificationScheduler;
             _serialPageStore.AddTo(CompositeDisposable);
             
             ResetInner(initialSize, initialOffset);
@@ -48,7 +50,7 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
         {
             var prev = this.Select(x => x).ToArray();
             ResetInner(Size, Offset);
-            _observeScheduler.Schedule(Unit.Default, (_, __) =>
+            _notificationScheduler.Schedule(Unit.Default, (_, __) =>
             {
                 OnCollectionChangedReplace(this.Select(x => x).ToArray(), prev);
                 OnPropertyChanged(nameof(Offset));

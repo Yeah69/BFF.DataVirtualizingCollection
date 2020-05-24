@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using MoreLinq.Extensions;
 using Xunit;
 
@@ -84,7 +85,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowSpecific
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                10,
+                20,
                 10,
                 69);
 
@@ -220,6 +221,8 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowSpecific
 
             // Act
             collection.IncreaseWindowSize();
+            
+            Thread.Sleep(500); // wait for preloading
 
             // Assert
             Assert.Equal(11, collection.Count);
@@ -247,6 +250,8 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowSpecific
 
             // Act
             collection.IncreaseWindowSizeBy(2);
+            
+            Thread.Sleep(500); // wait for preloading
 
             // Assert
             Assert.Equal(12, collection.Count);
@@ -274,6 +279,8 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowSpecific
 
             // Act
             collection.IncreaseWindowSize();
+            
+            Thread.Sleep(500); // wait for preloading
 
             // Assert
             Assert.Equal(11, collection.Count);
@@ -301,6 +308,8 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowSpecific
 
             // Act
             collection.DecreaseWindowSize();
+            
+            Thread.Sleep(500); // wait for preloading
 
             // Assert
             Assert.Equal(9, collection.Count);
@@ -329,6 +338,8 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowSpecific
 
             // Act
             collection.DecreaseWindowSizeBy(2);
+            
+            Thread.Sleep(500); // wait for preloading
 
             // Assert
             Assert.Equal(8, collection.Count);

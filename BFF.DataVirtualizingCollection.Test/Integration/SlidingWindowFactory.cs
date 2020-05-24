@@ -65,6 +65,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration
             var pageLoadingBehaviorCollectionBuilder = SlidingWindowBuilder<int>.Build(
                 initialWindowSize, 
                 initialWindowOffset, 
+                pageSize,
                 new EventLoopScheduler());
             var pageHoldingBehaviorCollectionBuilder =
                 StandardPageHoldingBehaviorCollectionBuilder(

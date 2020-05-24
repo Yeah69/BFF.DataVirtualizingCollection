@@ -12,13 +12,13 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
         
         protected DataVirtualizingCollectionBase(
             IObservable<(int Offset, int PageSize, T[] PreviousPage, T[] Page)> observePageFetches,
-            IDisposable? disposeOnDisposal,
-            IScheduler observeScheduler)
+            IDisposable disposeOnDisposal,
+            IScheduler notificationScheduler)
         {
-            disposeOnDisposal?.AddTo(CompositeDisposable);
+            disposeOnDisposal.AddTo(CompositeDisposable);
             
             observePageFetches
-                .ObserveOn(observeScheduler)
+                .ObserveOn(notificationScheduler)
                 .Subscribe(t =>
                 {
                     var (offset, pageSize, previousPage, page) = t;

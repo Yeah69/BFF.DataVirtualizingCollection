@@ -69,7 +69,7 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                     if (!IsDisposed) Requests.OnNext((pageKey, pageIndex));
                 }
 
-                var ret =Pages
+                var ret = Pages
                     .GetOrAdd(
                         pageKey,
                         FetchNonPreloadingPage)

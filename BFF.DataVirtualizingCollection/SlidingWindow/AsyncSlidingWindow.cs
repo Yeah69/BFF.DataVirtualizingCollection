@@ -16,7 +16,8 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
         private readonly Func<int, IPageStorage<T>> _pageStoreFactory;
         private readonly Func<int, IPageStorage<T>> _placeholderPageStoreFactory;
         private readonly Func<Task<int>> _countFetcher;
-        private readonly IScheduler _observeScheduler;
+        private readonly IScheduler _notificationScheduler;
+        private readonly IScheduler _countBackgroundScheduler;
         private IPageStorage<T> _pageStorage;
         
         private readonly SerialDisposable _serialPageStore = new SerialDisposable();
@@ -28,22 +29,24 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
             Func<int, IPageStorage<T>> placeholderPageStoreFactory,
             Func<Task<int>> countFetcher,
             IObservable<(int Offset, int PageSize, T[] PreviousPage, T[] Page)> observePageFetches,
-            IDisposable? disposeOnDisposal,
-            IScheduler observeScheduler) : base (observeScheduler)
+            IDisposable disposeOnDisposal,
+            IScheduler notificationScheduler,
+            IScheduler countBackgroundScheduler) 
+            : base (disposeOnDisposal, notificationScheduler)
         {
             _pageStoreFactory = pageStoreFactory;
             _placeholderPageStoreFactory = placeholderPageStoreFactory;
             _countFetcher = countFetcher;
-            _observeScheduler = observeScheduler;
+            _notificationScheduler = notificationScheduler;
+            _countBackgroundScheduler = countBackgroundScheduler;
             CountOfBackedDataSet = 0;
             _pageStorage = _placeholderPageStoreFactory(0);
             InitializationCompleted = ResetInner(initialOffset, initialSize, new T[0]);
 
-            disposeOnDisposal?.AddTo(CompositeDisposable);
             _serialPageStore.AddTo(CompositeDisposable);
             
             observePageFetches
-                .ObserveOn(observeScheduler)
+                .ObserveOn(notificationScheduler)
                 .Subscribe(t =>
                 {
                     var ( pageOffset, pageSize, previousPage, page) = t;
@@ -65,8 +68,7 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
 
         private Task ResetInner(int currentOffset, int currentSize, T[] prev)
         {
-            return _countFetcher()
-                .ToObservable()
+            return Observable.FromAsync(_countFetcher, _countBackgroundScheduler)
                 .Do(count =>
                 {
                     CountOfBackedDataSet = count;
@@ -74,7 +76,7 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
                     Offset = Math.Max(0, Math.Min(CountOfBackedDataSet - Size, currentOffset));
                     _pageStorage = _pageStoreFactory(CountOfBackedDataSet).AssignTo(_serialPageStore);
                 })
-                .ObserveOn(_observeScheduler)
+                .ObserveOn(_notificationScheduler)
                 .Do(count =>
                 {
                     var now = this.Select(x => x).ToArray();
@@ -92,7 +94,7 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
             var prevPrev = this.Select(x => x).ToArray();
             _pageStorage = _placeholderPageStoreFactory(CountOfBackedDataSet).AssignTo(_serialPageStore);
             var prev = this.Select(x => x).ToArray();
-            _observeScheduler.Schedule(Unit.Default, (_, __) =>
+            _notificationScheduler.Schedule(Unit.Default, (_, __) =>
                 {
                     OnCollectionChangedReplace(prev, prevPrev);
                     OnPropertyChanged(nameof(Offset));

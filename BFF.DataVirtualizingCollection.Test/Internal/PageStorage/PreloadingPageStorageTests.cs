@@ -47,13 +47,13 @@ namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
                 tuple =>
                 {
                     var (pageKey, pageIndex) = tuple;
-                    Assert.Equal(5, pageKey);
+                    Assert.Equal(7, pageKey);
                     Assert.Equal(-1, pageIndex);
                 },
                 tuple =>
                 {
                     var (pageKey, pageIndex) = tuple;
-                    Assert.Equal(7, pageKey);
+                    Assert.Equal(5, pageKey);
                     Assert.Equal(-1, pageIndex);
                 });
         }

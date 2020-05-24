@@ -2,7 +2,7 @@ using System;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Reactive.Threading.Tasks;
+using System.Threading.Tasks;
 
 namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
 {
@@ -60,34 +60,42 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
         {
         }
 
-        protected override IDataVirtualizingCollection<TItem> GenerateTaskBasedAsynchronousCollection(Subject<(int Offset, int PageSize, TItem[] PreviousPage, TItem[] Page)> pageFetchEvents)
+        protected override IDataVirtualizingCollection<TItem> GenerateTaskBasedAsynchronousCollection(
+            Subject<(int Offset, int PageSize, TItem[] PreviousPage, TItem[] Page)> pageFetchEvents)
         {
+            var taskBasedCountFetcher = TaskBasedCountFetcher ??
+                                        throw new NullReferenceException(UninitializedElementsExceptionMessage);
             return new AsyncDataVirtualizingCollection<TItem>(
                 GenerateTaskBasedAsynchronousPageStorage(pageFetchEvents),
                 PlaceholderOnlyPageStoreFactory,
-                TaskBasedCountFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
+                taskBasedCountFetcher,
                 pageFetchEvents.AsObservable(),
                 pageFetchEvents,
-                NotificationScheduler);
+                NotificationScheduler,
+                CountBackgroundScheduler);
         }
 
-        protected override IDataVirtualizingCollection<TItem> GenerateNonTaskBasedAsynchronousCollection(Subject<(int Offset, int PageSize, TItem[] PreviousPage, TItem[] Page)> pageFetchEvents)
+        protected override IDataVirtualizingCollection<TItem> GenerateNonTaskBasedAsynchronousCollection(
+            Subject<(int Offset, int PageSize, TItem[] PreviousPage, TItem[] Page)> pageFetchEvents)
         {
+            var countFetcher = CountFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
             return new AsyncDataVirtualizingCollection<TItem>(
                 GenerateNonTaskBasedAsynchronousPageStorage(pageFetchEvents),
                 PlaceholderOnlyPageStoreFactory,
-                () => Observable.Start(CountFetcher, BackgroundScheduler).ToTask(),
+                () => Task.FromResult(countFetcher()),
                 pageFetchEvents.AsObservable(),
                 pageFetchEvents,
-                NotificationScheduler);
+                NotificationScheduler,
+                CountBackgroundScheduler);
         }
 
         protected override IDataVirtualizingCollection<TItem> GenerateNonTaskBasedSynchronousCollection(
             Subject<(int Offset, int PageSize, TItem[] PreviousPage, TItem[] Page)> pageFetchEvents)
         {
+            var countFetcher = CountFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
             return new SyncDataVirtualizingCollection<TItem>(
                 GenerateNonTaskBasedSynchronousPageStorage(pageFetchEvents),
-                CountFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
+                countFetcher,
                 pageFetchEvents.AsObservable(),
                 pageFetchEvents,
                 NotificationScheduler);

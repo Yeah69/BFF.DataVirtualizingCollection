@@ -2,7 +2,7 @@ using System;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Reactive.Threading.Tasks;
+using System.Threading.Tasks;
 
 namespace BFF.DataVirtualizingCollection.SlidingWindow
 {
@@ -71,39 +71,49 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
             _initialOffset = initialOffset;
         }
 
-        protected override ISlidingWindow<TItem> GenerateTaskBasedAsynchronousCollection(Subject<(int Offset, int PageSize, TItem[] PreviousPage, TItem[] Page)> pageFetchEvents)
+        protected override ISlidingWindow<TItem> GenerateTaskBasedAsynchronousCollection(
+            Subject<(int Offset, int PageSize, TItem[] PreviousPage, TItem[] Page)> pageFetchEvents)
         {
+            var taskBasedCountFetcher = TaskBasedCountFetcher ??
+                                        throw new NullReferenceException(UninitializedElementsExceptionMessage);
             return new AsyncSlidingWindow<TItem>(
                 _windowSize,
                 _initialOffset,
                 GenerateTaskBasedAsynchronousPageStorage(pageFetchEvents),
                 PlaceholderOnlyPageStoreFactory,
-                TaskBasedCountFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
+                taskBasedCountFetcher,
                 pageFetchEvents.AsObservable(),
                 pageFetchEvents,
-                NotificationScheduler);
+                NotificationScheduler,
+                CountBackgroundScheduler);
         }
 
-        protected override ISlidingWindow<TItem> GenerateNonTaskBasedAsynchronousCollection(Subject<(int Offset, int PageSize, TItem[] PreviousPage, TItem[] Page)> pageFetchEvents)
+        protected override ISlidingWindow<TItem> GenerateNonTaskBasedAsynchronousCollection(
+            Subject<(int Offset, int PageSize, TItem[] PreviousPage, TItem[] Page)> pageFetchEvents)
         {
+            var countFetcher = CountFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
             return new AsyncSlidingWindow<TItem>(
                 _windowSize,
                 _initialOffset,
                 GenerateNonTaskBasedAsynchronousPageStorage(pageFetchEvents), 
                 PlaceholderOnlyPageStoreFactory,
-                () => Observable.Start(CountFetcher, BackgroundScheduler).ToTask(), 
+                () => Task.FromResult(countFetcher()), 
                 pageFetchEvents.AsObservable(),
                 pageFetchEvents,
-                NotificationScheduler);
+                NotificationScheduler,
+                CountBackgroundScheduler);
         }
 
-        protected override ISlidingWindow<TItem> GenerateNonTaskBasedSynchronousCollection(Subject<(int Offset, int PageSize, TItem[] PreviousPage, TItem[] Page)> pageFetchEvents)
+        protected override ISlidingWindow<TItem> GenerateNonTaskBasedSynchronousCollection(
+            Subject<(int Offset, int PageSize, TItem[] PreviousPage, TItem[] Page)> pageFetchEvents)
         {
+            var countFetcher = CountFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
             return new SyncSlidingWindow<TItem>(
                 _windowSize,
                 _initialOffset,
                 GenerateNonTaskBasedSynchronousPageStorage(pageFetchEvents), 
-                CountFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage),
+                countFetcher,
+                pageFetchEvents,
                 NotificationScheduler);
         }
     }

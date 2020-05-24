@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
+using System.Threading;
 using MoreLinq.Extensions;
 using Xunit;
 
@@ -26,7 +28,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            var set = new HashSet<int>();
+            var set = new ConcurrentBag<int>();
             using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogic(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
@@ -61,7 +63,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
         {
             // Arrange
             const int expected = 69;
-            var set = new HashSet<int>();
+            var set = new ConcurrentBag<int>();
             var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogic(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
@@ -82,6 +84,8 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
                 var _ = collection[i];
             }
             collection.Dispose();
+            
+            Thread.Sleep(500);
 
             // Assert
             Assert.Equal(expected, set.Count);

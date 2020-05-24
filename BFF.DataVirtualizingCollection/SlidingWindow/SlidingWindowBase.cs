@@ -3,23 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
+using BFF.DataVirtualizingCollection.Extensions;
 
 namespace BFF.DataVirtualizingCollection.SlidingWindow
 {
     internal abstract class SlidingWindowBase<T> : VirtualizationBase<T>, ISlidingWindow<T>
     {
-        private readonly IScheduler _observeScheduler;
+        private readonly IScheduler _notificationScheduler;
 
         protected int Size;
 
         protected int CountOfBackedDataSet;
         internal SlidingWindowBase(
-            IScheduler observeScheduler)
+            IDisposable disposeOnDisposal,
+            IScheduler notificationScheduler)
         {
+            disposeOnDisposal.AddTo(CompositeDisposable);
+            
             Size = 0;
             Offset = 0;
             CountOfBackedDataSet = 0;
-            _observeScheduler = observeScheduler;
+            _notificationScheduler = notificationScheduler;
         }
         
         public int Offset { get; protected set; }
@@ -33,7 +37,7 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
             if (Offset <= 0) return;
             var prev = this.Select(x => x).ToArray();
             Offset--;
-            _observeScheduler.Schedule(Unit.Default, (_, __) =>
+            _notificationScheduler.Schedule(Unit.Default, (_, __) =>
             {
                 OnCollectionChangedReplace(this.Select(x => x).ToArray(), prev);
                 OnPropertyChanged(nameof(Offset));
@@ -46,7 +50,7 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
             if (MaximumOffset <= Offset) return;
             var prev = this.Select(x => x).ToArray();
             Offset++;
-            _observeScheduler.Schedule(Unit.Default, (_, __) =>
+            _notificationScheduler.Schedule(Unit.Default, (_, __) =>
             {
                 OnCollectionChangedReplace(this.Select(x => x).ToArray(), prev);
                 OnPropertyChanged(nameof(Offset));
@@ -58,7 +62,7 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
         {
             var prev = this.Select(x => x).ToArray();
             Offset = Math.Max(0, Math.Min(CountOfBackedDataSet - Size, index));
-            _observeScheduler.Schedule(Unit.Default, (_, __) =>
+            _notificationScheduler.Schedule(Unit.Default, (_, __) =>
             {
                 OnCollectionChangedReplace(this.Select(x => x).ToArray(), prev);
                 OnPropertyChanged(nameof(Offset));
@@ -83,7 +87,7 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
             Size = Math.Min(CountOfBackedDataSet, Size + sizeIncrement);
             if (Offset > MaximumOffset)
                 Offset = MaximumOffset;
-            _observeScheduler.Schedule(Unit.Default, (_, __) =>
+            _notificationScheduler.Schedule(Unit.Default, (_, __) =>
             {
                 OnCollectionChangedReplace(this.Select(x => x).ToArray(), prev);
                 OnPropertyChanged(nameof(Offset));
@@ -98,7 +102,7 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
             var prev = this.Select(x => x).ToArray();
             sizeIncrement = Math.Max(0, sizeIncrement);
             Size = Math.Max(0, Size - sizeIncrement);
-            _observeScheduler.Schedule(Unit.Default, (_, __) =>
+            _notificationScheduler.Schedule(Unit.Default, (_, __) =>
             {
                 OnCollectionChangedReplace(this.Select(x => x).ToArray(), prev);
                 OnPropertyChanged(nameof(Offset));

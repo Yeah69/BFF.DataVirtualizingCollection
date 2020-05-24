@@ -15,7 +15,8 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
         private readonly Func<int, IPageStorage<T>> _pageStoreFactory;
         private readonly Func<int, IPageStorage<T>> _placeholderPageStoreFactory;
         private readonly Func<Task<int>> _countFetcher;
-        private readonly IScheduler _observeScheduler;
+        private readonly IScheduler _notificationScheduler;
+        private readonly IScheduler _countBackgroundScheduler;
         private readonly SerialDisposable _serialPageStorage = new SerialDisposable();
         private IPageStorage<T> _pageStorage;
 
@@ -26,14 +27,16 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
             Func<int, IPageStorage<T>> placeholderPageStoreFactory,
             Func<Task<int>> countFetcher,
             IObservable<(int Offset, int PageSize, T[] PreviousPage, T[] Page)> observePageFetches,
-            IDisposable? disposeOnDisposal,
-            IScheduler observeScheduler)
-        : base(observePageFetches, disposeOnDisposal, observeScheduler)
+            IDisposable disposeOnDisposal,
+            IScheduler notificationScheduler,
+            IScheduler countBackgroundScheduler)
+        : base(observePageFetches, disposeOnDisposal, notificationScheduler)
         {
             _pageStoreFactory = pageStoreFactory;
             _placeholderPageStoreFactory = placeholderPageStoreFactory;
             _countFetcher = countFetcher;
-            _observeScheduler = observeScheduler;
+            _notificationScheduler = notificationScheduler;
+            _countBackgroundScheduler = countBackgroundScheduler;
             _count = 0;
 
             _serialPageStorage.AddTo(CompositeDisposable);
@@ -48,14 +51,13 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
 
         private Task ResetInner()
         {
-            return _countFetcher()
-                .ToObservable()
+            return Observable.FromAsync(_countFetcher, _countBackgroundScheduler)
                 .Do(count =>
                 {
                     _count = count;
                     _pageStorage = _pageStoreFactory(_count).AssignTo(_serialPageStorage);
                 })
-                .ObserveOn(_observeScheduler)
+                .ObserveOn(_notificationScheduler)
                 .Do(_ =>
                 {
                     OnPropertyChanged(nameof(Count));
@@ -68,7 +70,7 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
         public override void Reset()
         {
             _pageStorage = _placeholderPageStoreFactory(_count).AssignTo(_serialPageStorage);
-            _observeScheduler.Schedule(Unit.Default, (_, __) =>
+            _notificationScheduler.Schedule(Unit.Default, (_, __) =>
             {
                 OnPropertyChanged(nameof(Count));
                 OnCollectionChangedReset();

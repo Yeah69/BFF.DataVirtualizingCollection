@@ -24,15 +24,15 @@ namespace BFF.DataVirtualizingCollection.PageStorage
 
         protected override void Preloading(int pageKey)
         {
-            var previousPageKey = pageKey - 1;
-            if (previousPageKey >= 0)
-                Pages.GetOrAdd(
-                    previousPageKey,
-                    FetchPreloadingPage);
             var nextPageKey = pageKey + 1;
             if (nextPageKey < PageCount)
                 Pages.GetOrAdd(
                     nextPageKey,
+                    FetchPreloadingPage);
+            var previousPageKey = pageKey - 1;
+            if (previousPageKey >= 0)
+                Pages.GetOrAdd(
+                    previousPageKey,
                     FetchPreloadingPage);
 
             IPage<T> FetchPreloadingPage(int key)

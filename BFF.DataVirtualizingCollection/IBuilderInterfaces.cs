@@ -23,13 +23,16 @@ namespace BFF.DataVirtualizingCollection
         /// Per default the TaskPoolScheduler is taken for the preloads.
         /// </summary>
         /// <returns>The builder itself.</returns>
-        IPageHoldingBehaviorCollectionBuilder<TItem, TVirtualizationKind> Preloading(Func<int, int, TItem> preloadingPlaceholderFactory);
+        IPageHoldingBehaviorCollectionBuilder<TItem, TVirtualizationKind> Preloading(
+            Func<int, int, TItem> preloadingPlaceholderFactory);
 
         /// <summary>
         /// Pages are loaded as soon as an item of the page is requested or as soon as a neighboring page is loaded.
         /// </summary>
         /// <returns>The builder itself.</returns>
-        IPageHoldingBehaviorCollectionBuilder<TItem, TVirtualizationKind> Preloading(Func<int, int, TItem> preloadingPlaceholderFactory, IScheduler scheduler);
+        IPageHoldingBehaviorCollectionBuilder<TItem, TVirtualizationKind> Preloading(
+            Func<int, int, TItem> preloadingPlaceholderFactory, 
+            IScheduler preloadingBackgroundScheduler);
     }
     
     /// <summary>
@@ -51,7 +54,8 @@ namespace BFF.DataVirtualizingCollection
         /// </summary>
         /// <param name="pageLimit">Has to be greater than zero (with preloading greater than two) in order to maintain at least one page in the page store (when preloading is active, then the neighbors of the most recently requested page are maintained as well).</param>
         /// <returns>The builder itself.</returns>
-        IFetchersKindCollectionBuilder<TItem, TVirtualizationKind> LeastRecentlyUsed(int pageLimit);
+        IFetchersKindCollectionBuilder<TItem, TVirtualizationKind> LeastRecentlyUsed(
+            int pageLimit);
 
         /// <summary>
         /// If the page limit is reached then the pages (amount: removal buffer plus one) which are least recently used will be chosen for removal.
@@ -60,7 +64,9 @@ namespace BFF.DataVirtualizingCollection
         /// <param name="removalCount">Has to be in between one and the page limit minus one (so at least one page remains).
         /// With active preloading the removal count cannot be greater than the page limit minus three.</param>
         /// <returns>The builder itself.</returns>
-        IFetchersKindCollectionBuilder<TItem, TVirtualizationKind> LeastRecentlyUsed(int pageLimit, int removalCount);
+        IFetchersKindCollectionBuilder<TItem, TVirtualizationKind> LeastRecentlyUsed(
+            int pageLimit, 
+            int removalCount);
 
         /// <summary>
         /// With this function you can provide an own page-removal strategy.
@@ -70,8 +76,7 @@ namespace BFF.DataVirtualizingCollection
         /// <param name="pageReplacementStrategyFactory"></param>
         /// <returns>The builder itself.</returns>
         IFetchersKindCollectionBuilder<TItem, TVirtualizationKind> CustomPageRemovalStrategy(
-            Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>>
-                pageReplacementStrategyFactory);
+            Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory);
     }
     
     /// <summary>
@@ -88,7 +93,9 @@ namespace BFF.DataVirtualizingCollection
         /// <param name="pageFetcher">First parameter is the offset, second parameter is the size. You have to provide a lambda function which given the parameters returns the expected page.</param>
         /// <param name="countFetcher">You have to provide a lambda function which gets the count of all elements in the data virtualized collection.</param>
         /// <returns>The builder itself.</returns>
-        IIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> NonTaskBasedFetchers(Func<int, int, TItem[]> pageFetcher, Func<int> countFetcher);
+        IIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> NonTaskBasedFetchers(
+            Func<int, int, TItem[]> pageFetcher, 
+            Func<int> countFetcher);
 
         /// <summary>
         /// You have to provide task-based (asynchronous) fetchers.
@@ -97,7 +104,9 @@ namespace BFF.DataVirtualizingCollection
         /// <param name="pageFetcher">First parameter is the offset, second parameter is the size. You have to provide a lambda function which given the parameters returns the expected page.</param>
         /// <param name="countFetcher">You have to provide a lambda function which gets the count of all elements in the data virtualized collection.</param>
         /// <returns>The builder itself.</returns>
-        IAsyncOnlyIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> TaskBasedFetchers(Func<int, int, Task<TItem[]>> pageFetcher, Func<Task<int>> countFetcher);
+        IAsyncOnlyIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> TaskBasedFetchers(
+            Func<int, int, Task<TItem[]>> pageFetcher, 
+            Func<Task<int>> countFetcher);
     }
     
     /// <summary>
@@ -116,7 +125,33 @@ namespace BFF.DataVirtualizingCollection
         /// <param name="backgroundScheduler">Scheduler for all background operations.</param>
         /// <param name="notificationScheduler">Scheduler on which the notifications are emitted.</param>
         /// <returns></returns>
-        TVirtualizationKind AsyncIndexAccess(Func<int, int, TItem> placeholderFactory);
+        TVirtualizationKind AsyncIndexAccess(
+            Func<int, int, TItem> placeholderFactory);
+        
+        /// <summary>
+        /// If item of requested index isn't loaded yet the collections will return a placeholder instead and emit a notification as soon as it arrives.
+        /// </summary>
+        /// <param name="placeholderFactory">You have to provide a factory lambda function which returns a placeholder.
+        /// The first parameter is the page key (index of pages) and the second is the page index (index of items inside the page).</param>
+        /// <param name="backgroundScheduler">Scheduler for all background operations.</param>
+        /// <param name="notificationScheduler">Scheduler on which the notifications are emitted.</param>
+        /// <returns></returns>
+        TVirtualizationKind AsyncIndexAccess(
+            Func<int, int, TItem> placeholderFactory,
+            IScheduler pageBackgroundScheduler);
+        
+        /// <summary>
+        /// If item of requested index isn't loaded yet the collections will return a placeholder instead and emit a notification as soon as it arrives.
+        /// </summary>
+        /// <param name="placeholderFactory">You have to provide a factory lambda function which returns a placeholder.
+        /// The first parameter is the page key (index of pages) and the second is the page index (index of items inside the page).</param>
+        /// <param name="backgroundScheduler">Scheduler for all background operations.</param>
+        /// <param name="notificationScheduler">Scheduler on which the notifications are emitted.</param>
+        /// <returns></returns>
+        TVirtualizationKind AsyncIndexAccess(
+            Func<int, int, TItem> placeholderFactory,
+            IScheduler pageBackgroundScheduler,
+            IScheduler countBackgroundScheduler);
     }
     
     /// <summary>

@@ -10,7 +10,7 @@ namespace BFF.DataVirtualizingCollection.PageStorage
     internal abstract class AsyncPageBase<T> : IPage<T>
     {
         private readonly int _pageSize;
-        private readonly IScheduler _scheduler;
+        private readonly IScheduler _pageBackgroundScheduler;
         protected T[] Page;
         protected bool IsDisposed;
 
@@ -18,10 +18,10 @@ namespace BFF.DataVirtualizingCollection.PageStorage
             int pageKey,
             int pageSize,
             Func<int, int, T> placeholderFactory,
-            IScheduler scheduler)
+            IScheduler pageBackgroundScheduler)
         {
             _pageSize = pageSize;
-            _scheduler = scheduler;
+            _pageBackgroundScheduler = pageBackgroundScheduler;
             Page = Enumerable
                 .Range(0, pageSize)
                 .Select(pageIndex => placeholderFactory(pageKey, pageIndex))
@@ -39,13 +39,12 @@ namespace BFF.DataVirtualizingCollection.PageStorage
         public void Dispose()
         {
             IsDisposed = true;
-            Observable
-                .StartAsync(async () =>
+            _pageBackgroundScheduler.Schedule(async () =>
                 {
                     await PageFetchCompletion;
                     DisposePageItems(Page);
                     PageFetchCompletion.Dispose();
-                }, _scheduler);
+                });
         }
 
         protected static void DisposePageItems(T[] page)
@@ -65,9 +64,9 @@ namespace BFF.DataVirtualizingCollection.PageStorage
             int pageSize,
             Func<int, int, T[]> pageFetcher,
             Func<int, int, T> placeholderFactory,
-            IScheduler scheduler,
+            IScheduler pageBackgroundScheduler,
             IObserver<(int Offset, int PageSize, T[] PreviousPage, T[] Page)> pageArrivalObservations) 
-            : base(pageKey, pageSize, placeholderFactory, scheduler)
+            : base(pageKey, pageSize, placeholderFactory, pageBackgroundScheduler)
         {
             PageFetchCompletion = Observable
                 .Start(() =>
@@ -77,7 +76,7 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                     DisposePageItems(previousPage);
                     if (!IsDisposed)
                         pageArrivalObservations.OnNext((offset, pageSize, previousPage, Page));
-                }, scheduler)
+                }, pageBackgroundScheduler)
                 .ToTask();
         }
 
@@ -92,9 +91,9 @@ namespace BFF.DataVirtualizingCollection.PageStorage
             int pageSize,
             Func<int, int, Task<T[]>> pageFetcher,
             Func<int, int, T> placeholderFactory,
-            IScheduler scheduler,
+            IScheduler pageBackgroundScheduler,
             IObserver<(int Offset, int PageSize, T[] PreviousPage, T[] Page)> pageArrivalObservations)
-            : base(pageKey,pageSize, placeholderFactory, scheduler)
+            : base(pageKey,pageSize, placeholderFactory, pageBackgroundScheduler)
         {
             PageFetchCompletion = Observable
                 .StartAsync(async () =>
@@ -104,7 +103,7 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                     DisposePageItems(previousPage);
                     if (!IsDisposed)
                         pageArrivalObservations.OnNext((offset, pageSize, previousPage, Page));
-                }, scheduler)
+                }, pageBackgroundScheduler)
                 .ToTask();
         }
 
@@ -117,8 +116,8 @@ namespace BFF.DataVirtualizingCollection.PageStorage
             int pageKey, 
             int pageSize, 
             Func<int, int, T> placeholderFactory, 
-            IScheduler scheduler) 
-            : base(pageKey, pageSize, placeholderFactory, scheduler)
+            IScheduler pageBackgroundScheduler) 
+            : base(pageKey, pageSize, placeholderFactory, pageBackgroundScheduler)
         {
         }
 
