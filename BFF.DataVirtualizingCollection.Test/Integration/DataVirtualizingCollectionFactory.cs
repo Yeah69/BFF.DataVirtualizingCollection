@@ -17,7 +17,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration
             int count,
             int pageSize)
         {
-            var pageLoadingBehaviorCollectionBuilder = DataVirtualizingCollectionBuilder<int>.Build(pageSize, new EventLoopScheduler());
+            var pageLoadingBehaviorCollectionBuilder = DataVirtualizingCollectionBuilder.Build<int>(pageSize, new EventLoopScheduler());
             var pageHoldingBehaviorCollectionBuilder =
                 StandardPageHoldingBehaviorCollectionBuilder(
                     pageLoadingBehaviorCollectionBuilder, 
@@ -54,7 +54,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration
             int count,
             int pageSize)
         {
-            var pageLoadingBehaviorCollectionBuilder = DataVirtualizingCollectionBuilder<int>.Build(pageSize, new EventLoopScheduler());
+            var pageLoadingBehaviorCollectionBuilder = DataVirtualizingCollectionBuilder.Build<int>(pageSize, new EventLoopScheduler());
             var pageHoldingBehaviorCollectionBuilder =
                 StandardPageHoldingBehaviorCollectionBuilder(
                     pageLoadingBehaviorCollectionBuilder, 
@@ -94,7 +94,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration
             Func<int, int, T[]> pageFetchingLogic,
             T placeholder)
         {
-            var pageLoadingBehaviorCollectionBuilder = DataVirtualizingCollectionBuilder<T>.Build(pageSize, new EventLoopScheduler());
+            var pageLoadingBehaviorCollectionBuilder = DataVirtualizingCollectionBuilder.Build<T>(pageSize, new EventLoopScheduler());
             var pageHoldingBehaviorCollectionBuilder =
                 StandardPageHoldingBehaviorCollectionBuilder(
                     pageLoadingBehaviorCollectionBuilder, 
@@ -133,7 +133,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration
             int pageLimit,
             int removalCount)
         {
-            var pageLoadingBehaviorCollectionBuilder = DataVirtualizingCollectionBuilder<T>.Build(pageSize, new EventLoopScheduler());
+            var pageLoadingBehaviorCollectionBuilder = DataVirtualizingCollectionBuilder.Build<T>(pageSize, new EventLoopScheduler());
             var pageHoldingBehaviorCollectionBuilder =
                 StandardPageHoldingBehaviorCollectionBuilder(
                     pageLoadingBehaviorCollectionBuilder, 

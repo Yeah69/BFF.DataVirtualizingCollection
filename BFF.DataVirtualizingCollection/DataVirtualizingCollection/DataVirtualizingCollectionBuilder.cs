@@ -6,13 +6,7 @@ using System.Threading.Tasks;
 
 namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
 {
-    /// <summary>
-    /// This class offers the function "Build" in order to build data virtualizing collections.
-    /// The construction of such collections is encapsulated and externally only access-able via this class. 
-    /// </summary>
-    /// <typeparam name="T">Type of the collection items.</typeparam>
-    public sealed class DataVirtualizingCollectionBuilder<TItem> 
-        : DataVirtualizingCollectionBuilderBase<TItem, IDataVirtualizingCollection<TItem>>
+    public static class DataVirtualizingCollectionBuilder
     {
         /// <summary>
         /// Initial entry point for creating a data virtualizing collection.
@@ -21,9 +15,9 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
         /// Page size is set to the default value 100.
         /// </summary>
         /// <returns>The builder itself.</returns>
-        public static IPageLoadingBehaviorCollectionBuilder<TItem, IDataVirtualizingCollection<TItem>> Build(
+        public static IPageLoadingBehaviorCollectionBuilder<TItem, IDataVirtualizingCollection<TItem>> Build<TItem>(
             IScheduler notificationScheduler) =>
-            Build(DefaultPageSize, notificationScheduler);
+            Build<TItem>(DataVirtualizingCollectionBuilderBase.DefaultPageSize, notificationScheduler);
 
         /// <summary>
         /// Initial entry point for creating a data virtualizing collection.
@@ -32,7 +26,7 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
         /// </summary>
         /// <param name="pageSize">Maximum size of a single page.</param>
         /// <returns>The builder itself.</returns>
-        public static IPageLoadingBehaviorCollectionBuilder<TItem, IDataVirtualizingCollection<TItem>> Build(
+        public static IPageLoadingBehaviorCollectionBuilder<TItem, IDataVirtualizingCollection<TItem>> Build<TItem>(
             int pageSize, 
             IScheduler notificationScheduler) => 
             new DataVirtualizingCollectionBuilder<TItem>(pageSize, notificationScheduler);
@@ -44,18 +38,23 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
         /// </summary>
         /// <param name="pageSize">Maximum size of a single page.</param>
         /// <returns>The builder itself.</returns>
-        public static IPageLoadingBehaviorCollectionBuilder<TItem, IDataVirtualizingCollection<TItem>> Build(
+        public static IPageLoadingBehaviorCollectionBuilder<TItem, IDataVirtualizingCollection<TItem>> Build<TItem>(
             int pageSize, 
             IScheduler notificationScheduler,
             IScheduler backgroundScheduler) => 
             new DataVirtualizingCollectionBuilder<TItem>(pageSize, notificationScheduler, backgroundScheduler);
+    }
+    
+    internal sealed class DataVirtualizingCollectionBuilder<TItem> 
+        : DataVirtualizingCollectionBuilderBase<TItem, IDataVirtualizingCollection<TItem>>
+    {
 
-        private DataVirtualizingCollectionBuilder(int pageSize, IScheduler notificationScheduler)
+        internal DataVirtualizingCollectionBuilder(int pageSize, IScheduler notificationScheduler)
             : base(pageSize, notificationScheduler)
         {
         }
 
-        private DataVirtualizingCollectionBuilder(int pageSize, IScheduler notificationScheduler, IScheduler backgroundScheduler)
+        internal DataVirtualizingCollectionBuilder(int pageSize, IScheduler notificationScheduler, IScheduler backgroundScheduler)
             : base(pageSize, notificationScheduler, backgroundScheduler)
         {
         }

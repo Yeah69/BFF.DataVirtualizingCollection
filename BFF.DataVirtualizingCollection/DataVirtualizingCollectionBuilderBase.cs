@@ -28,7 +28,12 @@ namespace BFF.DataVirtualizingCollection
         Synchronous
     }
 
-    public abstract class DataVirtualizingCollectionBuilderBase<TItem, TVirtualizationKind> :
+    internal static class DataVirtualizingCollectionBuilderBase
+    {
+        internal const int DefaultPageSize = 100;
+    }
+
+    internal abstract class DataVirtualizingCollectionBuilderBase<TItem, TVirtualizationKind> :
         IPageLoadingBehaviorCollectionBuilder<TItem, TVirtualizationKind>,
         IPageHoldingBehaviorCollectionBuilder<TItem, TVirtualizationKind>,
         IFetchersKindCollectionBuilder<TItem, TVirtualizationKind>,
@@ -37,7 +42,6 @@ namespace BFF.DataVirtualizingCollection
         protected const string UninitializedElementsExceptionMessage =
             "The builder used an uninitialized element. This should be impossible. Please open an issue on https://github.com/Yeah69/BFF.DataVirtualizingCollection.";
 
-        protected const int DefaultPageSize = 100;
         protected readonly IScheduler NotificationScheduler;
 
         private readonly int _pageSize;

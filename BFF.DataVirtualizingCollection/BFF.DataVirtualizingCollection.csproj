@@ -3,17 +3,19 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>BFF.DataVirtualizingCollection</PackageId>
-    <PackageVersion>2.0.2</PackageVersion>
+    <PackageVersion>3.0.0</PackageVersion>
     <Authors>Dimitri Enns</Authors>
     <Description>This is an approach to data virtualizing collections intended to be used in WPF projects.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes>- integrated SelectedIndex workaround for binding on Selector-controls</PackageReleaseNotes>
+    <PackageReleaseNotes>- breaking changes compared to version 2.* and before
+    - no blocking calls anymore
+    - separate background scheduler for count fetching, page fetching and preloading configurable</PackageReleaseNotes>
     <Copyright></Copyright>
     <PackageTags>data-virtualization wpf csharp</PackageTags>
-    <Version>2.0.2</Version>
+    <Version>3.0.0</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <AssemblyVersion>2.0.2.0</AssemblyVersion>
-    <FileVersion>2.0.2.0</FileVersion>
+    <AssemblyVersion>3.0.0.0</AssemblyVersion>
+    <FileVersion>3.0.0.0</FileVersion>
     <PackageProjectUrl>https://github.com/Yeah69/BFF.DataVirtualizingCollection</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Yeah69/BFF.DataVirtualizingCollection.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>

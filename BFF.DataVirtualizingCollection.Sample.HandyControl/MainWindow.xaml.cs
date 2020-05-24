@@ -26,8 +26,8 @@ namespace BFF.DataVirtualizingCollection.Sample.HandyControl
 
             DataContext = this;
             
-            _numberWindow  = SlidingWindowBuilder<int>
-                .Build(10, 0, 100, DispatcherScheduler, TaskPoolScheduler.Default)
+            _numberWindow  = SlidingWindowBuilder
+                .Build<int>(10, 0, 100, DispatcherScheduler, TaskPoolScheduler.Default)
                 .NonPreloading()
                 .Hoarding()
                 /*.NonTaskBasedFetchers(

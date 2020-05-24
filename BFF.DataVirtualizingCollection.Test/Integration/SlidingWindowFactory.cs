@@ -19,7 +19,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration
             int initialWindowSize,
             int initialWindowOffset)
         {
-            var pageLoadingBehaviorCollectionBuilder = SlidingWindowBuilder<int>.Build(
+            var pageLoadingBehaviorCollectionBuilder = SlidingWindowBuilder.Build<int>(
                 initialWindowSize, 
                 initialWindowOffset,
                 pageSize, 
@@ -62,7 +62,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration
             int initialWindowSize,
             int initialWindowOffset)
         {
-            var pageLoadingBehaviorCollectionBuilder = SlidingWindowBuilder<int>.Build(
+            var pageLoadingBehaviorCollectionBuilder = SlidingWindowBuilder.Build<int>(
                 initialWindowSize, 
                 initialWindowOffset, 
                 pageSize,
@@ -108,7 +108,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration
             Func<int, int, T[]> pageFetchingLogic,
             T placeholder)
         {
-            var pageLoadingBehaviorCollectionBuilder = SlidingWindowBuilder<T>.Build(
+            var pageLoadingBehaviorCollectionBuilder = SlidingWindowBuilder.Build<T>(
                 initialWindowSize, 
                 initialWindowOffset, 
                 pageSize, 
@@ -153,7 +153,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration
             int pageLimit,
             int removalCount)
         {
-            var pageLoadingBehaviorCollectionBuilder = SlidingWindowBuilder<T>.Build(
+            var pageLoadingBehaviorCollectionBuilder = SlidingWindowBuilder.Build<T>(
                 initialWindowSize,
                 initialWindowOffset,
                 pageSize,
@@ -194,7 +194,7 @@ namespace BFF.DataVirtualizingCollection.Test.Integration
             int initialWindowSize,
             int initialWindowOffset)
         {
-            var pageLoadingBehaviorCollectionBuilder = SlidingWindowBuilder<int>.Build(
+            var pageLoadingBehaviorCollectionBuilder = SlidingWindowBuilder.Build<int>(
                 initialWindowSize, 
                 initialWindowOffset, pageSize, 
                 new EventLoopScheduler());

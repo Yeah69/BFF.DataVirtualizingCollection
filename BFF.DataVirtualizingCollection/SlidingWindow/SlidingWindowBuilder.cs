@@ -6,13 +6,7 @@ using System.Threading.Tasks;
 
 namespace BFF.DataVirtualizingCollection.SlidingWindow
 {
-    /// <summary>
-    /// This class offers the function "Build" in order to build data virtualizing collections.
-    /// The construction of such collections is encapsulated and externally only access-able via this class. 
-    /// </summary>
-    /// <typeparam name="T">Type of the collection items.</typeparam>
-    public class SlidingWindowBuilder<TItem> 
-        : DataVirtualizingCollectionBuilderBase<TItem, ISlidingWindow<TItem>>
+    public static class SlidingWindowBuilder
     {
         /// <summary>
         /// Initial entry point for creating a data virtualizing collection.
@@ -21,11 +15,11 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
         /// Page size is set to the default value 100.
         /// </summary>
         /// <returns>The builder itself.</returns>
-        public static IPageLoadingBehaviorCollectionBuilder<TItem, ISlidingWindow<TItem>> Build(
+        public static IPageLoadingBehaviorCollectionBuilder<TItem, ISlidingWindow<TItem>> Build<TItem>(
             int windowSize, 
             int initialOffset,
             IScheduler notificationScheduler) => 
-            Build(windowSize, initialOffset, DefaultPageSize, notificationScheduler);
+            Build<TItem>(windowSize, initialOffset, DataVirtualizingCollectionBuilderBase.DefaultPageSize, notificationScheduler);
 
         /// <summary>
         /// Initial entry point for creating a data virtualizing collection.
@@ -33,7 +27,7 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
         /// Further settings are applied via method chaining.
         /// </summary>
         /// <returns>The builder itself.</returns>
-        public static IPageLoadingBehaviorCollectionBuilder<TItem, ISlidingWindow<TItem>> Build(
+        public static IPageLoadingBehaviorCollectionBuilder<TItem, ISlidingWindow<TItem>> Build<TItem>(
             int windowSize,
             int initialOffset, 
             int pageSize,
@@ -46,25 +40,29 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
         /// Further settings are applied via method chaining.
         /// </summary>
         /// <returns>The builder itself.</returns>
-        public static IPageLoadingBehaviorCollectionBuilder<TItem, ISlidingWindow<TItem>> Build(
+        public static IPageLoadingBehaviorCollectionBuilder<TItem, ISlidingWindow<TItem>> Build<TItem>(
             int windowSize,
             int initialOffset, 
             int pageSize,
             IScheduler notificationScheduler,
             IScheduler backgroundScheduler) => 
             new SlidingWindowBuilder<TItem>(windowSize, initialOffset, pageSize, notificationScheduler, backgroundScheduler);
+    }
 
+    internal class SlidingWindowBuilder<TItem> 
+        : DataVirtualizingCollectionBuilderBase<TItem, ISlidingWindow<TItem>>
+    {
         private readonly int _windowSize;
         private readonly int _initialOffset;
 
-        private SlidingWindowBuilder(int windowSize, int initialOffset, int pageSize, IScheduler notificationScheduler)
+        internal SlidingWindowBuilder(int windowSize, int initialOffset, int pageSize, IScheduler notificationScheduler)
             : base(pageSize, notificationScheduler)
         {
             _windowSize = windowSize;
             _initialOffset = initialOffset;
         }
 
-        private SlidingWindowBuilder(int windowSize, int initialOffset, int pageSize, IScheduler notificationScheduler, IScheduler backgroundScheduler)
+        internal SlidingWindowBuilder(int windowSize, int initialOffset, int pageSize, IScheduler notificationScheduler, IScheduler backgroundScheduler)
             : base(pageSize, notificationScheduler, backgroundScheduler)
         {
             _windowSize = windowSize;

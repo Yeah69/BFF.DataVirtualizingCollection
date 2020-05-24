@@ -163,7 +163,7 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels
             IScheduler notificationScheduler,
             IScheduler backgroundScheduler)
         {
-            return DataVirtualizingCollectionBuilder<TViewModel>.Build(
+            return DataVirtualizingCollectionBuilder.Build<TViewModel>(
                 pageSize, 
                 notificationScheduler,
                 backgroundScheduler);
@@ -210,7 +210,7 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels
             IScheduler notificationScheduler,
             IScheduler backgroundScheduler)
         {
-            return SlidingWindowBuilder<TViewModel>.Build(
+            return SlidingWindowBuilder.Build<TViewModel>(
                 _slidingWindowOptionsViewModel.WindowSize,
                 _slidingWindowOptionsViewModel.WindowOffset,
                 pageSize, 
