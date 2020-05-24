@@ -1,0 +1,13 @@
+<Project>
+    <PropertyGroup>
+        <PackageVersion>3.0.0</PackageVersion>
+        <Authors>Dimitri Enns</Authors>
+        <DisableTransitiveProjectReferences>true</DisableTransitiveProjectReferences>
+        <LangVersion>8</LangVersion>
+        <Nullable>enable</Nullable>
+        <WarningsAsErrors>CS8600;CS8602;CS8603;CS8604;CS8625</WarningsAsErrors>
+        <Version>3.0.0</Version>
+        <AssemblyVersion>3.0.0.0</AssemblyVersion>
+        <FileVersion>3.0.0.0</FileVersion>
+    </PropertyGroup>
+</Project>

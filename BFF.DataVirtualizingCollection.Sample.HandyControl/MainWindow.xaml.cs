@@ -74,7 +74,7 @@ namespace BFF.DataVirtualizingCollection.Sample.HandyControl
             
             void OnUnloaded(object sender, RoutedEventArgs e)
             {
-                disposable.Dispose();
+                disposable?.Dispose();
                 Unloaded -= OnUnloaded;
             }
         }
@@ -100,7 +100,7 @@ namespace BFF.DataVirtualizingCollection.Sample.HandyControl
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

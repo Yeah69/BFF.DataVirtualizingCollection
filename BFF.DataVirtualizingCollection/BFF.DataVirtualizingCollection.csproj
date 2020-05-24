@@ -3,8 +3,6 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>BFF.DataVirtualizingCollection</PackageId>
-    <PackageVersion>3.0.0</PackageVersion>
-    <Authors>Dimitri Enns</Authors>
     <Description>This is an approach to data virtualizing collections intended to be used in WPF projects.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes>- breaking changes compared to version 2.* and before
@@ -12,19 +10,13 @@
     - separate background scheduler for count fetching, page fetching and preloading configurable</PackageReleaseNotes>
     <Copyright></Copyright>
     <PackageTags>data-virtualization wpf csharp</PackageTags>
-    <Version>3.0.0</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <AssemblyVersion>3.0.0.0</AssemblyVersion>
-    <FileVersion>3.0.0.0</FileVersion>
     <PackageProjectUrl>https://github.com/Yeah69/BFF.DataVirtualizingCollection</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Yeah69/BFF.DataVirtualizingCollection.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageIcon>Yeah69Logo_256.png</PackageIcon>
     <PackageLicenseExpression />
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-    <LangVersion>8</LangVersion>
-    <Nullable>enable</Nullable>
-    <WarningsAsErrors>CS8600;CS8602;CS8603;CS8604;CS8625</WarningsAsErrors>
     <PackageIconUrl>../Icon/Yeah69_256.png</PackageIconUrl>
   </PropertyGroup>
 
