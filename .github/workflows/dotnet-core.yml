@@ -20,11 +20,11 @@ jobs:
       
     steps:
     - uses: actions/checkout@v2
-    - run: set DOTNET_CLI_TELEMETRY_OPTOUT=1
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.101
+    - run: set DOTNET_CLI_TELEMETRY_OPTOUT=1
     - name: Install dependencies
       run: dotnet restore .\BFF.DataVirtualizingCollection.sln
     - name: Build
