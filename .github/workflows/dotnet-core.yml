@@ -27,11 +27,11 @@ jobs:
       with:
         dotnet-version: 3.1.101
     - name: Install dependencies
-      run: dotnet restore .\BFF.DataVirtualizingCollection.sln
+      run: dotnet restore ./BFF.DataVirtualizingCollection.sln
     - name: Build
-      run: dotnet build .\BFF.DataVirtualizingCollection.sln --configuration Release --no-restore
+      run: dotnet build ./BFF.DataVirtualizingCollection.sln --configuration Release --no-restore
     - name: Test
-      run: dotnet test .\BFF.DataVirtualizingCollection.UnitTests\BFF.DataVirtualizingCollection.UnitTests.csproj --no-restore --verbosity normal
+      run: dotnet test ./BFF.DataVirtualizingCollection.UnitTests/BFF.DataVirtualizingCollection.UnitTests.csproj --no-restore --verbosity normal
 
   windows:
     
@@ -78,8 +78,8 @@ jobs:
       with:
         dotnet-version: 3.1.101
     - name: Install dependencies
-      run: dotnet restore .\BFF.DataVirtualizingCollection.sln
+      run: dotnet restore ./BFF.DataVirtualizingCollection.sln
     - name: Build
-      run: dotnet build .\BFF.DataVirtualizingCollection.sln --configuration Release --no-restore
+      run: dotnet build ./BFF.DataVirtualizingCollection.sln --configuration Release --no-restore
     - name: Test
-      run: dotnet test .\BFF.DataVirtualizingCollection.UnitTests\BFF.DataVirtualizingCollection.UnitTests.csproj --no-restore --verbosity normal
+      run: dotnet test ./BFF.DataVirtualizingCollection.UnitTests/BFF.DataVirtualizingCollection.UnitTests.csproj --no-restore --verbosity normal
