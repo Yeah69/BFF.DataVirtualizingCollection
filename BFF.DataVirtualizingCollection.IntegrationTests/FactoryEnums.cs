@@ -1,4 +1,4 @@
-namespace BFF.DataVirtualizingCollection.Test.Integration
+namespace BFF.DataVirtualizingCollection.IntegrationTests
 {
     public enum PageLoadingBehavior
     {

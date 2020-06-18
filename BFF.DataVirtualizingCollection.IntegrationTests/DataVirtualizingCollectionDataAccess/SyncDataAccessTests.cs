@@ -4,7 +4,7 @@ using System.Linq;
 using MoreLinq.Extensions;
 using Xunit;
 
-namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowDataAccess
+namespace BFF.DataVirtualizingCollection.IntegrationTests.DataVirtualizingCollectionDataAccess
 {
     public class SyncDataAccessTests
     {
@@ -26,15 +26,13 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowDataAcces
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
+            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                100,
-                10,
-                0);
+                100);
 
             // Act + Assert
             Assert.Equal(0, collection[0]);
@@ -49,18 +47,16 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowDataAcces
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
+            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                100,
-                10,
-                60);
+                100);
 
             // Act + Assert
-            Assert.Equal(69, collection[9]);
+            Assert.Equal(69, collection[69]);
         }
 
         [Theory]
@@ -72,18 +68,16 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowDataAcces
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
+            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                100,
-                10,
-                120);
+                100);
 
             // Act + Assert
-            Assert.Equal(123, collection[3]);
+            Assert.Equal(123, collection[123]);
         }
 
         [Theory]
@@ -95,18 +89,16 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowDataAcces
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
+            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                100,
-                10,
-                6000);
+                100);
 
             // Act + Assert
-            Assert.Equal(6000, collection[0]);
+            Assert.Equal(6000, collection[6000]);
         }
 
         [Theory]
@@ -118,41 +110,37 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowDataAcces
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
+            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                100,
-                10,
-                6959);
+                100);
 
             // Act + Assert
-            Assert.Equal(6968, collection[9]);
+            Assert.Equal(6968, collection[6968]);
         }
 
         [Theory]
         [MemberData(nameof(Combinations))]
-        public void BuildingCollectionWith6969Elements_11thWindowEntry_ThrowsIndexOutOfRangeException(
+        public void BuildingCollectionWith6969Elements_6970thEntry_ThrowsIndexOutOfRangeException(
             PageLoadingBehavior pageLoadingBehavior,
             PageRemovalBehavior pageRemovalBehavior,
             FetchersKind fetchersKind,
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
+            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                100,
-                10,
-                6959);
+                100);
 
             // Act + Assert
-            Assert.Throws<IndexOutOfRangeException>(() => collection[10]);
+            Assert.Throws<IndexOutOfRangeException>(() => collection[6969]);
         }
 
         [Theory]
@@ -164,15 +152,13 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowDataAcces
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
+            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                100,
-                10,
-                6959);
+                100);
 
             // Act + Assert
             Assert.Throws<IndexOutOfRangeException>(() => collection[-1]);
@@ -187,18 +173,16 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.SlidingWindowDataAcces
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalIntegerWhereFetchersIgnorePageSize(
+            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalIntegerWhereFetchersIgnorePageSize(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                23,
-                10,
-                60);
+                23);
 
             // Act + Assert
-            Assert.Equal(69, collection[9]);
+            Assert.Equal(69, collection[69]);
         }
     }
 }

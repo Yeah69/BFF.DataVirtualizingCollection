@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using MoreLinq.Extensions;
 using Xunit;
 
-namespace BFF.DataVirtualizingCollection.Test.Integration.PageRemoval
+namespace BFF.DataVirtualizingCollection.IntegrationTests.PageRemoval
 {
     public class SyncLeastRecentlyUsedTests
     {

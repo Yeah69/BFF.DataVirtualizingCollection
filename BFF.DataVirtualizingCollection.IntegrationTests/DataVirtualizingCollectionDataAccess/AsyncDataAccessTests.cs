@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using MoreLinq.Extensions;
 using Xunit;
 
-namespace BFF.DataVirtualizingCollection.Test.Integration.DataVirtualizingCollectionDataAccess
+namespace BFF.DataVirtualizingCollection.IntegrationTests.DataVirtualizingCollectionDataAccess
 {
     public class AsyncDataAccessTests
     {

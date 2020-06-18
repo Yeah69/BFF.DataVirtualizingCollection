@@ -1,164 +1,218 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using MoreLinq.Extensions;
 using Xunit;
 
-namespace BFF.DataVirtualizingCollection.Test.Integration.DataVirtualizingCollectionDataAccess
+namespace BFF.DataVirtualizingCollection.IntegrationTests.SlidingWindowDataAccess
 {
-    public class SyncDataAccessTests
+    public class AsyncDataAccessTests
     {
         // ReSharper disable once MemberCanBePrivate.Global
         public static IEnumerable<object[]> Combinations =>
             Enum.GetValues(typeof(PageLoadingBehavior)).OfType<PageLoadingBehavior>()
                 .Cartesian(
                     Enum.GetValues(typeof(PageRemovalBehavior)).OfType<PageRemovalBehavior>(), 
-                    Enum.GetValues(typeof(FetchersKind)).OfType<FetchersKind>().Except(new [] { FetchersKind.TaskBased }),
+                    Enum.GetValues(typeof(FetchersKind)).OfType<FetchersKind>(),
                     (first, second, third) =>
-                        new object[] {first, second, third, IndexAccessBehavior.Synchronous});
+                        new object[] {first, second, third, IndexAccessBehavior.Asynchronous});
 
         [Theory]
         [MemberData(nameof(Combinations))]
-        public void BuildingCollectionWith6969Elements_FirstEntry_0(
+        public async Task BuildingCollectionWith6969Elements_FirstEntry_0(
             PageLoadingBehavior pageLoadingBehavior,
             PageRemovalBehavior pageRemovalBehavior,
             FetchersKind fetchersKind,
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
+            using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                100);
+                100,
+                10,
+                0);
 
-            // Act + Assert
+            await collection.InitializationCompleted;
+
+            // Act
+            var placeholder = collection[0];
+            await Task.Delay(50);
+
+            // Assert
+            Assert.Equal(-1, placeholder);
             Assert.Equal(0, collection[0]);
         }
 
         [Theory]
         [MemberData(nameof(Combinations))]
-        public void BuildingCollectionWith6969Elements_70thEntry_69(
+        public async Task BuildingCollectionWith6969Elements_70thEntry_69(
             PageLoadingBehavior pageLoadingBehavior,
             PageRemovalBehavior pageRemovalBehavior,
             FetchersKind fetchersKind,
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
+            using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                100);
+                100,
+                10,
+                60);
 
-            // Act + Assert
-            Assert.Equal(69, collection[69]);
+            await collection.InitializationCompleted;
+
+            // Act
+            var placeholder = collection[9];
+            await Task.Delay(500);
+
+            // Assert
+            Assert.Equal(-1, placeholder);
+            Assert.Equal(69, collection[9]);
         }
 
         [Theory]
         [MemberData(nameof(Combinations))]
-        public void BuildingCollectionWith6969Elements_124thEntry_123(
+        public async Task BuildingCollectionWith6969Elements_124thEntry_123(
             PageLoadingBehavior pageLoadingBehavior,
             PageRemovalBehavior pageRemovalBehavior,
             FetchersKind fetchersKind,
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
+            using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                100);
+                100,
+                10,
+                120);
 
-            // Act + Assert
-            Assert.Equal(123, collection[123]);
+            await collection.InitializationCompleted;
+
+            // Act
+            var placeholder = collection[3];
+            await Task.Delay(50);
+
+            // Assert
+            Assert.Equal(-1, placeholder);
+            Assert.Equal(123, collection[3]);
         }
 
         [Theory]
         [MemberData(nameof(Combinations))]
-        public void BuildingCollectionWith6969Elements_6001thEntry_6000(
+        public async Task BuildingCollectionWith6969Elements_6001thEntry_6000(
             PageLoadingBehavior pageLoadingBehavior,
             PageRemovalBehavior pageRemovalBehavior,
             FetchersKind fetchersKind,
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
+            using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                100);
+                100,
+                10,
+                6000);
 
-            // Act + Assert
-            Assert.Equal(6000, collection[6000]);
+            await collection.InitializationCompleted;
+
+            // Act
+            var placeholder = collection[0];
+            await Task.Delay(50);
+
+            // Assert
+            Assert.Equal(-1, placeholder);
+            Assert.Equal(6000, collection[0]);
         }
 
         [Theory]
         [MemberData(nameof(Combinations))]
-        public void BuildingCollectionWith6969Elements_6969thEntry_6968(
+        public async Task BuildingCollectionWith6969Elements_6969thEntry_6968(
             PageLoadingBehavior pageLoadingBehavior,
             PageRemovalBehavior pageRemovalBehavior,
             FetchersKind fetchersKind,
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
+            using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                100);
+                100,
+                10,
+                6959);
 
-            // Act + Assert
-            Assert.Equal(6968, collection[6968]);
+            await collection.InitializationCompleted;
+
+            // Act
+            var placeholder = collection[9];
+            await Task.Delay(50);
+
+            // Assert
+            Assert.Equal(-1, placeholder);
+            Assert.Equal(6968, collection[9]);
         }
 
         [Theory]
         [MemberData(nameof(Combinations))]
-        public void BuildingCollectionWith6969Elements_6970thEntry_ThrowsIndexOutOfRangeException(
+        public async Task BuildingCollectionWith6969Elements_11thWindowEntry_ThrowsIndexOutOfRangeException(
             PageLoadingBehavior pageLoadingBehavior,
             PageRemovalBehavior pageRemovalBehavior,
             FetchersKind fetchersKind,
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
+            using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                100);
+                100,
+                10,
+                6959);
+
+            await collection.InitializationCompleted;
 
             // Act + Assert
-            Assert.Throws<IndexOutOfRangeException>(() => collection[6969]);
+            Assert.Throws<IndexOutOfRangeException>(() => collection[10]);
         }
 
         [Theory]
         [MemberData(nameof(Combinations))]
-        public void BuildingCollectionWith6969Elements_MinusFirstEntry_ThrowsIndexOutOfRangeException(
+        public async Task BuildingCollectionWith6969Elements_MinusFirstEntry_ThrowsIndexOutOfRangeException(
             PageLoadingBehavior pageLoadingBehavior,
             PageRemovalBehavior pageRemovalBehavior,
             FetchersKind fetchersKind,
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
+            using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                100);
+                100,
+                10,
+                6959);
+
+            await collection.InitializationCompleted;
 
             // Act + Assert
             Assert.Throws<IndexOutOfRangeException>(() => collection[-1]);
@@ -166,23 +220,32 @@ namespace BFF.DataVirtualizingCollection.Test.Integration.DataVirtualizingCollec
 
         [Theory]
         [MemberData(nameof(Combinations))]
-        public void BuildingCollectionWherePageFetcherIgnoresGivenPageSize23_70thEntry_69(
+        public async Task BuildingCollectionWherePageFetcherIgnoresGivenPageSize23_70thEntry_69(
             PageLoadingBehavior pageLoadingBehavior,
             PageRemovalBehavior pageRemovalBehavior,
             FetchersKind fetchersKind,
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalIntegerWhereFetchersIgnorePageSize(
+            using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalIntegerWhereFetchersIgnorePageSize(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                23);
+                23,
+                10,
+                60);
 
-            // Act + Assert
-            Assert.Equal(69, collection[69]);
+            await collection.InitializationCompleted;
+
+            // Act
+            var placeholder = collection[9];
+            await Task.Delay(50);
+
+            // Assert
+            Assert.Equal(-1, placeholder);
+            Assert.Equal(69, collection[9]);
         }
     }
 }
