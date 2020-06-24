@@ -24,9 +24,21 @@
     <DocumentationFile>bin\Release\netstandard1.4\BFF.DataVirtualizingCollection.xml</DocumentationFile>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DocumentationFile>bin\Debug\BFF.DataVirtualizingCollection.xml</DocumentationFile>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <DocumentationMarkdown>..\Documentation\API.md</DocumentationMarkdown>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="System.Reactive" Version="4.4.1" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+    <PackageReference Include="Vsxmd" Version="1.4.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>

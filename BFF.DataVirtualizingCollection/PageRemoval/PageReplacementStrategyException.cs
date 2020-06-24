@@ -3,7 +3,7 @@
 namespace BFF.DataVirtualizingCollection.PageRemoval
 {
     /// <summary>
-    /// Thrown whenever an exception occurs during initialization or the process of page replacement
+    /// Thrown whenever an exception occurs during the process of page replacement.
     /// </summary>
     public class PageReplacementStrategyException : Exception
     {

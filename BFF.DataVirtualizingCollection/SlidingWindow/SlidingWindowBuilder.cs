@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -6,15 +8,20 @@ using System.Threading.Tasks;
 
 namespace BFF.DataVirtualizingCollection.SlidingWindow
 {
+    /// <summary>
+    /// Initial entry point for creating a sliding window.
+    /// </summary>
     public static class SlidingWindowBuilder
     {
         /// <summary>
-        /// Initial entry point for creating a data virtualizing collection.
-        /// This call can be used to configure the maximum size of a single page. Hence, this configures how much data will be loaded at once.
+        /// Use to configure general virtualization and sliding-window-specific settings.
         /// Further settings are applied via method chaining.
         /// Page size is set to the default value 100.
+        /// The background scheduler is per default the <see cref="TaskPoolScheduler"/>.
         /// </summary>
-        /// <returns>The builder itself.</returns>
+        /// <param name="windowSize">Initial count of items that the window should contain.</param>
+        /// <param name="initialOffset">Initial starting item within the backend.</param>
+        /// <param name="notificationScheduler">A scheduler for sending the notifications (<see cref="INotifyCollectionChanged"/>, <see cref="INotifyPropertyChanged"/>).</param>
         public static IPageLoadingBehaviorCollectionBuilder<TItem, ISlidingWindow<TItem>> Build<TItem>(
             int windowSize, 
             int initialOffset,
@@ -22,11 +29,14 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
             Build<TItem>(windowSize, initialOffset, DataVirtualizingCollectionBuilderBase.DefaultPageSize, notificationScheduler);
 
         /// <summary>
-        /// Initial entry point for creating a data virtualizing collection.
-        /// This call can be used to configure the maximum size of a single page. Hence, this configures how much data will be loaded at once.
+        /// Use to configure general virtualization and sliding-window-specific settings.
         /// Further settings are applied via method chaining.
+        /// The background scheduler is per default the <see cref="TaskPoolScheduler"/>.
         /// </summary>
-        /// <returns>The builder itself.</returns>
+        /// <param name="windowSize">Initial count of items that the window should contain.</param>
+        /// <param name="initialOffset">Initial starting item within the backend.</param>
+        /// <param name="pageSize">Maximum size of a single page.</param>
+        /// <param name="notificationScheduler">A scheduler for sending the notifications (<see cref="INotifyCollectionChanged"/>, <see cref="INotifyPropertyChanged"/>).</param>
         public static IPageLoadingBehaviorCollectionBuilder<TItem, ISlidingWindow<TItem>> Build<TItem>(
             int windowSize,
             int initialOffset, 
@@ -35,11 +45,14 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
             new SlidingWindowBuilder<TItem>(windowSize, initialOffset, pageSize, notificationScheduler);
 
         /// <summary>
-        /// Initial entry point for creating a data virtualizing collection.
-        /// This call can be used to configure the maximum size of a single page. Hence, this configures how much data will be loaded at once.
+        /// Use to configure general virtualization and sliding-window-specific settings.
         /// Further settings are applied via method chaining.
         /// </summary>
-        /// <returns>The builder itself.</returns>
+        /// <param name="windowSize">Initial count of items that the window should contain.</param>
+        /// <param name="initialOffset">Initial starting item within the backend.</param>
+        /// <param name="pageSize">Maximum size of a single page.</param>
+        /// <param name="notificationScheduler">A scheduler for sending the notifications (<see cref="INotifyCollectionChanged"/>, <see cref="INotifyPropertyChanged"/>).</param>
+        /// <param name="backgroundScheduler">Per default this scheduler is used for all background operations (page and count fetches, preloading). In further settings you'll have the option to override this scheduler with another for specific background operations. </param>
         public static IPageLoadingBehaviorCollectionBuilder<TItem, ISlidingWindow<TItem>> Build<TItem>(
             int windowSize,
             int initialOffset, 

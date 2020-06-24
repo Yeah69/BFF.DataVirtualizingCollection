@@ -12,9 +12,6 @@ using BFF.DataVirtualizingCollection.SlidingWindow;
 
 namespace BFF.DataVirtualizingCollection.Sample.HandyControl
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : INotifyPropertyChanged
     {
         private static readonly IScheduler DispatcherScheduler = new DispatcherScheduler(Application.Current.Dispatcher);

@@ -3,37 +3,36 @@
     // ReSharper disable once PossibleInterfaceMemberAmbiguity
     // Ambiguous Members should be implemented explicitly
     /// <summary>
-    /// Defines a window to the backend (accessed by the page- and count-fetchers).
+    /// Defines a nongeneric window to the backend (accessed by the page- and count-fetchers).
     /// A window is intended to be a much smaller section of the backend. It is specified by an offset and a size.
     /// Outwards it looks like a small list which contains only a few items of the whole backend. However, the sliding functionality
     /// makes it possible to go through the whole backend.
     /// </summary>
-    /// <typeparam name="T">Type of the collection items.</typeparam>
     public interface ISlidingWindow :
         IVirtualizationBase
     {
         /// <summary>
-        /// Current offset of the window inside of the range of the items from the backend.
+        /// Current offset of the window inside of the range of the items from the backend. The Offset marks the first item of the backend which is represented in the sliding window.
         /// </summary>
         int Offset { get; }
         
         /// <summary>
-        /// Current maximum possible offset.
+        /// Current maximum possible offset. Depends on the count of all backend items and the size of the window.
         /// </summary>
         int MaximumOffset { get; }
 
         /// <summary>
-        /// Slides the window to the backend one step to the left (bottom).
+        /// Slides the window (<see cref="Offset"/>) to the backend one step to the start (left).
         /// </summary>
         void SlideLeft();
         
         /// <summary>
-        /// Slides the window to the backend one step to the right (top).
+        /// Slides the window (<see cref="Offset"/>) to the backend one step to the end (right).
         /// </summary>
         void SlideRight();
         
         /// <summary>
-        /// Sets the first entry of the window to the given index of the backend.
+        /// Sets the first entry of the window (<see cref="Offset"/>) to the given index of the backend.
         /// </summary>
         void JumpTo(int index);
         
@@ -62,12 +61,12 @@
     // ReSharper disable once PossibleInterfaceMemberAmbiguity
     // Ambiguous Members should be implemented explicitly
     /// <summary>
-    /// Defines a window to the backend (accessed by the page- and count-fetchers).
+    /// Defines a generic window to the backend (accessed by the page- and count-fetchers).
     /// A window is intended to be a much smaller section of the backend. It is specified by an offset and a size.
     /// Outwards it looks like a small list which contains only a few items of the whole backend. However, the sliding functionality
     /// makes it possible to go through the whole backend.
     /// </summary>
-    /// <typeparam name="T">Type of the collection items.</typeparam>
+    /// <typeparam name="T">Item type.</typeparam>
     public interface ISlidingWindow<T> :
         IVirtualizationBase<T>,
         ISlidingWindow

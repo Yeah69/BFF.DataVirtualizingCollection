@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>7</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>210</x>
+      <y>252</y>
+      <w>175</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>bg=#00008B
+fg=white
+&lt;&lt;Interface&gt;&gt;
+IVirtualizationBase
+--
+Task InitializationCompleted { get; }
+int SelectedIndex { get; set; }
+void Reset()</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>0</x>
+      <y>154</y>
+      <w>147</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>bg=#8A2BE2
+fg=white
+&lt;&lt;Interface&gt;&gt;
+IList</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>154</x>
+      <y>154</y>
+      <w>147</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>bg=#8A2BE2
+fg=white
+&lt;&lt;Interface&gt;&gt;
+INotifyCollectionChanged
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>308</x>
+      <y>154</y>
+      <w>147</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>bg=#8A2BE2
+fg=white
+&lt;&lt;Interface&gt;&gt;
+INotifyPropertyChanged</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>462</x>
+      <y>154</y>
+      <w>147</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>bg=#8A2BE2
+fg=white
+&lt;&lt;Interface&gt;&gt;
+IDisposable</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>63</x>
+      <y>175</y>
+      <w>245</w>
+      <h>91</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;70.0;330.0;70.0;330.0;110.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>217</x>
+      <y>175</y>
+      <w>91</w>
+      <h>91</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;70.0;110.0;70.0;110.0;110.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>287</x>
+      <y>175</y>
+      <w>105</w>
+      <h>91</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>130.0;10.0;130.0;70.0;10.0;70.0;10.0;110.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>287</x>
+      <y>175</y>
+      <w>259</w>
+      <h>91</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>350.0;10.0;350.0;70.0;10.0;70.0;10.0;110.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>119</x>
+      <y>364</y>
+      <w>147</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>bg=#8A2BE2
+fg=white
+&lt;&lt;Interface&gt;&gt;
+IList&lt;T&gt;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>322</x>
+      <y>364</y>
+      <w>147</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>bg=#8A2BE2
+fg=white
+&lt;&lt;Interface&gt;&gt;
+IReadOnlyList&lt;T&gt;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>210</x>
+      <y>441</y>
+      <w>175</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>bg=#00008B
+fg=white
+&lt;&lt;Interface&gt;&gt;
+IVirtualizationBase&lt;T&gt;
+--
+new int Count { get; }
+new T this[int index] { get; }</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>287</x>
+      <y>315</y>
+      <w>21</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;180.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>259</x>
+      <y>371</y>
+      <w>49</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;50.0;10.0;50.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>287</x>
+      <y>371</y>
+      <w>49</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>50.0;10.0;10.0;10.0;10.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>7</x>
+      <y>441</y>
+      <w>175</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>bg=#00008B
+fg=white
+&lt;&lt;Interface&gt;&gt;
+IDataVirtualizingCollection</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>7</x>
+      <y>588</y>
+      <w>175</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>bg=#00008B
+fg=white
+&lt;&lt;Interface&gt;&gt;
+IDataVirtualizingCollection&lt;T&gt;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>91</x>
+      <y>280</y>
+      <w>133</w>
+      <h>175</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>170.0;10.0;10.0;10.0;10.0;230.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>91</x>
+      <y>462</y>
+      <w>21</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;180.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>91</x>
+      <y>504</y>
+      <w>168</w>
+      <h>98</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>220.0;10.0;220.0;80.0;10.0;80.0;10.0;120.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>413</x>
+      <y>441</y>
+      <w>175</w>
+      <h>98</h>
+    </coordinates>
+    <panel_attributes>bg=#00008B
+fg=white
+&lt;&lt;Interface&gt;&gt;
+ISlidingWindow
+--
+int Offset { get; }
+void SlideLeft();
+void SlideRight();
+void IncreaseWindowSize();
+void DecreaseWindowSize();
+[…]</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>378</x>
+      <y>280</y>
+      <w>133</w>
+      <h>175</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;170.0;10.0;170.0;230.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>413</x>
+      <y>581</y>
+      <w>175</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>bg=#00008B
+fg=white
+&lt;&lt;Interface&gt;&gt;
+ISlidingWindow&lt;T&gt;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>490</x>
+      <y>532</y>
+      <w>21</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>343</x>
+      <y>504</y>
+      <w>168</w>
+      <h>91</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;80.0;220.0;80.0;220.0;110.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>609</x>
+      <y>511</y>
+      <w>259</w>
+      <h>98</h>
+    </coordinates>
+    <panel_attributes>*Key*
+group=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>616</x>
+      <y>539</y>
+      <w>70</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>bg=#8A2BE2
+fg=white
+&lt;&lt;Interface&gt;&gt;
+IPurple
+group=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>693</x>
+      <y>539</y>
+      <w>140</w>
+      <h>21</h>
+    </coordinates>
+    <panel_attributes>From .Net (members hidden)
+style=wordwrap
+group=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>616</x>
+      <y>574</y>
+      <w>70</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>bg=#00008B
+fg=white
+&lt;&lt;Interface&gt;&gt;
+IBlue
+group=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>693</x>
+      <y>574</y>
+      <w>175</w>
+      <h>21</h>
+    </coordinates>
+    <panel_attributes>From BFF.DataVirtualizingCollection
+style=wordwrap
+group=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

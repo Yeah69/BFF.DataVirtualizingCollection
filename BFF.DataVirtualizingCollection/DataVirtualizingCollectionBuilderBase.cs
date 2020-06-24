@@ -92,7 +92,6 @@ namespace BFF.DataVirtualizingCollection
             CountBackgroundScheduler = backgroundScheduler;
         }
 
-        /// <inheritdoc />
         public IIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> NonTaskBasedFetchers(
             Func<int, int, TItem[]> pageFetcher, 
             Func<int> countFetcher)
@@ -103,7 +102,6 @@ namespace BFF.DataVirtualizingCollection
             return this;
         }
 
-        /// <inheritdoc />
         public IAsyncOnlyIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> TaskBasedFetchers(
             Func<int, int, Task<TItem[]>> pageFetcher,
             Func<Task<int>> countFetcher)
@@ -114,14 +112,12 @@ namespace BFF.DataVirtualizingCollection
             return this;
         }
 
-        /// <inheritdoc />
         public TVirtualizationKind SyncIndexAccess()
         {
             _indexAccessBehavior = IndexAccessBehavior.Synchronous;
             return GenerateCollection();
         }
 
-        /// <inheritdoc />
         public TVirtualizationKind AsyncIndexAccess(
             Func<int, int, TItem> placeholderFactory)
         {
@@ -148,20 +144,17 @@ namespace BFF.DataVirtualizingCollection
             return AsyncIndexAccess(placeholderFactory);
         }
 
-        /// <inheritdoc />
         public IFetchersKindCollectionBuilder<TItem, TVirtualizationKind> Hoarding()
         {
             return CustomPageRemovalStrategy(HoardingPageNonRemoval.Create());
         }
 
-        /// <inheritdoc />
         public IFetchersKindCollectionBuilder<TItem, TVirtualizationKind> LeastRecentlyUsed(
             int pageLimit)
         {
             return LeastRecentlyUsed(pageLimit, 1);
         }
 
-        /// <inheritdoc />
         public IFetchersKindCollectionBuilder<TItem, TVirtualizationKind> LeastRecentlyUsed(
             int pageLimit,
             int removalCount)
@@ -173,7 +166,6 @@ namespace BFF.DataVirtualizingCollection
                 new DateTimeTimestampProvider()));
         }
 
-        /// <inheritdoc />
         public IFetchersKindCollectionBuilder<TItem, TVirtualizationKind> CustomPageRemovalStrategy(
             Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>>
                 pageReplacementStrategyFactory)
@@ -182,14 +174,12 @@ namespace BFF.DataVirtualizingCollection
             return this;
         }
 
-        /// <inheritdoc />
         public IPageHoldingBehaviorCollectionBuilder<TItem, TVirtualizationKind> NonPreloading()
         {
             _pageLoadingBehavior = PageLoadingBehavior.NonPreloading;
             return this;
         }
 
-        /// <inheritdoc />
         public IPageHoldingBehaviorCollectionBuilder<TItem, TVirtualizationKind> Preloading(
             Func<int, int, TItem> preloadingPlaceholderFactory)
         {
@@ -198,7 +188,6 @@ namespace BFF.DataVirtualizingCollection
             return this;
         }
 
-        /// <inheritdoc />
         public IPageHoldingBehaviorCollectionBuilder<TItem, TVirtualizationKind> Preloading(
             Func<int, int, TItem> preloadingPlaceholderFactory, 
             IScheduler preloadingBackgroundScheduler)
