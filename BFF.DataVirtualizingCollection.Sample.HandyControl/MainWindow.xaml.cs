@@ -94,7 +94,7 @@ namespace BFF.DataVirtualizingCollection.Sample.HandyControl
             set => AllPositiveIntNumbers.JumpTo(value);
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)

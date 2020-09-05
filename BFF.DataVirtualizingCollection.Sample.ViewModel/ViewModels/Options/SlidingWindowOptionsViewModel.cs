@@ -23,7 +23,7 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Options
     {
         private int _windowSize = 4;
         
-        private int _windowOffset = 0;
+        private int _windowOffset;
 
         public int WindowSize
         {

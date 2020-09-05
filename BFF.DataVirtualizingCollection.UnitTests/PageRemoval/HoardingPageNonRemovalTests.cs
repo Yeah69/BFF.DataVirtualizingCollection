@@ -2,9 +2,10 @@
 using System.Reactive.Subjects;
 using BFF.DataVirtualizingCollection.PageRemoval;
 using Xunit;
+
 // ReSharper disable UnusedVariable *** Necessary for some tests
 
-namespace BFF.DataVirtualizingCollection.Test.Internal.PageRemoval
+namespace BFF.DataVirtualizingCollection.Test.PageRemoval
 {
     public class HoardingPageNonRemovalTests
     {

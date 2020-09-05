@@ -2,7 +2,7 @@
 using BFF.DataVirtualizingCollection.PageStorage;
 using Xunit;
 
-namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
+namespace BFF.DataVirtualizingCollection.Test.PageStorage
 {
     public abstract class PageTestsBase
     {

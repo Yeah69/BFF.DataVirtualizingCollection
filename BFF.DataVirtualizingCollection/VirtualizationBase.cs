@@ -49,8 +49,21 @@ namespace BFF.DataVirtualizingCollection
         }
 
         private int GetCountInner() => Count;
+        
+        public IEnumerator<T> GetEnumerator()
+        {
+            return Iterate().GetEnumerator();
 
-        public abstract IEnumerator<T> GetEnumerator();
+            IEnumerable<T> Iterate()
+            {
+                for (var i = 0; i < Count; i++)
+                {
+                    yield return GetItemForEnumerator(i);
+                }
+            }
+        }
+
+        protected abstract T GetItemForEnumerator(int i);
 
         IEnumerator IEnumerable.GetEnumerator()
         {
@@ -176,6 +189,7 @@ namespace BFF.DataVirtualizingCollection
 
         protected void OnIndexerChanged()
         {
+            // ReSharper disable once ExplicitCallerInfoArgument
             OnPropertyChanged("Item[]");
         }
 

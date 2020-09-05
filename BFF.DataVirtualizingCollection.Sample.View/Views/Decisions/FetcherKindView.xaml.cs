@@ -1,15 +1,11 @@
 using System.Windows;
-using System.Windows.Controls;
 using BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions;
 
 namespace BFF.DataVirtualizingCollection.Sample.View.Views.Decisions
 {
-    public partial class FetcherKindView : UserControl
+    public partial class FetcherKindView
     {
-        public FetcherKindView()
-        {
-            InitializeComponent();
-        }
+        public FetcherKindView() => InitializeComponent();
 
         private void NonTaskBased_OnChecked(object sender, RoutedEventArgs e)
         {

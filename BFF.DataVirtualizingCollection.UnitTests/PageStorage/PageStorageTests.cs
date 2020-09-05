@@ -6,10 +6,11 @@ using NSubstitute;
 using NSubstitute.Extensions;
 using NSubstitute.ReceivedExtensions;
 using Xunit;
+
 // ReSharper disable UnusedVariable *** Necessary for some tests
 // ReSharper disable AccessToDisposedClosure *** Controlled disposal
 
-namespace BFF.DataVirtualizingCollection.Test.Internal.PageStorage
+namespace BFF.DataVirtualizingCollection.Test.PageStorage
 {
     public class PageStorageTests
     {

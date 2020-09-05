@@ -5,9 +5,10 @@ using BFF.DataVirtualizingCollection.PageRemoval;
 using BFF.DataVirtualizingCollection.Utilities;
 using NSubstitute;
 using Xunit;
+
 // ReSharper disable UnusedVariable *** Necessary for some tests
 
-namespace BFF.DataVirtualizingCollection.Test.Internal.PageRemoval
+namespace BFF.DataVirtualizingCollection.Test.PageRemoval
 {
     public class LeastRecentlyUsedPageRemovalTests
     {

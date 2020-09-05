@@ -1,12 +1,7 @@
-using System.Windows.Controls;
-
 namespace BFF.DataVirtualizingCollection.Sample.View.Views.Functions
 {
-    public partial class GeneralFunctionsView : UserControl
+    public partial class GeneralFunctionsView
     {
-        public GeneralFunctionsView()
-        {
-            InitializeComponent();
-        }
+        public GeneralFunctionsView() => InitializeComponent();
     }
 }

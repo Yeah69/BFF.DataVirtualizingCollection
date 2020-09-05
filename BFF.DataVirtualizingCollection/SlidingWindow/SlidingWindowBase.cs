@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
@@ -112,18 +111,7 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
             });
         }
 
-        public override IEnumerator<T> GetEnumerator()
-        {
-            return Enumeration().GetEnumerator();
-
-            IEnumerable<T> Enumeration()
-            {
-                for (var i = 0; i < Count; i++)
-                {
-                    yield return this[i];
-                }
-            }
-        }
+        protected override T GetItemForEnumerator(int i) => this[i];
 
         protected override T IndexerInnerGet(int index) =>
             index >= Size || Offset + index >= CountOfBackedDataSet || index < 0

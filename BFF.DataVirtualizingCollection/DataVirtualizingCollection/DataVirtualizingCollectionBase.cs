@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using BFF.DataVirtualizingCollection.Extensions;
@@ -48,18 +47,7 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
             SelectedIndex = _preResetSelectedIndex;
         }
 
-        public override IEnumerator<T> GetEnumerator()
-        {
-            return Iterate().GetEnumerator();
-
-            IEnumerable<T> Iterate()
-            {
-                for (var i = 0; i < Count; i++)
-                {
-                    yield return GetItemInner(i);
-                }
-            }
-        }
+        protected override T GetItemForEnumerator(int i) => GetItemInner(i);
 
         public override int SelectedIndex
         {

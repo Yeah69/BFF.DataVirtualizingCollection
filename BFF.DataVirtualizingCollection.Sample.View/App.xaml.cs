@@ -2,7 +2,7 @@
 
 namespace BFF.DataVirtualizingCollection.Sample.View
 {
-    public partial class App : Application
+    public partial class App
     {
         public App()
         {
