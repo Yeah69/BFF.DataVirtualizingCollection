@@ -8,7 +8,7 @@
     <PackageReleaseNotes>- breaking changes compared to version 2.* and before
     - no blocking calls anymore
     - separate background scheduler for count fetching, page fetching and preloading configurable</PackageReleaseNotes>
-    <Copyright></Copyright>
+    <Copyright/>
     <PackageTags>data-virtualization wpf csharp</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageProjectUrl>https://github.com/Yeah69/BFF.DataVirtualizingCollection</PackageProjectUrl>
@@ -18,6 +18,7 @@
     <PackageLicenseExpression />
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <PackageIconUrl>../Icon/Yeah69_256.png</PackageIconUrl>
+    <Title>BFF.DataVirtualizingCollection</Title>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -44,13 +45,19 @@
   <ItemGroup>
     <None Include="..\LICENSE.md">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath />
     </None>
   </ItemGroup>
 
   <ItemGroup>
-      <None Include="..\Icon\Yeah69Logo.ico" Pack="true" PackagePath="" />
-      <None Include="..\Icon\Yeah69Logo_256.png" Pack="true" PackagePath="" />
+      <None Include="..\Icon\Yeah69Logo.ico">
+        <Pack>true</Pack>
+        <PackagePath />
+      </None>
+      <None Include="..\Icon\Yeah69Logo_256.png">
+        <Pack>true</Pack>
+        <PackagePath />
+      </None>
   </ItemGroup>
 
 </Project>

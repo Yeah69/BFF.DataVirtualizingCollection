@@ -47,7 +47,7 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                 {
                     var offset = key * _pageSize;
                     var actualPageSize = Math.Min(_pageSize, _count - offset);
-                    return new PlaceholderOnlyPage<T>(offset, actualPageSize, _placeholderFactory, _disposalScheduler);
+                    return new PlaceholderOnlyPage<T>(key, actualPageSize, _placeholderFactory, _disposalScheduler);
                 }
             }
         }

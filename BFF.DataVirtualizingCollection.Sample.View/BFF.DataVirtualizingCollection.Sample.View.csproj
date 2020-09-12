@@ -13,9 +13,9 @@
 
     <ItemGroup>
       <PackageReference Include="Autofac" Version="5.1.2" />
-      <PackageReference Include="ControlzEx" Version="3.0.2.4" />
+      <PackageReference Include="ControlzEx" Version="4.3.2" />
       <PackageReference Include="LambdaConverters" Version="4.0.0" />
-      <PackageReference Include="MahApps.Metro" Version="1.6.5" />
+      <PackageReference Include="MahApps.Metro" Version="2.2.0" />
       <PackageReference Include="MahApps.Metro.IconPacks" Version="3.7.0" />
       <PackageReference Include="VirtualizingWrapPanel" Version="1.4.2" />
     </ItemGroup>
