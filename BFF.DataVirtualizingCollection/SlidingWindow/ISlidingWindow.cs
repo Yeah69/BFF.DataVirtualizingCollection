@@ -55,6 +55,11 @@
         /// Decreases windows size by given increment.
         /// </summary>
         void DecreaseWindowSizeBy(int sizeIncrement);
+
+        /// <summary>
+        /// Sets windows size to given size.
+        /// </summary>
+        void SetWindowSizeTo(int size);
     }
     
     

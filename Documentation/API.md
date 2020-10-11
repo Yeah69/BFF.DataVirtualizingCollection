@@ -35,6 +35,7 @@
   - [IncreaseWindowSize()](#M-BFF-DataVirtualizingCollection-SlidingWindow-ISlidingWindow-IncreaseWindowSize 'BFF.DataVirtualizingCollection.SlidingWindow.ISlidingWindow.IncreaseWindowSize')
   - [IncreaseWindowSizeBy()](#M-BFF-DataVirtualizingCollection-SlidingWindow-ISlidingWindow-IncreaseWindowSizeBy-System-Int32- 'BFF.DataVirtualizingCollection.SlidingWindow.ISlidingWindow.IncreaseWindowSizeBy(System.Int32)')
   - [JumpTo()](#M-BFF-DataVirtualizingCollection-SlidingWindow-ISlidingWindow-JumpTo-System-Int32- 'BFF.DataVirtualizingCollection.SlidingWindow.ISlidingWindow.JumpTo(System.Int32)')
+  - [SetWindowSizeTo()](#M-BFF-DataVirtualizingCollection-SlidingWindow-ISlidingWindow-SetWindowSizeTo-System-Int32- 'BFF.DataVirtualizingCollection.SlidingWindow.ISlidingWindow.SetWindowSizeTo(System.Int32)')
   - [SlideLeft()](#M-BFF-DataVirtualizingCollection-SlidingWindow-ISlidingWindow-SlideLeft 'BFF.DataVirtualizingCollection.SlidingWindow.ISlidingWindow.SlideLeft')
   - [SlideRight()](#M-BFF-DataVirtualizingCollection-SlidingWindow-ISlidingWindow-SlideRight 'BFF.DataVirtualizingCollection.SlidingWindow.ISlidingWindow.SlideRight')
 - [ISlidingWindow\`1](#T-BFF-DataVirtualizingCollection-SlidingWindow-ISlidingWindow`1 'BFF.DataVirtualizingCollection.SlidingWindow.ISlidingWindow`1')
@@ -492,6 +493,17 @@ This method has no parameters.
 ##### Summary
 
 Sets the first entry of the window ([Offset](#P-BFF-DataVirtualizingCollection-SlidingWindow-ISlidingWindow-Offset 'BFF.DataVirtualizingCollection.SlidingWindow.ISlidingWindow.Offset')) to the given index of the backend.
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='M-BFF-DataVirtualizingCollection-SlidingWindow-ISlidingWindow-SetWindowSizeTo-System-Int32-'></a>
+### SetWindowSizeTo() `method`
+
+##### Summary
+
+Sets windows size to given size.
 
 ##### Parameters
 

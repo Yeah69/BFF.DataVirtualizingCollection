@@ -1,13 +1,15 @@
 <Project>
     <PropertyGroup>
-        <PackageVersion>3.0.1</PackageVersion>
+        <VersionPrefix>3.0.3</VersionPrefix>
+        <VersionSuffix>0</VersionSuffix>
+        <PackageVersion>$(VersionPrefix)</PackageVersion>
         <Authors>Dimitri Enns</Authors>
         <DisableTransitiveProjectReferences>true</DisableTransitiveProjectReferences>
         <LangVersion>8</LangVersion>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
-        <Version>3.0.1</Version>
-        <AssemblyVersion>3.0.1.0</AssemblyVersion>
-        <FileVersion>3.0.1.0</FileVersion>
+        <Version>$(VersionPrefix)</Version>
+        <AssemblyVersion>$(VersionPrefix).$(VersionSuffix)</AssemblyVersion>
+        <FileVersion>$(VersionPrefix).$(VersionSuffix)</FileVersion>
     </PropertyGroup>
 </Project>

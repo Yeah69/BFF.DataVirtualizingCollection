@@ -111,6 +111,15 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
             });
         }
 
+        public void SetWindowSizeTo(int size)
+        {
+            if (size < 0) throw new ArgumentException("Given size may not be below zero.", nameof(size));
+            if (size == Size) return;
+            var diff = size - Size;
+            if (diff < 0) DecreaseWindowSizeBy(-diff);
+            else IncreaseWindowSizeBy(diff);
+        }
+
         protected override T GetItemForEnumerator(int i) => this[i];
 
         protected override T IndexerInnerGet(int index) =>
