@@ -2,16 +2,16 @@ name: Build & Unit test
 
 on:
   push:
-    branches: [ master, develop ]
+    branches: [ master ]
   pull_request:
-    branches: [ master, develop ]
+    branches: [ master ]
 
 jobs:
   windows:
     
     strategy:
       matrix:
-        configuration: [Debug, Release]
+        configuration: [ Release ]
     runs-on: windows-latest
 
     env:
