@@ -8,7 +8,7 @@
     <PackageReleaseNotes>- breaking changes compared to version 2.* and before
     - no blocking calls anymore
     - separate background scheduler for count fetching, page fetching and preloading configurable</PackageReleaseNotes>
-    <Copyright/>
+    <Copyright />
     <PackageTags>data-virtualization wpf csharp</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageProjectUrl>https://github.com/Yeah69/BFF.DataVirtualizingCollection</PackageProjectUrl>
@@ -34,6 +34,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MinVer" Version="2.3.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="System.Reactive" Version="4.4.1" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="Vsxmd" Version="1.4.5">

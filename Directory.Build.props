@@ -1,15 +1,10 @@
 <Project>
     <PropertyGroup>
-        <VersionPrefix>3.0.3</VersionPrefix>
-        <VersionSuffix>0</VersionSuffix>
-        <PackageVersion>$(VersionPrefix)</PackageVersion>
+        <MinVerTagPrefix>v</MinVerTagPrefix>
         <Authors>Dimitri Enns</Authors>
         <DisableTransitiveProjectReferences>true</DisableTransitiveProjectReferences>
         <LangVersion>8</LangVersion>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
-        <Version>$(VersionPrefix)</Version>
-        <AssemblyVersion>$(VersionPrefix).$(VersionSuffix)</AssemblyVersion>
-        <FileVersion>$(VersionPrefix).$(VersionSuffix)</FileVersion>
     </PropertyGroup>
 </Project>

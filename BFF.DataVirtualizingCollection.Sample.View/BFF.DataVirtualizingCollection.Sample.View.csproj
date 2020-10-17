@@ -17,6 +17,10 @@
       <PackageReference Include="LambdaConverters" Version="4.0.0" />
       <PackageReference Include="MahApps.Metro" Version="2.2.0" />
       <PackageReference Include="MahApps.Metro.IconPacks" Version="3.7.0" />
+      <PackageReference Include="MinVer" Version="2.3.1">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
       <PackageReference Include="VirtualizingWrapPanel" Version="1.4.2" />
     </ItemGroup>
 
