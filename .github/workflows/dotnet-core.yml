@@ -33,10 +33,3 @@ jobs:
       run: dotnet build .\BFF.DataVirtualizingCollection.sln --configuration Release --no-restore
     - name: Test
       run: dotnet test .\BFF.DataVirtualizingCollection.UnitTests\BFF.DataVirtualizingCollection.UnitTests.csproj --no-restore --verbosity normal
-    - name: Publish to NuGet
-      uses: brandedoutcast/publish-nuget@v2
-      with:
-        PROJECT_FILE_PATH: BFF.DataVirtualizingCollection/BFF.DataVirtualizingCollection.csproj
-        VERSION_FILE_PATH: Directory.Build.props
-        TAG_COMMIT: false
-        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
