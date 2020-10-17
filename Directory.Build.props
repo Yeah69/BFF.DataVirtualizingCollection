@@ -1,6 +1,8 @@
 <Project>
     <PropertyGroup>
         <MinVerTagPrefix>v</MinVerTagPrefix>
+        <PackageVersion>$(MinVerVersion)</PackageVersion>
+        <Version>$(MinVerVersion)</Version>
         <Authors>Dimitri Enns</Authors>
         <DisableTransitiveProjectReferences>true</DisableTransitiveProjectReferences>
         <LangVersion>8</LangVersion>
