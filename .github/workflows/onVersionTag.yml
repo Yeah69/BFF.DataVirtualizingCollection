@@ -1,0 +1,44 @@
+# This is a basic workflow to help you get started with Actions
+
+name: OnVersionTag
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    tags:
+      - 'v*'
+jobs:
+  windows:
+    
+    strategy:
+      matrix:
+        configuration: [ Release ]
+    runs-on: windows-latest
+
+    env:
+      Solution_Name: BFF.DataVirtualizingCollection.sln                        # Replace with your solution name, i.e. MyWpfApp.sln.
+      Test_Project_Path: BFF.DataVirtualizingCollection.UnitTests\BFF.DataVirtualizingCollection.UnitTests.csproj                # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
+      
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.101
+    - run: set DOTNET_CLI_TELEMETRY_OPTOUT=1
+    - name: Install dependencies
+      run: dotnet restore .\BFF.DataVirtualizingCollection.sln
+    - name: Build
+      run: dotnet build .\BFF.DataVirtualizingCollection.sln --configuration Release --no-restore
+    - name: Test
+      run: dotnet test .\BFF.DataVirtualizingCollection.UnitTests\BFF.DataVirtualizingCollection.UnitTests.csproj --no-restore --verbosity normal
+    - name: Publish to NuGet
+      uses: brandedoutcast/publish-nuget@v2
+      with:
+        PROJECT_FILE_PATH: BFF.DataVirtualizingCollection/BFF.DataVirtualizingCollection.csproj
+        VERSION_FILE_PATH: Directory.Build.props
+        TAG_COMMIT: false
+        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
