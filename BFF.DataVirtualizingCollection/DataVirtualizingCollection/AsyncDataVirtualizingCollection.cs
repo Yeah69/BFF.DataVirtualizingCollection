@@ -5,8 +5,8 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-using BFF.DataVirtualizingCollection.Extensions;
 using BFF.DataVirtualizingCollection.PageStorage;
+using MrMeeseeks.Extensions;
 
 namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
 {
@@ -34,7 +34,7 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
             _countBackgroundScheduler = countBackgroundScheduler;
             _count = 0;
 
-            _resetSubject.AddTo(CompositeDisposable);
+            _resetSubject.AddForDisposalTo(CompositeDisposable);
 
             _pageStorage = pageStoreFactory(0);
             

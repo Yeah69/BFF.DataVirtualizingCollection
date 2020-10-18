@@ -3,8 +3,8 @@ using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
-using BFF.DataVirtualizingCollection.Extensions;
 using BFF.DataVirtualizingCollection.PageStorage;
+using MrMeeseeks.Extensions;
 
 namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
 {
@@ -30,11 +30,11 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
             _count = _countFetcher();
             _pageStorage = pageStoreFactory(_count);
 
-            _resetSubject.AddTo(CompositeDisposable);
+            _resetSubject.AddForDisposalTo(CompositeDisposable);
             
             _resetSubject
                 .Subscribe(_ => ResetInner())
-                .AddTo(CompositeDisposable);
+                .AddForDisposalTo(CompositeDisposable);
         }
 
         public override int Count => _count;

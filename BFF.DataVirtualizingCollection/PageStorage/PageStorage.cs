@@ -7,8 +7,8 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
-using BFF.DataVirtualizingCollection.Extensions;
 using BFF.DataVirtualizingCollection.PageRemoval;
+using MrMeeseeks.Extensions;
 
 namespace BFF.DataVirtualizingCollection.PageStorage
 {
@@ -45,7 +45,7 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                 ? count / pageSize 
                 : count / pageSize + 1;
             _nonPreloadingPageFactory = nonPreloadingPageFactory;
-            Requests = new Subject<(int PageKey, int PageIndex)>().AddTo(_compositeDisposable);
+            Requests = new Subject<(int PageKey, int PageIndex)>().AddForDisposalTo(_compositeDisposable);
             pageReplacementStrategyFactory(Requests)
                 .SelectMany(async pageKeysToRemove =>
                 {

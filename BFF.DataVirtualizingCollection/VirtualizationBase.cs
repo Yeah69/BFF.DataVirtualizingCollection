@@ -86,12 +86,6 @@ namespace BFF.DataVirtualizingCollection
         protected void OnCollectionChangedReplace(T newItem, T oldItem, int index) => 
             CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, newItem, oldItem, index));
 
-        protected void OnCollectionChangedRemove(T oldItem, int index) => 
-            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, oldItem, index));
-
-        protected void OnCollectionChangedAdd(T newItem, int index) => 
-            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, newItem, index));
-
         protected virtual void OnCollectionChangedReset() => 
             CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
 

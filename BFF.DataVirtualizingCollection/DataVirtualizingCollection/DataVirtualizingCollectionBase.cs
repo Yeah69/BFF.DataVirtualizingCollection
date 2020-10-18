@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using BFF.DataVirtualizingCollection.Extensions;
+using MrMeeseeks.Extensions;
 
 namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
 {
@@ -14,7 +14,7 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
             IDisposable disposeOnDisposal,
             IScheduler notificationScheduler)
         {
-            disposeOnDisposal.AddTo(CompositeDisposable);
+            disposeOnDisposal.AddForDisposalTo(CompositeDisposable);
             
             observePageFetches
                 .ObserveOn(notificationScheduler)
