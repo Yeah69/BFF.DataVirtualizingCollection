@@ -1,19 +1,29 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace BFF.DataVirtualizingCollection.PageStorage
 {
-    internal abstract class SyncNonPreloadingPageBase<T> : IPage<T>
+    internal class SyncNonPreloadingNonTaskBasedPage<T> : IPage<T>
     {
         private readonly int _pageSize;
+        private readonly IDisposable _onDisposalAfterFetchCompleted;
 
-        internal SyncNonPreloadingPageBase(
-            int pageSize)
+        internal SyncNonPreloadingNonTaskBasedPage(
+            // parameter
+            int offset,
+            int pageSize,
+            IDisposable onDisposalAfterFetchCompleted,
+            
+            // dependencies
+            Func<int, int, T[]> pageFetcher)
         {
             _pageSize = pageSize;
+            _onDisposalAfterFetchCompleted = onDisposalAfterFetchCompleted;
+            PageContent = pageFetcher(offset, pageSize);
         }
 
-        protected abstract T[] PageContent { get; }
+        private T[] PageContent { get; }
 
         public T this[int index] =>
             index >= _pageSize || index < 0
@@ -21,25 +31,16 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                     "Index was out of range. Must be non-negative and less than the size of the collection.")
                 : PageContent[index];
 
-        public void Dispose()
+        public Task PageFetchCompletion => Task.CompletedTask;
+        
+        public async ValueTask DisposeAsync()
         {
+            await PageFetchCompletion.ConfigureAwait(false);
+            _onDisposalAfterFetchCompleted.Dispose();
             foreach (var disposable in PageContent.OfType<IDisposable>())
             {
                 disposable.Dispose();
             }
         }
-    }
-
-    internal sealed class SyncNonPreloadingNonTaskBasedPage<T> : SyncNonPreloadingPageBase<T>
-    {
-        internal SyncNonPreloadingNonTaskBasedPage(
-            int offset,
-            int pageSize,
-            Func<int, int, T[]> pageFetcher) : base(pageSize)
-        {
-            PageContent = pageFetcher(offset, pageSize);
-        }
-
-        protected override T[] PageContent { get; }
     }
 }

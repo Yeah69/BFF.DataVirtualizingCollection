@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Linq;
-using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -13,12 +11,10 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
 {
     internal class AsyncSlidingWindow<T> : SlidingWindowBase<T>
     {
-        private readonly Func<int, IPageStorage<T>> _pageStoreFactory;
-        private readonly Func<int, IPageStorage<T>> _placeholderPageStoreFactory;
         private readonly Func<Task<int>> _countFetcher;
         private readonly IScheduler _notificationScheduler;
         private readonly IScheduler _countBackgroundScheduler;
-        private IPageStorage<T> _pageStorage;
+        private readonly IPageStorage<T> _pageStorage;
         
         private readonly SerialDisposable _serialPageStore = new SerialDisposable();
 
@@ -26,7 +22,6 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
             int initialSize,
             int initialOffset,
             Func<int, IPageStorage<T>> pageStoreFactory,
-            Func<int, IPageStorage<T>> placeholderPageStoreFactory,
             Func<Task<int>> countFetcher,
             IObservable<(int Offset, int PageSize, T[] PreviousPage, T[] Page)> observePageFetches,
             IDisposable disposeOnDisposal,
@@ -34,14 +29,12 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
             IScheduler countBackgroundScheduler) 
             : base (disposeOnDisposal, notificationScheduler)
         {
-            _pageStoreFactory = pageStoreFactory;
-            _placeholderPageStoreFactory = placeholderPageStoreFactory;
             _countFetcher = countFetcher;
             _notificationScheduler = notificationScheduler;
             _countBackgroundScheduler = countBackgroundScheduler;
             CountOfBackedDataSet = 0;
-            _pageStorage = _placeholderPageStoreFactory(0);
-            InitializationCompleted = ResetInner(initialOffset, initialSize, new T[0]);
+            _pageStorage = pageStoreFactory(0);
+            InitializationCompleted = ResetInner(initialOffset, initialSize);
 
             _serialPageStore.AddTo(CompositeDisposable);
             
@@ -66,7 +59,7 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
 
         public override int Count => Size;
 
-        private Task ResetInner(int currentOffset, int currentSize, T[] prev)
+        private Task ResetInner(int currentOffset, int currentSize)
         {
             return Observable.FromAsync(_countFetcher, _countBackgroundScheduler)
                 .Do(count =>
@@ -74,13 +67,12 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
                     CountOfBackedDataSet = count;
                     Size = Math.Min(currentSize, count);
                     Offset = Math.Max(0, Math.Min(CountOfBackedDataSet - Size, currentOffset));
-                    _pageStorage = _pageStoreFactory(CountOfBackedDataSet).AssignTo(_serialPageStore);
+                    _pageStorage.Reset(CountOfBackedDataSet);
                 })
                 .ObserveOn(_notificationScheduler)
                 .Do(count =>
                 {
-                    var now = this.Select(x => x).ToArray();
-                    OnCollectionChangedReplace(now, prev);
+                    OnCollectionChangedReset();
                     OnPropertyChanged(nameof(Offset));
                     OnPropertyChanged(nameof(MaximumOffset));
                     OnPropertyChanged(nameof(Count));
@@ -91,18 +83,7 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
 
         public override void Reset()
         {
-            var prevPrev = this.Select(x => x).ToArray();
-            _pageStorage = _placeholderPageStoreFactory(CountOfBackedDataSet).AssignTo(_serialPageStore);
-            var prev = this.Select(x => x).ToArray();
-            _notificationScheduler.Schedule(Unit.Default, (_, __) =>
-                {
-                    OnCollectionChangedReplace(prev, prevPrev);
-                    OnPropertyChanged(nameof(Offset));
-                    OnPropertyChanged(nameof(MaximumOffset));
-                    OnPropertyChanged(nameof(Count));
-                    OnIndexerChanged();
-                });
-            ResetInner(Offset, Size, prev);
+            ResetInner(Offset, Size);
         }
 
         protected override T GetItemInner(int index) => _pageStorage[index];

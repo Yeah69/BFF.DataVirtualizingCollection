@@ -71,7 +71,6 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
                                         throw new NullReferenceException(UninitializedElementsExceptionMessage);
             return new AsyncDataVirtualizingCollection<TItem>(
                 GenerateTaskBasedAsynchronousPageStorage(pageFetchEvents),
-                PlaceholderOnlyPageStoreFactory,
                 taskBasedCountFetcher,
                 pageFetchEvents.AsObservable(),
                 pageFetchEvents,
@@ -85,7 +84,6 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
             var countFetcher = CountFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
             return new AsyncDataVirtualizingCollection<TItem>(
                 GenerateNonTaskBasedAsynchronousPageStorage(pageFetchEvents),
-                PlaceholderOnlyPageStoreFactory,
                 () => Task.FromResult(countFetcher()),
                 pageFetchEvents.AsObservable(),
                 pageFetchEvents,

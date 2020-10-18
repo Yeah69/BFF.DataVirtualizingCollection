@@ -5,13 +5,13 @@ namespace BFF.DataVirtualizingCollection.PageStorage
 {
     internal class PreloadingPageStorage<T> : PageStorage<T>
     {
-        private readonly Func<int, int, int, IPage<T>> _preloadingPageFactory;
+        private readonly Func<int, int, int, IDisposable, IPage<T>> _preloadingPageFactory;
 
         internal PreloadingPageStorage(
             int pageSize,
             int count,
-            Func<int, int, int, IPage<T>> nonPreloadingPageFactory,
-            Func<int, int, int, IPage<T>> preloadingPageFactory,
+            Func<int, int, int, IDisposable, IPage<T>> nonPreloadingPageFactory,
+            Func<int, int, int, IDisposable, IPage<T>> preloadingPageFactory,
             Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> pageReplacementStrategyFactory)
             : base (
                 pageSize, 

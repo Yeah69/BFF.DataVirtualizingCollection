@@ -212,20 +212,10 @@ namespace BFF.DataVirtualizingCollection
             };
         }
 
-        internal IPageStorage<TItem> PlaceholderOnlyPageStoreFactory(int count)
-        {
-            var placeholderFactory = _placeholderFactory ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
-            return new PlaceholderOnlyPageStorage<TItem>(
-                _pageSize,
-                count,
-                placeholderFactory,
-                CurrentThreadScheduler.Instance);
-        }
-
         private IPageStorage<TItem> PageStoreFactory(
             int count,
-            Func<int, int, int, IPage<TItem>> nonPreloadingPageFetcherFactory,
-            Func<int, int, int, IPage<TItem>> preloadingPageFetcherFactory)
+            Func<int, int, int, IDisposable, IPage<TItem>> nonPreloadingPageFetcherFactory,
+            Func<int, int, int, IDisposable, IPage<TItem>> preloadingPageFetcherFactory)
         {
             return _pageLoadingBehavior == PageLoadingBehavior.Preloading
                 ? new PreloadingPageStorage<TItem>(
@@ -249,7 +239,8 @@ namespace BFF.DataVirtualizingCollection
             IPage<TItem> NonPreloadingPageFetcherFactory(
                 int pageKey,
                 int offset,
-                int pageSize)
+                int pageSize,
+                IDisposable onDisposalAfterFetchCompleted)
             {
                 var taskBasedPageFetcher = _taskBasedPageFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
                 var placeholderFactory = _placeholderFactory ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
@@ -257,6 +248,7 @@ namespace BFF.DataVirtualizingCollection
                     pageKey,
                     offset,
                     pageSize,
+                    onDisposalAfterFetchCompleted,
                     taskBasedPageFetcher,
                     placeholderFactory,
                     _pageBackgroundScheduler,
@@ -266,7 +258,8 @@ namespace BFF.DataVirtualizingCollection
             IPage<TItem> PreloadingPageFetcherFactory(
                 int pageKey,
                 int offset,
-                int pageSize)
+                int pageSize,
+                IDisposable onDisposalAfterFetchCompleted)
             {
                 var taskBasedPageFetcher = _taskBasedPageFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
                 var preloadingPlaceholderFactory = _preloadingPlaceholderFactory ??
@@ -275,6 +268,7 @@ namespace BFF.DataVirtualizingCollection
                     pageKey,
                     offset,
                     pageSize,
+                    onDisposalAfterFetchCompleted,
                     taskBasedPageFetcher,
                     preloadingPlaceholderFactory,
                     _preloadingBackgroundScheduler,
@@ -295,7 +289,8 @@ namespace BFF.DataVirtualizingCollection
             IPage<TItem> NonPreloadingPageFetcherFactory(
                 int pageKey,
                 int offset,
-                int pageSize)
+                int pageSize,
+                IDisposable onDisposalAfterFetchCompleted)
             {
                 var pageFetcher = _pageFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
                 var placeholderFactory = _placeholderFactory ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
@@ -303,6 +298,7 @@ namespace BFF.DataVirtualizingCollection
                     pageKey,
                     offset,
                     pageSize,
+                    onDisposalAfterFetchCompleted,
                     pageFetcher,
                     placeholderFactory,
                     _pageBackgroundScheduler,
@@ -312,7 +308,8 @@ namespace BFF.DataVirtualizingCollection
             IPage<TItem> PreloadingPageFetcherFactory(
                 int pageKey,
                 int offset,
-                int pageSize)
+                int pageSize,
+                IDisposable onDisposalAfterFetchCompleted)
             {
                 var pageFetcher = _pageFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
                 var preloadingPlaceholderFactory = _preloadingPlaceholderFactory ??
@@ -321,6 +318,7 @@ namespace BFF.DataVirtualizingCollection
                     pageKey,
                     offset,
                     pageSize,
+                    onDisposalAfterFetchCompleted,
                     pageFetcher,
                     preloadingPlaceholderFactory,
                     _preloadingBackgroundScheduler,
@@ -338,17 +336,26 @@ namespace BFF.DataVirtualizingCollection
         {
             return PageStoreFactoryComposition;
 
-            IPage<TItem> NonPreloadingPageFetcherFactory(int pageKey, int offset, int pageSize)
+            IPage<TItem> NonPreloadingPageFetcherFactory(
+                int pageKey,
+                int offset,
+                int pageSize,
+                IDisposable onDisposalAfterFetchCompleted)
             {
                 var pageFetcher =
                     _pageFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
                 return new SyncNonPreloadingNonTaskBasedPage<TItem>(
                     offset,
                     pageSize,
+                    onDisposalAfterFetchCompleted,
                     pageFetcher);
             }
 
-            IPage<TItem> PreloadingPageFetcherFactory(int pageKey, int offset, int pageSize)
+            IPage<TItem> PreloadingPageFetcherFactory(
+                int pageKey, 
+                int offset,
+                int pageSize,
+                IDisposable onDisposalAfterFetchCompleted)
             {
                 var pageFetcher =
                     _pageFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
@@ -358,6 +365,7 @@ namespace BFF.DataVirtualizingCollection
                     pageKey,
                     offset,
                     pageSize,
+                    onDisposalAfterFetchCompleted,
                     pageFetcher,
                     preloadingPlaceholderFactory,
                     _preloadingBackgroundScheduler,

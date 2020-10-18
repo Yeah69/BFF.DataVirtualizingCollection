@@ -29,12 +29,8 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels
         IVirtualizationBase? Items { get; }
     }
 
-    public interface IDataVirtualizingCollectionViewModelBase<T> : IDataVirtualizingCollectionViewModelBase
-    {
-    }
-
     public abstract class DataVirtualizingCollectionViewModelBaseBase<TViewModel, TVirtualizationKind> : 
-        ObservableObject, IDisposable, IDataVirtualizingCollectionViewModelBase<TViewModel>
+        ObservableObject, IDisposable, IDataVirtualizingCollectionViewModelBase
         where TVirtualizationKind : class, IVirtualizationBase<TViewModel>
     {
         private readonly IBackendAccessAdapter<TViewModel> _backendAccessAdapter;
@@ -221,10 +217,10 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels
 
     internal interface IDataVirtualizingCollectionViewModelFactory
     {
-        IDataVirtualizingCollectionViewModelBase<T> CreateDataVirtualizingCollection<T>(
+        IDataVirtualizingCollectionViewModelBase CreateDataVirtualizingCollection<T>(
             IBackendAccessAdapter<T> backendAccessAdapter);
         
-        IDataVirtualizingCollectionViewModelBase<T> CreateSlidingWindow<T>(
+        IDataVirtualizingCollectionViewModelBase CreateSlidingWindow<T>(
             IBackendAccessAdapter<T> backendAccessAdapter);
     }
 
@@ -262,7 +258,7 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels
             _compositeDisposableOfLifetimeScope = compositeDisposableOfLifetimeScope;
         }
 
-        public IDataVirtualizingCollectionViewModelBase<T> CreateDataVirtualizingCollection<T>(IBackendAccessAdapter<T> backendAccessAdapter)
+        public IDataVirtualizingCollectionViewModelBase CreateDataVirtualizingCollection<T>(IBackendAccessAdapter<T> backendAccessAdapter)
         {
             var ret = new DataVirtualizingCollectionViewModel<T>(
                 backendAccessAdapter,
@@ -276,7 +272,7 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels
             return ret;
         }
 
-        public IDataVirtualizingCollectionViewModelBase<T> CreateSlidingWindow<T>(IBackendAccessAdapter<T> backendAccessAdapter)
+        public IDataVirtualizingCollectionViewModelBase CreateSlidingWindow<T>(IBackendAccessAdapter<T> backendAccessAdapter)
         {
             var ret = new SlidingWindowViewModel<T>(
                 backendAccessAdapter,

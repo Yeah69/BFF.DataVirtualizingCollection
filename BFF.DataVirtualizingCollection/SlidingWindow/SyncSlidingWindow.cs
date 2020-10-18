@@ -12,11 +12,10 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
 {
     internal sealed class SyncSlidingWindow<T> : SlidingWindowBase<T>
     {
-        private readonly Func<int, IPageStorage<T>> _pageStoreFactory;
         private readonly Func<int> _countFetcher;
         private readonly IScheduler _notificationScheduler;
         private readonly SerialDisposable _serialPageStore = new SerialDisposable();
-        private IPageStorage<T>? _pageStorage;
+        private readonly IPageStorage<T> _pageStorage;
         
 
         internal SyncSlidingWindow(
@@ -28,10 +27,11 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
             IScheduler notificationScheduler) 
             : base(disposeOnDisposal, notificationScheduler)
         {
-            _pageStoreFactory = pageStoreFactory;
             _countFetcher = countFetcher;
             _notificationScheduler = notificationScheduler;
             _serialPageStore.AddTo(CompositeDisposable);
+
+            _pageStorage = pageStoreFactory(0);
             
             ResetInner(initialSize, initialOffset);
         }
@@ -43,7 +43,7 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
             CountOfBackedDataSet = _countFetcher();
             Size = Math.Min(currentSize, CountOfBackedDataSet);
             Offset = Math.Max(0, Math.Min(CountOfBackedDataSet - Size, currentOffset));
-            _pageStorage = _pageStoreFactory(CountOfBackedDataSet).AssignTo(_serialPageStore);
+            _pageStorage.Reset(CountOfBackedDataSet);
         }
 
         public override void Reset()

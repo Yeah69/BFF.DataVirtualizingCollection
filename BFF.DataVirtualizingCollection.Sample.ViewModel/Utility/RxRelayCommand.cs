@@ -5,15 +5,11 @@ using System.Windows.Input;
 
 namespace BFF.DataVirtualizingCollection.Sample.ViewModel.Utility
 {
-    public interface IRxRelayCommand<T> : ICommand, IDisposable
+    public interface IRxRelayCommand : ICommand, IDisposable
     {
     }
 
-    public interface IRxRelayCommand : IRxRelayCommand<object>
-    {
-    }
-
-    internal class RxRelayCommand<T> : IRxRelayCommand<T>
+    internal class RxRelayCommand<T> : IRxRelayCommand
     {
         protected Action<T> ExecuteAction = obj => { };
         private readonly IDisposable _canExecuteSubscription;
@@ -48,7 +44,7 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.Utility
         public void Dispose() => _canExecuteSubscription.Dispose();
     }
 
-    internal sealed class RxRelayCommand : RxRelayCommand<object>, IRxRelayCommand
+    internal sealed class RxRelayCommand : RxRelayCommand<object>
     {
         private RxRelayCommand(IObservable<bool> canExecute, bool initialCanExecute = true) : base(canExecute, initialCanExecute)
         {
@@ -61,7 +57,7 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.Utility
             => ExecuteAction = _ => executeAction();
     }
 
-    internal class AsyncRxRelayCommand<T> : IRxRelayCommand<T>
+    internal class AsyncRxRelayCommand<T> : IRxRelayCommand
     {
         private readonly Func<T, Task> _executeAction;
         private readonly IDisposable _canExecuteSubscription;
@@ -94,7 +90,7 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.Utility
         public void Dispose() => _canExecuteSubscription.Dispose();
     }
 
-    internal sealed class AsyncRxRelayCommand : RxRelayCommand<object>, IRxRelayCommand
+    internal sealed class AsyncRxRelayCommand : RxRelayCommand<object>
     {
         private AsyncRxRelayCommand(IObservable<bool> canExecute, bool initialCanExecute = true) : base(canExecute, initialCanExecute)
         {

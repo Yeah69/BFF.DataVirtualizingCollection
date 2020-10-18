@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reactive;
 using System.Reactive.Concurrency;
-using System.Reactive.Disposables;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using BFF.DataVirtualizingCollection.Extensions;
 using BFF.DataVirtualizingCollection.PageStorage;
@@ -10,11 +10,11 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
 {
     internal sealed class SyncDataVirtualizingCollection<T> : DataVirtualizingCollectionBase<T>
     {
-        private readonly Func<int, IPageStorage<T>> _pageStoreFactory;
         private readonly Func<int> _countFetcher;
         private readonly IScheduler _notificationScheduler;
-        private IPageStorage<T> _pageStorage;
-        private readonly SerialDisposable _serialPageStorage = new SerialDisposable();
+        private readonly IPageStorage<T> _pageStorage;
+        private readonly Subject<Unit> _resetSubject = new Subject<Unit>();
+        
         private int _count;
 
         internal SyncDataVirtualizingCollection(
@@ -25,12 +25,16 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
             IScheduler notificationScheduler)
         : base (observePageFetches, disposeOnDisposal, notificationScheduler)
         {
-            _pageStoreFactory = pageStoreFactory;
             _countFetcher = countFetcher;
             _notificationScheduler = notificationScheduler;
             _count = _countFetcher();
-            _serialPageStorage.AddTo(CompositeDisposable);
-            _pageStorage = _pageStoreFactory(_count).AssignTo(_serialPageStorage);
+            _pageStorage = pageStoreFactory(_count);
+
+            _resetSubject.AddTo(CompositeDisposable);
+            
+            _resetSubject
+                .Subscribe(_ => ResetInner())
+                .AddTo(CompositeDisposable);
         }
 
         public override int Count => _count;
@@ -40,10 +44,10 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
             return _pageStorage[index];
         }
 
-        public override void Reset()
+        private void ResetInner()
         {
             _count = _countFetcher();
-            _pageStorage = _pageStoreFactory(_count).AssignTo(_serialPageStorage);
+            _pageStorage.Reset(_count);
             _notificationScheduler.Schedule(Unit.Default, (_, __) =>
             {
                 OnPropertyChanged(nameof(Count));
@@ -51,6 +55,8 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
                 OnIndexerChanged();
             });
         }
+
+        public override void Reset() => _resetSubject.OnNext(Unit.Default);
 
         public override Task InitializationCompleted { get; } = Task.CompletedTask;
     }

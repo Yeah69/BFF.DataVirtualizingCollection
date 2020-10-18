@@ -28,17 +28,17 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
             var sut = PageWithDisposable(disposable);
 
             // Act
-            sut.Dispose();
+            await sut.DisposeAsync();
 
             // Assert
             await isDisposed.Task.ToObservable().Timeout(TimeSpan.FromMinutes(5)).ToTask();
         }
 
         [Fact]
-        internal void Index_FetchFirstIndex_ReturnsPlaceholderImmediately()
+        internal async Task Index_FetchFirstIndex_ReturnsPlaceholderImmediately()
         {
             // Arrange
-            using var sut = PageWithFirstEntry69AndPlaceholder23;
+            await using var sut = PageWithFirstEntry69AndPlaceholder23;
 
             // Act
             var value = sut[0];
@@ -51,7 +51,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
         internal async Task Index_FetchFirstIndex_ReturnsValueAfterWaiting()
         {
             // Arrange
-            using var sut = PageWithFirstEntry69AndPlaceholder23;
+            await using var sut = PageWithFirstEntry69AndPlaceholder23;
 
             // Act
             await Task.Delay(250).ConfigureAwait(false);
@@ -67,7 +67,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
             // Arrange
             var isDisposed = new TaskCompletionSource<Unit>();
             var disposable = Disposable.Create(() => isDisposed.SetResult(Unit.Default));
-            using var sut = PageWithDisposablePlaceholder(disposable);
+            await using var sut = PageWithDisposablePlaceholder(disposable);
 
             // Act
             var _ = sut[0];
@@ -85,6 +85,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                 0,
                 0, 
                 1,
+                Disposable.Empty, 
                 (offset, pageSize) =>
                 {
                     Thread.Sleep(10);
@@ -99,6 +100,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                 0,
                 0,
                 1,
+                Disposable.Empty, 
                 (offset, pageSize) =>
                 {
                     Thread.Sleep(10);
@@ -115,6 +117,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                     0,
                     0,
                     1,
+                    Disposable.Empty, 
                     (offset, pageSize) =>
                     {
                         Thread.Sleep(10);
@@ -132,6 +135,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                     0,
                     0,
                     1,
+                    Disposable.Empty, 
                     (offset, pageSize) =>
                     {
                         Thread.Sleep(10);
@@ -151,6 +155,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                 0,
                 0,
                 1,
+                Disposable.Empty, 
                 async (offset, pageSize) =>
                 {
                     await Task.Delay(10);
@@ -165,6 +170,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                 0,
                 0,
                 1,
+                Disposable.Empty, 
                 async (offset, pageSize) =>
                 {
                     await Task.Delay(10);
@@ -181,6 +187,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                     0,
                     0,
                     1,
+                    Disposable.Empty, 
                     async (offset, pageSize) =>
                     {
                         await Task.Delay(10);
@@ -198,6 +205,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                     0,
                     0,
                     1,
+                    Disposable.Empty, 
                     async (offset, pageSize) =>
                     {
                         await Task.Delay(10);

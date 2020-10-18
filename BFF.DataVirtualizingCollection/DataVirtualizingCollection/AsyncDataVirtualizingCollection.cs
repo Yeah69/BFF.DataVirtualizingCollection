@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Reactive;
 using System.Reactive.Concurrency;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using BFF.DataVirtualizingCollection.Extensions;
@@ -12,19 +12,16 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
 {
     internal sealed class AsyncDataVirtualizingCollection<T> : DataVirtualizingCollectionBase<T>
     {
-        private readonly Func<int, IPageStorage<T>> _pageStoreFactory;
-        private readonly Func<int, IPageStorage<T>> _placeholderPageStoreFactory;
         private readonly Func<Task<int>> _countFetcher;
         private readonly IScheduler _notificationScheduler;
         private readonly IScheduler _countBackgroundScheduler;
-        private readonly SerialDisposable _serialPageStorage = new SerialDisposable();
-        private IPageStorage<T> _pageStorage;
+        private readonly IPageStorage<T> _pageStorage;
+        private readonly Subject<Unit> _resetSubject = new Subject<Unit>();
 
         private int _count;
 
         internal AsyncDataVirtualizingCollection(
             Func<int, IPageStorage<T>> pageStoreFactory,
-            Func<int, IPageStorage<T>> placeholderPageStoreFactory,
             Func<Task<int>> countFetcher,
             IObservable<(int Offset, int PageSize, T[] PreviousPage, T[] Page)> observePageFetches,
             IDisposable disposeOnDisposal,
@@ -32,17 +29,28 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
             IScheduler countBackgroundScheduler)
         : base(observePageFetches, disposeOnDisposal, notificationScheduler)
         {
-            _pageStoreFactory = pageStoreFactory;
-            _placeholderPageStoreFactory = placeholderPageStoreFactory;
             _countFetcher = countFetcher;
             _notificationScheduler = notificationScheduler;
             _countBackgroundScheduler = countBackgroundScheduler;
             _count = 0;
 
-            _serialPageStorage.AddTo(CompositeDisposable);
+            _resetSubject.AddTo(CompositeDisposable);
 
-            _pageStorage = _placeholderPageStoreFactory(0);
+            _pageStorage = pageStoreFactory(0);
+            
             InitializationCompleted = ResetInner();
+
+            InitializationCompleted
+                .ToObservable()
+                .Concat(
+                    _resetSubject
+                        .SelectMany(async _ =>
+                        {
+                            await ResetInner().ConfigureAwait(false);
+                            return Unit.Default;
+                        }))
+                .Subscribe(_ => {})
+                .AddTo(CompositeDisposable);
         }
 
         public override int Count => _count;
@@ -52,10 +60,11 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
         private Task ResetInner()
         {
             return Observable.FromAsync(_countFetcher, _countBackgroundScheduler)
-                .Do(count =>
+                .SelectMany(async count =>
                 {
                     _count = count;
-                    _pageStorage = _pageStoreFactory(_count).AssignTo(_serialPageStorage);
+                    await _pageStorage.Reset(_count);
+                    return Unit.Default;
                 })
                 .ObserveOn(_notificationScheduler)
                 .Do(_ =>
@@ -67,17 +76,7 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
                 .ToTask();
         }
 
-        public override void Reset()
-        {
-            _pageStorage = _placeholderPageStoreFactory(_count).AssignTo(_serialPageStorage);
-            _notificationScheduler.Schedule(Unit.Default, (_, __) =>
-            {
-                OnPropertyChanged(nameof(Count));
-                OnCollectionChangedReset();
-                OnIndexerChanged();
-            });
-            ResetInner();
-        }
+        public override void Reset() => _resetSubject.OnNext(Unit.Default);
 
         public override Task InitializationCompleted { get; }
     }
