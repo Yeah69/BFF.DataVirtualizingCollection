@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Threading;
+using System.Threading.Tasks;
 using MoreLinq.Extensions;
 using Xunit;
 
@@ -21,7 +22,7 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.PageRemoval
 
         [Theory]
         [MemberData(nameof(Combinations))]
-        public void With6969ElementsAndPageSize100_GetAnElementFromEachPage_NoneDisposed(
+        public async Task With6969ElementsAndPageSize100_GetAnElementFromEachPage_NoneDisposed(
             PageLoadingBehavior pageLoadingBehavior,
             PageRemovalBehavior pageRemovalBehavior,
             FetchersKind fetchersKind,
@@ -29,7 +30,7 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.PageRemoval
         {
             // Arrange
             var set = new ConcurrentBag<int>();
-            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogic(
+            await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogic(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -55,7 +56,7 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.PageRemoval
 
         [Theory]
         [MemberData(nameof(Combinations))]
-        public void With69ElementsAndPageSize10_GetAnElementFromEachPageDisposeCollection_AllDisposed(
+        public async Task With69ElementsAndPageSize10_GetAnElementFromEachPageDisposeCollection_AllDisposed(
             PageLoadingBehavior pageLoadingBehavior,
             PageRemovalBehavior pageRemovalBehavior,
             FetchersKind fetchersKind,
@@ -83,7 +84,7 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.PageRemoval
             {
                 var _ = collection[i];
             }
-            collection.Dispose();
+            await collection.DisposeAsync();
             
             Thread.Sleep(500);
 

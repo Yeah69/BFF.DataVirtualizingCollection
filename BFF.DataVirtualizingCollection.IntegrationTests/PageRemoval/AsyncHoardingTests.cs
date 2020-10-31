@@ -28,7 +28,7 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.PageRemoval
         {
             // Arrange
             var set = new ConcurrentBag<int>();
-            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogic(
+            await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogic(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -88,7 +88,7 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.PageRemoval
                 var _ = collection[i];
                 await Task.Delay(50);
             }
-            collection.Dispose();
+            await collection.DisposeAsync();
             await Task.Delay(50);
 
             // Assert

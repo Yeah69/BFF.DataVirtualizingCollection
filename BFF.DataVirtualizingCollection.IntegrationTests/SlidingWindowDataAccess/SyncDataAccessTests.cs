@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using MoreLinq.Extensions;
 using Xunit;
 
@@ -19,14 +20,14 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.SlidingWindowDataAcces
 
         [Theory]
         [MemberData(nameof(Combinations))]
-        public void BuildingCollectionWith6969Elements_FirstEntry_0(
+        public async Task BuildingCollectionWith6969Elements_FirstEntry_0(
             PageLoadingBehavior pageLoadingBehavior,
             PageRemovalBehavior pageRemovalBehavior,
             FetchersKind fetchersKind,
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
+            await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -42,14 +43,14 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.SlidingWindowDataAcces
 
         [Theory]
         [MemberData(nameof(Combinations))]
-        public void BuildingCollectionWith6969Elements_70thEntry_69(
+        public async Task BuildingCollectionWith6969Elements_70thEntry_69(
             PageLoadingBehavior pageLoadingBehavior,
             PageRemovalBehavior pageRemovalBehavior,
             FetchersKind fetchersKind,
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
+            await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -65,14 +66,14 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.SlidingWindowDataAcces
 
         [Theory]
         [MemberData(nameof(Combinations))]
-        public void BuildingCollectionWith6969Elements_124thEntry_123(
+        public async Task BuildingCollectionWith6969Elements_124thEntry_123(
             PageLoadingBehavior pageLoadingBehavior,
             PageRemovalBehavior pageRemovalBehavior,
             FetchersKind fetchersKind,
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
+            await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -88,14 +89,14 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.SlidingWindowDataAcces
 
         [Theory]
         [MemberData(nameof(Combinations))]
-        public void BuildingCollectionWith6969Elements_6001thEntry_6000(
+        public async Task BuildingCollectionWith6969Elements_6001thEntry_6000(
             PageLoadingBehavior pageLoadingBehavior,
             PageRemovalBehavior pageRemovalBehavior,
             FetchersKind fetchersKind,
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
+            await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -111,14 +112,14 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.SlidingWindowDataAcces
 
         [Theory]
         [MemberData(nameof(Combinations))]
-        public void BuildingCollectionWith6969Elements_6969thEntry_6968(
+        public async Task BuildingCollectionWith6969Elements_6969thEntry_6968(
             PageLoadingBehavior pageLoadingBehavior,
             PageRemovalBehavior pageRemovalBehavior,
             FetchersKind fetchersKind,
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
+            await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -134,14 +135,14 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.SlidingWindowDataAcces
 
         [Theory]
         [MemberData(nameof(Combinations))]
-        public void BuildingCollectionWith6969Elements_11thWindowEntry_ThrowsIndexOutOfRangeException(
+        public async Task BuildingCollectionWith6969Elements_11thWindowEntry_ThrowsIndexOutOfRangeException(
             PageLoadingBehavior pageLoadingBehavior,
             PageRemovalBehavior pageRemovalBehavior,
             FetchersKind fetchersKind,
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
+            await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -157,14 +158,14 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.SlidingWindowDataAcces
 
         [Theory]
         [MemberData(nameof(Combinations))]
-        public void BuildingCollectionWith6969Elements_MinusFirstEntry_ThrowsIndexOutOfRangeException(
+        public async Task BuildingCollectionWith6969Elements_MinusFirstEntry_ThrowsIndexOutOfRangeException(
             PageLoadingBehavior pageLoadingBehavior,
             PageRemovalBehavior pageRemovalBehavior,
             FetchersKind fetchersKind,
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
+            await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -180,14 +181,14 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.SlidingWindowDataAcces
 
         [Theory]
         [MemberData(nameof(Combinations))]
-        public void BuildingCollectionWherePageFetcherIgnoresGivenPageSize23_70thEntry_69(
+        public async Task BuildingCollectionWherePageFetcherIgnoresGivenPageSize23_70thEntry_69(
             PageLoadingBehavior pageLoadingBehavior,
             PageRemovalBehavior pageRemovalBehavior,
             FetchersKind fetchersKind,
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalIntegerWhereFetchersIgnorePageSize(
+            await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalIntegerWhereFetchersIgnorePageSize(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,

@@ -80,7 +80,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
             await sut.DisposeAsync().ConfigureAwait(false);
 
             // Assert
-            page.Received(Quantity.Exactly(7)).DisposeAsync();
+            await page.Received(Quantity.Exactly(7)).DisposeAsync();
         }
 
         [Fact]
@@ -104,7 +104,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
             subject.OnNext(new[] { 0, 1, 2, 3, 5, 7 });
 
             // Assert
-            page.Received(Quantity.Exactly(6)).DisposeAsync();
+            await page.Received(Quantity.Exactly(6)).DisposeAsync();
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using BFF.DataVirtualizingCollection.PageStorage;
-using MrMeeseeks.Extensions;
+using MrMeeseeks.Reactive.Extensions;
 
 namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
 {
@@ -30,11 +30,11 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
             _count = _countFetcher();
             _pageStorage = pageStoreFactory(_count);
 
-            _resetSubject.AddForDisposalTo(CompositeDisposable);
+            _resetSubject.CompositeDisposalWith(CompositeDisposable);
             
             _resetSubject
                 .Subscribe(_ => ResetInner())
-                .AddForDisposalTo(CompositeDisposable);
+                .CompositeDisposalWith(CompositeDisposable);
         }
 
         public override int Count => _count;
@@ -59,5 +59,11 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
         public override void Reset() => _resetSubject.OnNext(Unit.Default);
 
         public override Task InitializationCompleted { get; } = Task.CompletedTask;
+
+        public override async ValueTask DisposeAsync()
+        {
+            await base.DisposeAsync().ConfigureAwait(false);
+            await _pageStorage.DisposeAsync().ConfigureAwait(false);
+        }
     }
 }

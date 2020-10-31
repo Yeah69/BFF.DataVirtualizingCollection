@@ -27,7 +27,7 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.SlidingWindowDataAcces
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
+            await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -57,7 +57,7 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.SlidingWindowDataAcces
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
+            await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -87,7 +87,7 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.SlidingWindowDataAcces
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
+            await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -117,7 +117,7 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.SlidingWindowDataAcces
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
+            await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -147,7 +147,7 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.SlidingWindowDataAcces
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
+            await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -177,7 +177,7 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.SlidingWindowDataAcces
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
+            await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -202,7 +202,7 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.SlidingWindowDataAcces
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
+            await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -227,7 +227,7 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.SlidingWindowDataAcces
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalIntegerWhereFetchersIgnorePageSize(
+            await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalIntegerWhereFetchersIgnorePageSize(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,

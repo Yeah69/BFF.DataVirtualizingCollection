@@ -8,7 +8,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using BFF.DataVirtualizingCollection.PageRemoval;
-using MrMeeseeks.Extensions;
+using MrMeeseeks.Reactive.Extensions;
 
 namespace BFF.DataVirtualizingCollection.PageStorage
 {
@@ -45,7 +45,7 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                 ? count / pageSize 
                 : count / pageSize + 1;
             _nonPreloadingPageFactory = nonPreloadingPageFactory;
-            Requests = new Subject<(int PageKey, int PageIndex)>().AddForDisposalTo(_compositeDisposable);
+            Requests = new Subject<(int PageKey, int PageIndex)>().CompositeDisposalWith(_compositeDisposable);
             pageReplacementStrategyFactory(Requests)
                 .SelectMany(async pageKeysToRemove =>
                 {
@@ -63,7 +63,7 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                     exception => throw new PageReplacementStrategyException(
                         "LeastRecentlyUsed strategy: Something unexpected happened during page removal! See inner exception.",
                         exception))
-                .AddTo(_compositeDisposable);
+                .CompositeDisposalWith(_compositeDisposable);
         }
 
         public T this[int index]

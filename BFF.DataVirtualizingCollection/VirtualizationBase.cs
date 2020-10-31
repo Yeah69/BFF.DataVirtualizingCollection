@@ -79,10 +79,6 @@ namespace BFF.DataVirtualizingCollection
         public event NotifyCollectionChangedEventHandler? CollectionChanged;
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public void Dispose() =>
-            InitializationCompleted
-                .ContinueWith(_ => CompositeDisposable.Dispose());
-
         protected void OnCollectionChangedReplace(T newItem, T oldItem, int index) => 
             CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, newItem, oldItem, index));
 
@@ -125,5 +121,11 @@ namespace BFF.DataVirtualizingCollection
         public void CopyTo(T[] array, int arrayIndex) => throw new NotSupportedException();
 
         #endregion
+        
+        public virtual async ValueTask DisposeAsync()
+        {
+            await InitializationCompleted.ConfigureAwait(false);
+            CompositeDisposable.Dispose();
+        }
     }
 }

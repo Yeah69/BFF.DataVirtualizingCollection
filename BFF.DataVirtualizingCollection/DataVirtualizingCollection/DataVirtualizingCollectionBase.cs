@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using MrMeeseeks.Extensions;
+using MrMeeseeks.Reactive.Extensions;
 
 namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
 {
@@ -14,7 +14,7 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
             IDisposable disposeOnDisposal,
             IScheduler notificationScheduler)
         {
-            disposeOnDisposal.AddForDisposalTo(CompositeDisposable);
+            disposeOnDisposal.CompositeDisposalWith(CompositeDisposable);
             
             observePageFetches
                 .ObserveOn(notificationScheduler)
@@ -27,7 +27,7 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
                     }
                     OnIndexerChanged();
                 })
-                .AddTo(CompositeDisposable);
+                .CompositeDisposalWith(CompositeDisposable);
         }
         
         protected override T IndexerInnerGet(int index) =>

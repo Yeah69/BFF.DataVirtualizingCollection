@@ -27,7 +27,7 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.DataVirtualizingCollec
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
+            await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -55,7 +55,7 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.DataVirtualizingCollec
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
+            await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -83,7 +83,7 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.DataVirtualizingCollec
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
+            await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -111,7 +111,7 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.DataVirtualizingCollec
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
+            await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -139,7 +139,7 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.DataVirtualizingCollec
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
+            await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -167,7 +167,7 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.DataVirtualizingCollec
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
+            await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -190,7 +190,7 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.DataVirtualizingCollec
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
+            await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -213,7 +213,7 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.DataVirtualizingCollec
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
-            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalIntegerWhereFetchersIgnorePageSize(
+            await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalIntegerWhereFetchersIgnorePageSize(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,

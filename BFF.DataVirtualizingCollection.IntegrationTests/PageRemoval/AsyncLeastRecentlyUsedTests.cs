@@ -41,7 +41,7 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.PageRemoval
         {
             // Arrange
             var set = new ConcurrentBag<int>();
-            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
+            await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -80,7 +80,7 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.PageRemoval
         {
             // Arrange
             var set = new ConcurrentBag<int>();
-            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
+            await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -119,7 +119,7 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.PageRemoval
         {
             // Arrange
             var set = new ConcurrentBag<int>();
-            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
+            await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -163,7 +163,7 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.PageRemoval
         {
             // Arrange
             var set = new ConcurrentBag<int>();
-            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
+            await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -208,7 +208,7 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.PageRemoval
             // Arrange
             int[] expected = Enumerable.Range(0, 100).ToArray();
             var set = new ConcurrentBag<int>();
-            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
+            await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -250,7 +250,7 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.PageRemoval
             // Arrange
             int[] expected = Enumerable.Range(0, 100).ToArray();
             var set = new ConcurrentBag<int>();
-            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
+            await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -292,7 +292,7 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.PageRemoval
             // Arrange
             int[] expected = Enumerable.Range(0, 300).ToArray();
             var set = new ConcurrentBag<int>();
-            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
+            await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -334,7 +334,7 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.PageRemoval
             // Arrange
             int[] expected = Enumerable.Range(0, 100).ToArray();
             var set = new ConcurrentBag<int>();
-            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
+            await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
@@ -375,7 +375,7 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests.PageRemoval
             // Arrange
             int[] expected = Enumerable.Range(0, 100).ToArray();
             var set = new ConcurrentBag<int>();
-            using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
+            await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,

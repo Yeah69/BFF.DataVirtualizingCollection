@@ -21,7 +21,7 @@ namespace BFF.DataVirtualizingCollection
         IList,
         INotifyCollectionChanged,
         INotifyPropertyChanged,
-        IDisposable
+        IAsyncDisposable
     {
         /// <summary>
         /// Task is successfully completed when initialization is completed. <para/>

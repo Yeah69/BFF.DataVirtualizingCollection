@@ -6,7 +6,6 @@ using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using BFF.DataVirtualizingCollection.DataVirtualizingCollection;
-using MrMeeseeks.Extensions;
 using MrMeeseeks.Reactive.Extensions;
 
 namespace BFF.DataVirtualizingCollection.SlidingWindow
@@ -26,7 +25,7 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
         {
             _size = 0;
             Offset = 0;
-            _dataVirtualizingCollection = dataVirtualizingCollection.AddForDisposalTo(CompositeDisposable);
+            _dataVirtualizingCollection = dataVirtualizingCollection;
             _notificationScheduler = notificationScheduler;
 
             Observable
@@ -60,13 +59,13 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
                     OnPropertyChanged(nameof(Count));
                     OnPropertyChanged(nameof(MaximumOffset));
                 })
-                .AddForDisposalTo(CompositeDisposable);
+                .CompositeDisposalWith(CompositeDisposable);
             
             _dataVirtualizingCollection
                 .ObservePropertyChanged("Item[]")
                 .ObserveOn(notificationScheduler)
                 .Subscribe(_ => OnIndexerChanged())
-                .AddForDisposalTo(CompositeDisposable);
+                .CompositeDisposalWith(CompositeDisposable);
 
             InitializationCompleted
                 .ToObservable()
@@ -76,10 +75,10 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
                     _size = windowSize;
                     JumpTo(offset);
                 })
-                .AddForDisposalTo(CompositeDisposable);
+                .CompositeDisposalWith(CompositeDisposable);
         }
         
-        public int Offset { get; protected set; }
+        public int Offset { get; private set; }
 
         public int MaximumOffset => _dataVirtualizingCollection.Count - _size;
         
@@ -179,5 +178,11 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
         public override void Reset() => _dataVirtualizingCollection.Reset();
 
         public override Task InitializationCompleted => _dataVirtualizingCollection.InitializationCompleted;
+
+        public override async ValueTask DisposeAsync()
+        {
+            await base.DisposeAsync().ConfigureAwait(false);
+            await _dataVirtualizingCollection.DisposeAsync().ConfigureAwait(false);
+        }
     }
 }
