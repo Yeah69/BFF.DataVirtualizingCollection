@@ -82,7 +82,7 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels
             {
                 if (_items == value) return;
                 _items = value;
-                _serialItems.Disposable = _items;
+                _serialItems.Disposable = _items as IDisposable;
                 OnPropertyChanged();
             }
         }
