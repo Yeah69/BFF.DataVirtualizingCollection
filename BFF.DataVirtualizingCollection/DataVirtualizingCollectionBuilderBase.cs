@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Subjects;
+using System.Threading;
 using System.Threading.Tasks;
 using BFF.DataVirtualizingCollection.PageRemoval;
 using BFF.DataVirtualizingCollection.PageStorage;
@@ -52,14 +53,14 @@ namespace BFF.DataVirtualizingCollection
         private IndexAccessBehavior _indexAccessBehavior =
             IndexAccessBehavior.Synchronous;
 
-        private Func<int, int, TItem[]>? _pageFetcher;
+        private Func<int, int, CancellationToken, TItem[]>? _pageFetcher;
         private Func<int, int, TItem>? _placeholderFactory;
         private Func<int, int, TItem>? _preloadingPlaceholderFactory;
         private IScheduler _preloadingBackgroundScheduler;
         private IScheduler _pageBackgroundScheduler;
         protected IScheduler CountBackgroundScheduler;
-        private Func<int, int, Task<TItem[]>>? _taskBasedPageFetcher;
-        protected Func<int>? CountFetcher;
+        private Func<int, int, CancellationToken, Task<TItem[]>>? _taskBasedPageFetcher;
+        protected Func<CancellationToken, int>? CountFetcher;
 
         private Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> _pageHoldingBehavior =
             HoardingPageNonRemoval.Create();
@@ -67,7 +68,7 @@ namespace BFF.DataVirtualizingCollection
         private PageLoadingBehavior _pageLoadingBehavior =
             PageLoadingBehavior.NonPreloading;
 
-        protected Func<Task<int>>? TaskBasedCountFetcher;
+        protected Func<CancellationToken, Task<int>>? TaskBasedCountFetcher;
 
 
         protected DataVirtualizingCollectionBuilderBase(
@@ -97,14 +98,30 @@ namespace BFF.DataVirtualizingCollection
             Func<int> countFetcher)
         {
             _fetchersKind = FetchersKind.NonTaskBased;
-            _pageFetcher = pageFetcher;
-            CountFetcher = countFetcher;
+            _pageFetcher = (offset, size, _) => pageFetcher(offset, size);
+            CountFetcher = _ => countFetcher();
             return this;
         }
 
         public IAsyncOnlyIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> TaskBasedFetchers(
             Func<int, int, Task<TItem[]>> pageFetcher,
             Func<Task<int>> countFetcher)
+        {
+            _fetchersKind = FetchersKind.TaskBased;
+            _taskBasedPageFetcher = (offset, size, _) => pageFetcher(offset, size);
+            TaskBasedCountFetcher = _ => countFetcher();
+            return this;
+        }
+
+        public IIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> NonTaskBasedFetchers(Func<int, int, CancellationToken, TItem[]> pageFetcher, Func<CancellationToken, int> countFetcher)
+        {
+            _fetchersKind = FetchersKind.NonTaskBased;
+            _pageFetcher = pageFetcher;
+            CountFetcher = countFetcher;
+            return this;
+        }
+
+        public IAsyncOnlyIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> TaskBasedFetchers(Func<int, int, CancellationToken, Task<TItem[]>> pageFetcher, Func<CancellationToken, Task<int>> countFetcher)
         {
             _fetchersKind = FetchersKind.TaskBased;
             _taskBasedPageFetcher = pageFetcher;

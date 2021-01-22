@@ -86,7 +86,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                 0, 
                 1,
                 Disposable.Empty, 
-                (offset, pageSize) =>
+                (offset, pageSize, _) =>
                 {
                     Thread.Sleep(10);
                     return new[] { 69 };
@@ -101,7 +101,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                 0,
                 1,
                 Disposable.Empty, 
-                (offset, pageSize) =>
+                (offset, pageSize, _) =>
                 {
                     Thread.Sleep(10);
                     return new[] {69};
@@ -118,7 +118,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                     0,
                     1,
                     Disposable.Empty, 
-                    (offset, pageSize) =>
+                    (offset, pageSize, _) =>
                     {
                         Thread.Sleep(10);
                         return new[] { disposable };
@@ -136,7 +136,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                     0,
                     1,
                     Disposable.Empty, 
-                    (offset, pageSize) =>
+                    (offset, pageSize, _) =>
                     {
                         Thread.Sleep(10);
                         return new []{ Disposable.Empty };
@@ -156,7 +156,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                 0,
                 1,
                 Disposable.Empty, 
-                async (offset, pageSize) =>
+                async (offset, pageSize, _) =>
                 {
                     await Task.Delay(10);
                     return new[] { 69 };
@@ -171,7 +171,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                 0,
                 1,
                 Disposable.Empty, 
-                async (offset, pageSize) =>
+                async (offset, pageSize, _) =>
                 {
                     await Task.Delay(10);
                     return new[] {69};
@@ -188,7 +188,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                     0,
                     1,
                     Disposable.Empty, 
-                    async (offset, pageSize) =>
+                    async (offset, pageSize, _) =>
                     {
                         await Task.Delay(10);
                         return new[] { disposable };
@@ -206,7 +206,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                     0,
                     1,
                     Disposable.Empty, 
-                    async (offset, pageSize) =>
+                    async (offset, pageSize, _) =>
                     {
                         await Task.Delay(10);
                         return new[] { Disposable.Empty };

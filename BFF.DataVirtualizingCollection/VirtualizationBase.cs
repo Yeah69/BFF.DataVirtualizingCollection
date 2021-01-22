@@ -124,7 +124,14 @@ namespace BFF.DataVirtualizingCollection
         
         public virtual async ValueTask DisposeAsync()
         {
-            await InitializationCompleted.ConfigureAwait(false);
+            try
+            {
+                await InitializationCompleted.ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                // Ignore cancellation
+            }
             CompositeDisposable.Dispose();
         }
     }

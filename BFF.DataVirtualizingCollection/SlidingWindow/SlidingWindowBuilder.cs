@@ -110,7 +110,7 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
             
             var dvc = new AsyncDataVirtualizingCollection<TItem>(
                 GenerateTaskBasedAsynchronousPageStorage(pageFetchEvents),
-                () => Task.FromResult(countFetcher()), 
+                ct => Task.FromResult(countFetcher(ct)), 
                 pageFetchEvents.AsObservable(),
                 pageFetchEvents,
                 NotificationScheduler,

@@ -2,6 +2,7 @@
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Subjects;
+using System.Threading;
 using System.Threading.Tasks;
 using BFF.DataVirtualizingCollection.PageStorage;
 using MrMeeseeks.Reactive.Extensions;
@@ -10,7 +11,7 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
 {
     internal sealed class SyncDataVirtualizingCollection<T> : DataVirtualizingCollectionBase<T>
     {
-        private readonly Func<int> _countFetcher;
+        private readonly Func<CancellationToken, int> _countFetcher;
         private readonly IScheduler _notificationScheduler;
         private readonly IPageStorage<T> _pageStorage;
         private readonly Subject<Unit> _resetSubject = new Subject<Unit>();
@@ -19,7 +20,7 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
 
         internal SyncDataVirtualizingCollection(
             Func<int, IPageStorage<T>> pageStoreFactory,
-            Func<int> countFetcher,
+            Func<CancellationToken, int> countFetcher,
             IObservable<(int Offset, int PageSize, T[] PreviousPage, T[] Page)> observePageFetches,
             IDisposable disposeOnDisposal,
             IScheduler notificationScheduler)
@@ -27,7 +28,7 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
         {
             _countFetcher = countFetcher;
             _notificationScheduler = notificationScheduler;
-            _count = _countFetcher();
+            _count = _countFetcher(CancellationToken.None);
             _pageStorage = pageStoreFactory(_count);
 
             _resetSubject.CompositeDisposalWith(CompositeDisposable);
@@ -46,7 +47,7 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
 
         private void ResetInner()
         {
-            _count = _countFetcher();
+            _count = _countFetcher(CancellationToken.None);
             _pageStorage.Reset(_count);
             _notificationScheduler.Schedule(Unit.Default, (_, __) =>
             {

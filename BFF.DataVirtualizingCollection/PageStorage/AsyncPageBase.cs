@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BFF.DataVirtualizingCollection.PageStorage
@@ -12,6 +13,7 @@ namespace BFF.DataVirtualizingCollection.PageStorage
     {
         private readonly int _pageSize;
         private readonly IDisposable _onDisposalAfterFetchCompleted;
+        protected readonly CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
         protected T[] Page;
         protected bool IsDisposed;
 
@@ -49,10 +51,21 @@ namespace BFF.DataVirtualizingCollection.PageStorage
         public async ValueTask DisposeAsync()
         {
             IsDisposed = true;
-            await PageFetchCompletion.ConfigureAwait(false);
-            _onDisposalAfterFetchCompleted.Dispose();
-            DisposePageItems(Page);
-            PageFetchCompletion.Dispose();
+            try
+            {
+                CancellationTokenSource.Cancel();
+                await PageFetchCompletion.ConfigureAwait(false);
+                DisposePageItems(Page);
+                PageFetchCompletion.Dispose();
+            }
+            catch (OperationCanceledException)
+            {
+                // Ignore cancellation
+            }
+            finally
+            {
+                _onDisposalAfterFetchCompleted.Dispose();
+            }
         }
     }
 
@@ -66,7 +79,7 @@ namespace BFF.DataVirtualizingCollection.PageStorage
             IDisposable onDisposalAfterFetchCompleted,
             
             // dependencies
-            Func<int, int, T[]> pageFetcher,
+            Func<int, int, CancellationToken, T[]> pageFetcher,
             Func<int, int, T> placeholderFactory,
             IScheduler pageBackgroundScheduler,
             IObserver<(int Offset, int PageSize, T[] PreviousPage, T[] Page)> pageArrivalObservations) 
@@ -77,15 +90,16 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                 placeholderFactory)
         {
             PageFetchCompletion = Observable
-                .Start(() =>
+                .StartAsync(ct =>
                 {
                     var previousPage = Page;
-                    Page = pageFetcher(offset, pageSize);
+                    Page = pageFetcher(offset, pageSize, ct);
                     DisposePageItems(previousPage);
                     if (!IsDisposed)
                         pageArrivalObservations.OnNext((offset, pageSize, previousPage, Page));
+                    return Task.CompletedTask;
                 }, pageBackgroundScheduler)
-                .ToTask();
+                .ToTask(CancellationTokenSource.Token);
         }
 
         public override Task PageFetchCompletion { get; }
@@ -101,7 +115,7 @@ namespace BFF.DataVirtualizingCollection.PageStorage
             IDisposable onDisposalAfterFetchCompleted,
             
             // dependencies
-            Func<int, int, Task<T[]>> pageFetcher,
+            Func<int, int, CancellationToken, Task<T[]>> pageFetcher,
             Func<int, int, T> placeholderFactory,
             IScheduler pageBackgroundScheduler,
             IObserver<(int Offset, int PageSize, T[] PreviousPage, T[] Page)> pageArrivalObservations)
@@ -112,15 +126,15 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                 placeholderFactory)
         {
             PageFetchCompletion = Observable
-                .StartAsync(async () =>
+                .StartAsync(async ct =>
                 {
                     var previousPage = Page;
-                    Page = await pageFetcher(offset, pageSize);
+                    Page = await pageFetcher(offset, pageSize, ct);
                     DisposePageItems(previousPage);
                     if (!IsDisposed)
                         pageArrivalObservations.OnNext((offset, pageSize, previousPage, Page));
                 }, pageBackgroundScheduler)
-                .ToTask();
+                .ToTask(CancellationTokenSource.Token);
         }
 
         public override Task PageFetchCompletion { get; }

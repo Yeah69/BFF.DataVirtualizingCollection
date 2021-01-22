@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BFF.DataVirtualizingCollection.PageStorage
@@ -16,11 +17,11 @@ namespace BFF.DataVirtualizingCollection.PageStorage
             IDisposable onDisposalAfterFetchCompleted,
             
             // dependencies
-            Func<int, int, T[]> pageFetcher)
+            Func<int, int, CancellationToken, T[]> pageFetcher)
         {
             _pageSize = pageSize;
             _onDisposalAfterFetchCompleted = onDisposalAfterFetchCompleted;
-            PageContent = pageFetcher(offset, pageSize);
+            PageContent = pageFetcher(offset, pageSize, CancellationToken.None);
         }
 
         private T[] PageContent { get; }

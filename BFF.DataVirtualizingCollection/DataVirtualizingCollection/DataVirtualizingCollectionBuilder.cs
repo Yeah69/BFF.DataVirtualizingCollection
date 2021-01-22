@@ -84,7 +84,7 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
             var countFetcher = CountFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
             return new AsyncDataVirtualizingCollection<TItem>(
                 GenerateNonTaskBasedAsynchronousPageStorage(pageFetchEvents),
-                () => Task.FromResult(countFetcher()),
+                ct => Task.FromResult(countFetcher(ct)),
                 pageFetchEvents.AsObservable(),
                 pageFetchEvents,
                 NotificationScheduler,
