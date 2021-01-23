@@ -25,7 +25,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.101
+        dotnet-version: 5.0.102
     - run: set DOTNET_CLI_TELEMETRY_OPTOUT=1
     - name: Install dependencies
       run: dotnet restore .\BFF.DataVirtualizingCollection.sln
