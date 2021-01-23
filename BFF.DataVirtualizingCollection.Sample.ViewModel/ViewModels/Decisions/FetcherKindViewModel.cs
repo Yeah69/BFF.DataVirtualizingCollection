@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using BFF.DataVirtualizingCollection.Sample.Model.BackendAccesses;
@@ -7,7 +9,8 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions
     public enum FetcherKind
     {
         NonTaskBased,
-        TaskBased
+        TaskBased,
+        AsyncEnumerableBased
     }
 
     public interface IFetcherKindViewModelInternal : IFetcherKindViewModel
@@ -27,8 +30,9 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions
             IFetchersKindCollectionBuilder<T, TVirtualizationKind> builder, 
             IBackendAccess<T> backendAccess)
         {
-            return FetcherKind == FetcherKind.NonTaskBased
-                ? builder.NonTaskBasedFetchers(
+            return FetcherKind switch
+            {
+                FetcherKind.NonTaskBased => builder.NonTaskBasedFetchers(
                     (offset, size) =>
                     {
                         Thread.Sleep(DelayPageFetcherInMilliseconds);
@@ -38,8 +42,8 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions
                     {
                         Thread.Sleep(DelayCountFetcherInMilliseconds);
                         return backendAccess.CountFetch();
-                    })
-                : builder.TaskBasedFetchers(
+                    }),
+                FetcherKind.TaskBased => builder.TaskBasedFetchers(
                     async (offset, size) =>
                     {
                         await Task.Delay(DelayPageFetcherInMilliseconds);
@@ -49,7 +53,29 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions
                     {
                         await Task.Delay(DelayCountFetcherInMilliseconds);
                         return backendAccess.CountFetch();
-                    });
+                    }),
+                FetcherKind.AsyncEnumerableBased => builder.AsyncEnumerableBasedFetchers(
+                    (offset, size, _) =>
+                    {
+                        var delay = DelayCountFetcherInMilliseconds / size - 1;
+                        return Fetch();
+
+                        async IAsyncEnumerable<T> Fetch()
+                        {
+                            await foreach (var item in backendAccess.AsyncEnumerablePageFetch(offset, size))
+                            {
+                                await Task.Delay(delay);
+                                yield return item;
+                            }
+                        }
+                    },
+                    async _ =>
+                    {
+                        await Task.Delay(DelayCountFetcherInMilliseconds);
+                        return backendAccess.CountFetch();
+                    }),
+                _ => throw new ArgumentOutOfRangeException()
+            };
         }
     }
 

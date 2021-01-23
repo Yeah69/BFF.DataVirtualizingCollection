@@ -20,7 +20,8 @@ namespace BFF.DataVirtualizingCollection
     internal enum FetchersKind
     {
         NonTaskBased,
-        TaskBased
+        TaskBased,
+        AsyncEnumerableBased
     }
 
     internal enum IndexAccessBehavior
@@ -60,6 +61,7 @@ namespace BFF.DataVirtualizingCollection
         private IScheduler _pageBackgroundScheduler;
         protected IScheduler CountBackgroundScheduler;
         private Func<int, int, CancellationToken, Task<TItem[]>>? _taskBasedPageFetcher;
+        private Func<int, int, CancellationToken, IAsyncEnumerable<TItem>>? _asyncEnumerableBasedPageFetcher;
         protected Func<CancellationToken, int>? CountFetcher;
 
         private Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>> _pageHoldingBehavior =
@@ -125,6 +127,14 @@ namespace BFF.DataVirtualizingCollection
         {
             _fetchersKind = FetchersKind.TaskBased;
             _taskBasedPageFetcher = pageFetcher;
+            TaskBasedCountFetcher = countFetcher;
+            return this;
+        }
+
+        public IAsyncOnlyIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> AsyncEnumerableBasedFetchers(Func<int, int, CancellationToken, IAsyncEnumerable<TItem>> pageFetcher, Func<CancellationToken, Task<int>> countFetcher)
+        {
+            _fetchersKind = FetchersKind.AsyncEnumerableBased;
+            _asyncEnumerableBasedPageFetcher = pageFetcher;
             TaskBasedCountFetcher = countFetcher;
             return this;
         }
@@ -225,6 +235,8 @@ namespace BFF.DataVirtualizingCollection
                     GenerateNonTaskBasedAsynchronousCollection(pageFetchEvents),
                 (IndexAccessBehavior.Asynchronous, FetchersKind.TaskBased) => 
                     GenerateTaskBasedAsynchronousCollection(pageFetchEvents),
+                (IndexAccessBehavior.Asynchronous, FetchersKind.AsyncEnumerableBased) => 
+                    GenerateAsyncEnumerableBasedAsynchronousCollection(pageFetchEvents),
                 _ => throw new ArgumentException("Can't build data-virtualizing collection with given input.")
             };
         }
@@ -287,6 +299,56 @@ namespace BFF.DataVirtualizingCollection
                     pageSize,
                     onDisposalAfterFetchCompleted,
                     taskBasedPageFetcher,
+                    preloadingPlaceholderFactory,
+                    _preloadingBackgroundScheduler,
+                    pageFetchEvents.AsObserver());
+            }
+
+            IPageStorage<TItem> PageStoreFactoryComposition(int count)
+            {
+                return PageStoreFactory(count, NonPreloadingPageFetcherFactory, PreloadingPageFetcherFactory);
+            }
+        }
+
+        internal Func<int, IPageStorage<TItem>> GenerateAsyncEnumerableBasedAsynchronousPageStorage(
+            Subject<(int Offset, int PageSize, TItem[] PreviousPage, TItem[] Page)> pageFetchEvents)
+        {
+            return PageStoreFactoryComposition;
+
+            IPage<TItem> NonPreloadingPageFetcherFactory(
+                int pageKey,
+                int offset,
+                int pageSize,
+                IDisposable onDisposalAfterFetchCompleted)
+            {
+                var asyncEnumerableBasedPageFetcher = _asyncEnumerableBasedPageFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
+                var placeholderFactory = _placeholderFactory ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
+                return new AsyncEnumerableBasedPage<TItem>(
+                    pageKey,
+                    offset,
+                    pageSize,
+                    onDisposalAfterFetchCompleted,
+                    asyncEnumerableBasedPageFetcher,
+                    placeholderFactory,
+                    _pageBackgroundScheduler,
+                    pageFetchEvents.AsObserver());
+            }
+
+            IPage<TItem> PreloadingPageFetcherFactory(
+                int pageKey,
+                int offset,
+                int pageSize,
+                IDisposable onDisposalAfterFetchCompleted)
+            {
+                var asyncEnumerableBasedPageFetcher = _asyncEnumerableBasedPageFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
+                var preloadingPlaceholderFactory = _preloadingPlaceholderFactory ??
+                                                   throw new NullReferenceException(UninitializedElementsExceptionMessage);
+                return new AsyncEnumerableBasedPage<TItem>(
+                    pageKey,
+                    offset,
+                    pageSize,
+                    onDisposalAfterFetchCompleted,
+                    asyncEnumerableBasedPageFetcher,
                     preloadingPlaceholderFactory,
                     _preloadingBackgroundScheduler,
                     pageFetchEvents.AsObserver());
@@ -396,6 +458,9 @@ namespace BFF.DataVirtualizingCollection
         }
 
         protected abstract TVirtualizationKind GenerateTaskBasedAsynchronousCollection(
+            Subject<(int Offset, int PageSize, TItem[] PreviousPage, TItem[] Page)> pageFetchEvents);
+
+        protected abstract TVirtualizationKind GenerateAsyncEnumerableBasedAsynchronousCollection(
             Subject<(int Offset, int PageSize, TItem[] PreviousPage, TItem[] Page)> pageFetchEvents);
 
         protected abstract TVirtualizationKind GenerateNonTaskBasedAsynchronousCollection(

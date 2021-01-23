@@ -78,6 +78,19 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
                 CountBackgroundScheduler);
         }
 
+        protected override IDataVirtualizingCollection<TItem> GenerateAsyncEnumerableBasedAsynchronousCollection(Subject<(int Offset, int PageSize, TItem[] PreviousPage, TItem[] Page)> pageFetchEvents)
+        {
+            var taskBasedCountFetcher = TaskBasedCountFetcher ??
+                                        throw new NullReferenceException(UninitializedElementsExceptionMessage);
+            return new AsyncDataVirtualizingCollection<TItem>(
+                GenerateAsyncEnumerableBasedAsynchronousPageStorage(pageFetchEvents),
+                taskBasedCountFetcher,
+                pageFetchEvents.AsObservable(),
+                pageFetchEvents,
+                NotificationScheduler,
+                CountBackgroundScheduler);
+        }
+
         protected override IDataVirtualizingCollection<TItem> GenerateNonTaskBasedAsynchronousCollection(
             Subject<(int Offset, int PageSize, TItem[] PreviousPage, TItem[] Page)> pageFetchEvents)
         {

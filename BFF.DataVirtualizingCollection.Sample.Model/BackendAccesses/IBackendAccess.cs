@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
 namespace BFF.DataVirtualizingCollection.Sample.Model.BackendAccesses
 {
     public interface IBackendAccess<T>
@@ -5,6 +8,15 @@ namespace BFF.DataVirtualizingCollection.Sample.Model.BackendAccesses
         string Name { get; }
         
         T[] PageFetch(int pageOffset, int pageSize);
+
+        async IAsyncEnumerable<T> AsyncEnumerablePageFetch(int pageOffset, int pageSize)
+        {
+            foreach (var item in PageFetch(pageOffset, pageSize))
+            {
+                await Task.Delay(1);
+                yield return item;
+            }
+        }
 
         T PlaceholderFetch(int pageOffset, int indexInsidePage);
 

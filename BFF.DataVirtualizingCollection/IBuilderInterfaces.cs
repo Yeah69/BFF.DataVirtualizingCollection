@@ -88,6 +88,7 @@ namespace BFF.DataVirtualizingCollection
         /// </summary>
         /// <param name="pageFetcher">First parameter is the offset, second parameter is the size. You have to provide a lambda function which given the parameters returns the expected page from the backend.</param>
         /// <param name="countFetcher">You have to provide a lambda function which gets the count of all elements in the backend.</param>
+        [Obsolete("Please use the overload with CancellationToken parameters (which can be ignored if not required). This function will be removed in next major release.")]
         IIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> NonTaskBasedFetchers(
             Func<int, int, TItem[]> pageFetcher, 
             Func<int> countFetcher);
@@ -98,6 +99,7 @@ namespace BFF.DataVirtualizingCollection
         /// </summary>
         /// <param name="pageFetcher">First parameter is the offset, second parameter is the size. You have to provide a lambda function which given the parameters returns the expected page from the backend.</param>
         /// <param name="countFetcher">You have to provide a lambda function which gets the count of all elements in the backend.</param>
+        [Obsolete("Please use the overload with CancellationToken parameters (which can be ignored if not required). This function will be removed in next major release.")]
         IAsyncOnlyIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> TaskBasedFetchers(
             Func<int, int, Task<TItem[]>> pageFetcher, 
             Func<Task<int>> countFetcher);
@@ -106,8 +108,8 @@ namespace BFF.DataVirtualizingCollection
         /// You have to provide non-task-based (synchronous) fetchers.
         /// The page fetcher has to get a page from the backend based on the provided offset and size. The count fetcher has to get the count of the items in the backend.
         /// </summary>
-        /// <param name="pageFetcher">First parameter is the offset, second parameter is the size. You have to provide a lambda function which given the parameters returns the expected page from the backend.</param>
-        /// <param name="countFetcher">You have to provide a lambda function which gets the count of all elements in the backend.</param>
+        /// <param name="pageFetcher">First parameter is the offset, second parameter is the size, third parameter will signal cancellation when the result of the fetch won't be used. You have to provide a lambda function which given the parameters returns the expected page from the backend.</param>
+        /// <param name="countFetcher">The parameter will signal cancellation when the result of the fetch won't be used. You have to provide a lambda function which gets the count of all elements in the backend.</param>
         IIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> NonTaskBasedFetchers(
             Func<int, int, CancellationToken, TItem[]> pageFetcher, 
             Func<CancellationToken, int> countFetcher);
@@ -116,10 +118,20 @@ namespace BFF.DataVirtualizingCollection
         /// You have to provide task-based (asynchronous) fetchers.
         /// The page fetcher has to get a page from the backend based on the provided offset and size. The count fetcher has to get the count of the items in the backend.
         /// </summary>
-        /// <param name="pageFetcher">First parameter is the offset, second parameter is the size. You have to provide a lambda function which given the parameters returns the expected page from the backend.</param>
-        /// <param name="countFetcher">You have to provide a lambda function which gets the count of all elements in the backend.</param>
+        /// <param name="pageFetcher">First parameter is the offset, second parameter is the size, third parameter will signal cancellation when the result of the fetch won't be used. You have to provide a lambda function which given the parameters returns the expected page from the backend.</param>
+        /// <param name="countFetcher">The parameter will signal cancellation when the result of the fetch won't be used. You have to provide a lambda function which gets the count of all elements in the backend.</param>
         IAsyncOnlyIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> TaskBasedFetchers(
             Func<int, int, CancellationToken, Task<TItem[]>> pageFetcher, 
+            Func<CancellationToken, Task<int>> countFetcher);
+
+        /// <summary>
+        /// You have to provide a enumerable-based (asynchronous) page fetcher and a task-based (asynchronous) count fetcher.
+        /// The page fetcher has to get a page from the backend based on the provided offset and size. The count fetcher has to get the count of the items in the backend.
+        /// </summary>
+        /// <param name="pageFetcher">First parameter is the offset, second parameter is the size, third parameter will signal cancellation when the result of the fetch won't be used. You have to provide a lambda function which given the parameters returns the expected page from the backend.</param>
+        /// <param name="countFetcher">The parameter will signal cancellation when the result of the fetch won't be used. You have to provide a lambda function which gets the count of all elements in the backend.</param>
+        IAsyncOnlyIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> AsyncEnumerableBasedFetchers(
+            Func<int, int, CancellationToken, IAsyncEnumerable<TItem>> pageFetcher, 
             Func<CancellationToken, Task<int>> countFetcher);
     }
     

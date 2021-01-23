@@ -4,7 +4,7 @@
         <Version>$(MinVerVersion)</Version>
         <Authors>Dimitri Enns</Authors>
         <DisableTransitiveProjectReferences>true</DisableTransitiveProjectReferences>
-        <LangVersion>8</LangVersion>
+        <LangVersion>9</LangVersion>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
     </PropertyGroup>

@@ -103,6 +103,25 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
                 NotificationScheduler);
         }
 
+        protected override ISlidingWindow<TItem> GenerateAsyncEnumerableBasedAsynchronousCollection(Subject<(int Offset, int PageSize, TItem[] PreviousPage, TItem[] Page)> pageFetchEvents)
+        {
+            var taskBasedCountFetcher = TaskBasedCountFetcher ??
+                                        throw new NullReferenceException(UninitializedElementsExceptionMessage);
+            
+            var dvc = new AsyncDataVirtualizingCollection<TItem>(
+                GenerateAsyncEnumerableBasedAsynchronousPageStorage(pageFetchEvents),
+                taskBasedCountFetcher,
+                pageFetchEvents.AsObservable(),
+                pageFetchEvents,
+                NotificationScheduler,
+                CountBackgroundScheduler);
+            return new SlidingWindow<TItem>(
+                _initialOffset,
+                _windowSize,
+                dvc,
+                NotificationScheduler);
+        }
+
         protected override ISlidingWindow<TItem> GenerateNonTaskBasedAsynchronousCollection(
             Subject<(int Offset, int PageSize, TItem[] PreviousPage, TItem[] Page)> pageFetchEvents)
         {

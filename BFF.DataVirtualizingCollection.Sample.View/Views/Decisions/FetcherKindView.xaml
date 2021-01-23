@@ -16,13 +16,20 @@
                                          Converter={x:Static utilities:Converters.ValueEqualsToParameter},
                                          ConverterParameter={x:Static decisions:FetcherKind.NonTaskBased}}"
                      Checked="NonTaskBased_OnChecked" />
-        <RadioButton x:Name="TaskBased" Content="Task-based"
+        <RadioButton Content="Task-based"
                      Margin="5"
                      IsChecked="{Binding FetcherKind, 
                                          Mode=OneWay,
                                          Converter={x:Static utilities:Converters.ValueEqualsToParameter},
                                          ConverterParameter={x:Static decisions:FetcherKind.TaskBased}}"
                      Checked="TaskBased_OnChecked"/>
+        <RadioButton Content="AsyncEnumerable-based"
+                     Margin="5"
+                     IsChecked="{Binding FetcherKind, 
+                                         Mode=OneWay,
+                                         Converter={x:Static utilities:Converters.ValueEqualsToParameter},
+                                         ConverterParameter={x:Static decisions:FetcherKind.AsyncEnumerableBased}}"
+                     Checked="AsyncEnumerableBased_OnChecked"/>
         <StackPanel Orientation="Horizontal">
             <TextBlock Text="Page-Fetcher Delay:" 
                        Margin="5"  />

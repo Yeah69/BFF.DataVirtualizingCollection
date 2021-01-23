@@ -18,5 +18,11 @@ namespace BFF.DataVirtualizingCollection.Sample.View.Views.Decisions
             if (DataContext is IFetcherKindViewModel fetcherKindViewModel)
                 fetcherKindViewModel.FetcherKind = FetcherKind.TaskBased;
         }
+
+        private void AsyncEnumerableBased_OnChecked(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is IFetcherKindViewModel fetcherKindViewModel)
+                fetcherKindViewModel.FetcherKind = FetcherKind.AsyncEnumerableBased;
+        }
     }
 }

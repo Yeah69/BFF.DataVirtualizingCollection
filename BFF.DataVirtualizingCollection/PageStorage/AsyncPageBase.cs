@@ -6,6 +6,7 @@ using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
+using MrMeeseeks.Extensions;
 
 namespace BFF.DataVirtualizingCollection.PageStorage
 {
@@ -42,10 +43,12 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                     "Index was out of range. Must be non-negative and less than the size of the collection.")
                 : Page[index];
 
-        protected static void DisposePageItems(IEnumerable<T> page)
+        protected static async Task DisposePageItems(T[] page)
         {
             foreach (var disposable in page.OfType<IDisposable>())
                 disposable.Dispose();
+            foreach (var disposable in page.OfType<IAsyncDisposable>())
+                await disposable.DisposeAsync().ConfigureAwait(false);
         }
 
         public async ValueTask DisposeAsync()
@@ -55,7 +58,7 @@ namespace BFF.DataVirtualizingCollection.PageStorage
             {
                 CancellationTokenSource.Cancel();
                 await PageFetchCompletion.ConfigureAwait(false);
-                DisposePageItems(Page);
+                await DisposePageItems(Page).ConfigureAwait(false);
                 PageFetchCompletion.Dispose();
             }
             catch (OperationCanceledException)
@@ -90,14 +93,13 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                 placeholderFactory)
         {
             PageFetchCompletion = Observable
-                .StartAsync(ct =>
+                .StartAsync(async ct =>
                 {
                     var previousPage = Page;
                     Page = pageFetcher(offset, pageSize, ct);
-                    DisposePageItems(previousPage);
+                    await DisposePageItems(previousPage).ConfigureAwait(false);
                     if (!IsDisposed)
                         pageArrivalObservations.OnNext((offset, pageSize, previousPage, Page));
-                    return Task.CompletedTask;
                 }, pageBackgroundScheduler)
                 .ToTask(CancellationTokenSource.Token);
         }
@@ -130,9 +132,52 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                 {
                     var previousPage = Page;
                     Page = await pageFetcher(offset, pageSize, ct);
-                    DisposePageItems(previousPage);
+                    await DisposePageItems(previousPage).ConfigureAwait(false);
                     if (!IsDisposed)
                         pageArrivalObservations.OnNext((offset, pageSize, previousPage, Page));
+                }, pageBackgroundScheduler)
+                .ToTask(CancellationTokenSource.Token);
+        }
+
+        public override Task PageFetchCompletion { get; }
+    }
+    
+    internal sealed class AsyncEnumerableBasedPage<T> : AsyncPageBase<T>
+    {
+        internal AsyncEnumerableBasedPage(
+            // parameter
+            int pageKey,
+            int offset,
+            int pageSize,
+            IDisposable onDisposalAfterFetchCompleted,
+            
+            // dependencies
+            Func<int, int, CancellationToken, IAsyncEnumerable<T>> pageFetcher,
+            Func<int, int, T> placeholderFactory,
+            IScheduler pageBackgroundScheduler,
+            IObserver<(int Offset, int PageSize, T[] PreviousPage, T[] Page)> pageArrivalObservations)
+            : base(
+                pageKey,
+                pageSize,
+                onDisposalAfterFetchCompleted, 
+                placeholderFactory)
+        {
+            PageFetchCompletion = Observable
+                .StartAsync(async ct =>
+                {
+                    var i = 0;
+                    await foreach (var item in pageFetcher(offset, pageSize, ct))
+                    {
+                        ct.ThrowIfCancellationRequested();
+                        var temp = Page[i];
+                        Page[i] = item;
+                        (temp as IDisposable)?.Dispose();
+                        if (temp is IAsyncDisposable asyncDisposable)
+                            await asyncDisposable.DisposeAsync().ConfigureAwait(false);
+                        if(IsDisposed.Not())
+                            pageArrivalObservations.OnNext((offset + i, 1, temp.ToEnumerable().ToArray(), item.ToEnumerable().ToArray()));
+                        i++;
+                    }
                 }, pageBackgroundScheduler)
                 .ToTask(CancellationTokenSource.Token);
         }
