@@ -189,23 +189,23 @@ namespace BFF.DataVirtualizingCollection.IntegrationTests
             fetchersKind switch
                 {
                 FetchersKind.NonTaskBased => fetchersKindCollectionBuilder.NonTaskBasedFetchers(
-                    (offset, pSize) =>
+                    (offset, pSize, _) =>
                     {
                         Thread.Sleep(25);
                         return pageFetcher(offset, pSize);
                     },
-                    () =>
+                    _ =>
                     {
                         Thread.Sleep(25);
                         return countFetcher();
                     }),
                 FetchersKind.TaskBased => fetchersKindCollectionBuilder.TaskBasedFetchers(
-                    async (offset, pSize) =>
+                    async (offset, pSize, _) =>
                     {
                         await Task.Delay(25).ConfigureAwait(false);
                         return pageFetcher(offset, pSize);
                     },
-                    async () =>
+                    async _ =>
                     {
                         await Task.Delay(25).ConfigureAwait(false);
                         return countFetcher();

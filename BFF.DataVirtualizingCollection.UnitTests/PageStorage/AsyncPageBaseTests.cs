@@ -28,7 +28,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
             var sut = PageWithDisposable(disposable);
 
             // Act
-            await sut.DisposeAsync();
+            await sut.DisposeAsync().ConfigureAwait(false);
 
             // Assert
             await isDisposed.Task.ToObservable().Timeout(TimeSpan.FromMinutes(5)).ToTask();
@@ -190,7 +190,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                     Disposable.Empty, 
                     async (offset, pageSize, _) =>
                     {
-                        await Task.Delay(10);
+                        await Task.Delay(10).ConfigureAwait(false);
                         return new[] { disposable };
                     },
                     (_, __) => Disposable.Empty,

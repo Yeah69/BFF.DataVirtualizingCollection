@@ -58,8 +58,6 @@ namespace BFF.DataVirtualizingCollection.PageStorage
             {
                 CancellationTokenSource.Cancel();
                 await PageFetchCompletion.ConfigureAwait(false);
-                await DisposePageItems(Page).ConfigureAwait(false);
-                PageFetchCompletion.Dispose();
             }
             catch (OperationCanceledException)
             {
@@ -67,6 +65,8 @@ namespace BFF.DataVirtualizingCollection.PageStorage
             }
             finally
             {
+                await DisposePageItems(Page).ConfigureAwait(false);
+                PageFetchCompletion.Dispose();
                 _onDisposalAfterFetchCompleted.Dispose();
             }
         }
@@ -96,10 +96,13 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                 .StartAsync(async ct =>
                 {
                     var previousPage = Page;
+                    await Task.Delay(1).ConfigureAwait(false);
                     Page = pageFetcher(offset, pageSize, ct);
                     await DisposePageItems(previousPage).ConfigureAwait(false);
                     if (!IsDisposed)
                         pageArrivalObservations.OnNext((offset, pageSize, previousPage, Page));
+                    else
+                        await DisposePageItems(Page).ConfigureAwait(false);
                 }, pageBackgroundScheduler)
                 .ToTask(CancellationTokenSource.Token);
         }
@@ -131,10 +134,13 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                 .StartAsync(async ct =>
                 {
                     var previousPage = Page;
-                    Page = await pageFetcher(offset, pageSize, ct);
+                    await Task.Delay(1).ConfigureAwait(false);
+                    Page = await pageFetcher(offset, pageSize, ct).ConfigureAwait(false);
                     await DisposePageItems(previousPage).ConfigureAwait(false);
                     if (!IsDisposed)
                         pageArrivalObservations.OnNext((offset, pageSize, previousPage, Page));
+                    else
+                        await DisposePageItems(Page).ConfigureAwait(false);
                 }, pageBackgroundScheduler)
                 .ToTask(CancellationTokenSource.Token);
         }

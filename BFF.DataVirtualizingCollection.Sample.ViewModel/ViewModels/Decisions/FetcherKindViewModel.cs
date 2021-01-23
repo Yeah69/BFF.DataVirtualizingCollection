@@ -33,23 +33,23 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions
             return FetcherKind switch
             {
                 FetcherKind.NonTaskBased => builder.NonTaskBasedFetchers(
-                    (offset, size) =>
+                    (offset, size, _) =>
                     {
                         Thread.Sleep(DelayPageFetcherInMilliseconds);
                         return backendAccess.PageFetch(offset, size);
                     },
-                    () =>
+                    _ =>
                     {
                         Thread.Sleep(DelayCountFetcherInMilliseconds);
                         return backendAccess.CountFetch();
                     }),
                 FetcherKind.TaskBased => builder.TaskBasedFetchers(
-                    async (offset, size) =>
+                    async (offset, size, _) =>
                     {
                         await Task.Delay(DelayPageFetcherInMilliseconds);
                         return backendAccess.PageFetch(offset, size);
                     },
-                    async () =>
+                    async _ =>
                     {
                         await Task.Delay(DelayCountFetcherInMilliseconds);
                         return backendAccess.CountFetch();
