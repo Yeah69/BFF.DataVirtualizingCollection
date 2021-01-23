@@ -54,7 +54,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
             await using var sut = PageWithFirstEntry69AndPlaceholder23;
 
             // Act
-            await Task.Delay(250).ConfigureAwait(false);
+            await sut.PageFetchCompletion.ConfigureAwait(false);
             var value = sut[0];
 
             // Assert
