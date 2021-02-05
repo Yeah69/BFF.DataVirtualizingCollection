@@ -3,6 +3,8 @@
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <UseWPF>true</UseWPF>
+        <RootNamespace>BFF.DataVirtualizingCollection.Tests.Integration</RootNamespace>
+        <AssemblyName>BFF.DataVirtualizingCollection.Tests.Integration</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>

@@ -5,6 +5,7 @@
     <IsPackable>false</IsPackable>
     <OutputType>Library</OutputType>
     <RootNamespace>BFF.DataVirtualizingCollection.Test</RootNamespace>
+    <AssemblyName>BFF.DataVirtualizingCollection.Tests.Unit</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

@@ -2,6 +2,8 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
+        <RootNamespace>BFF.DataVirtualizingCollection.Sample.Persistence.Proxy</RootNamespace>
+        <AssemblyName>BFF.DataVirtualizingCollection.Sample.Persistence.Proxy</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>
@@ -10,6 +12,10 @@
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Sample.Persistence\Sample.Persistence.csproj" />
     </ItemGroup>
 
 </Project>

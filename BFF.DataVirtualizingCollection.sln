@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.28917.182
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BFF.DataVirtualizingCollection", "BFF.DataVirtualizingCollection\BFF.DataVirtualizingCollection.csproj", "{D4D769DA-F7A2-43F0-ADA7-5895D36D585F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BFF.DataVirtualizingCollection.UnitTests", "BFF.DataVirtualizingCollection.UnitTests\BFF.DataVirtualizingCollection.UnitTests.csproj", "{F09BE363-223D-44B2-82BF-C3B3B3D6C547}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Icon", "Icon", "{2536F943-EEC8-4CF7-B0B2-E3569E164152}"
 	ProjectSection(SolutionItems) = preProject
 		Icon\Yeah69Logo.ico = Icon\Yeah69Logo.ico
@@ -18,7 +16,9 @@ ProjectSection(SolutionItems) = preProject
 	Directory.Build.props = Directory.Build.props
 EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BFF.DataVirtualizingCollection.IntegrationTests", "BFF.DataVirtualizingCollection.IntegrationTests\BFF.DataVirtualizingCollection.IntegrationTests.csproj", "{2DFC25F0-EEAC-4841-80D7-9EF235F73610}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Integration", "Tests.Integration\Tests.Integration.csproj", "{3F7BB7A3-7950-45B9-9968-3BBF6F186B30}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Unit", "Tests.Unit\Tests.Unit.csproj", "{E0EBFFF9-3F4F-4E81-AC3D-69937E0393CA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,14 +30,14 @@ Global
 		{D4D769DA-F7A2-43F0-ADA7-5895D36D585F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4D769DA-F7A2-43F0-ADA7-5895D36D585F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4D769DA-F7A2-43F0-ADA7-5895D36D585F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F09BE363-223D-44B2-82BF-C3B3B3D6C547}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F09BE363-223D-44B2-82BF-C3B3B3D6C547}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F09BE363-223D-44B2-82BF-C3B3B3D6C547}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F09BE363-223D-44B2-82BF-C3B3B3D6C547}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2DFC25F0-EEAC-4841-80D7-9EF235F73610}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2DFC25F0-EEAC-4841-80D7-9EF235F73610}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2DFC25F0-EEAC-4841-80D7-9EF235F73610}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2DFC25F0-EEAC-4841-80D7-9EF235F73610}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F7BB7A3-7950-45B9-9968-3BBF6F186B30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F7BB7A3-7950-45B9-9968-3BBF6F186B30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F7BB7A3-7950-45B9-9968-3BBF6F186B30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F7BB7A3-7950-45B9-9968-3BBF6F186B30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0EBFFF9-3F4F-4E81-AC3D-69937E0393CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0EBFFF9-3F4F-4E81-AC3D-69937E0393CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0EBFFF9-3F4F-4E81-AC3D-69937E0393CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0EBFFF9-3F4F-4E81-AC3D-69937E0393CA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

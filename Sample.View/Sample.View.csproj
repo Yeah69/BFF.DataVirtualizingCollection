@@ -4,11 +4,12 @@
         <OutputType>WinExe</OutputType>
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <UseWPF>true</UseWPF>
+      <RootNamespace>BFF.DataVirtualizingCollection.Sample.View</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\BFF.DataVirtualizingCollection.Sample.Persistence.Proxy\BFF.DataVirtualizingCollection.Sample.Persistence.Proxy.csproj" />
-      <ProjectReference Include="..\BFF.DataVirtualizingCollection.Sample.ViewModel\BFF.DataVirtualizingCollection.Sample.ViewModel.csproj" />
+      <ProjectReference Include="..\Sample.Persistence.Proxy\Sample.Persistence.Proxy.csproj" />
+      <ProjectReference Include="..\Sample.ViewModel\Sample.ViewModel.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -21,6 +22,7 @@
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
+      <PackageReference Include="System.Reactive" Version="5.0.0" />
       <PackageReference Include="VirtualizingWrapPanel" Version="1.4.2" />
     </ItemGroup>
 
