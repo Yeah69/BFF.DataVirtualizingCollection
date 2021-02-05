@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using MoreLinq.Extensions;
 using Xunit;
 
-namespace BFF.DataVirtualizingCollection.IntegrationTests.PageRemoval
+namespace BFF.DataVirtualizingCollection.Tests.Integration.PageRemoval
 {
     public class AsyncHoardingTests
     {

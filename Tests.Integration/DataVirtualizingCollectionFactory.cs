@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BFF.DataVirtualizingCollection.DataVirtualizingCollection;
 
-namespace BFF.DataVirtualizingCollection.IntegrationTests
+namespace BFF.DataVirtualizingCollection.Tests.Integration
 {
     internal static class DataVirtualizingCollectionFactory
     {

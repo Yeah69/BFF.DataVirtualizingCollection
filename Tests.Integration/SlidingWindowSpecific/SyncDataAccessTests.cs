@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using MoreLinq.Extensions;
 using Xunit;
 
-namespace BFF.DataVirtualizingCollection.IntegrationTests.SlidingWindowSpecific
+namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
 {
     public class SyncTests
     {
