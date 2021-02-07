@@ -14,7 +14,7 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
         private readonly Func<CancellationToken, int> _countFetcher;
         private readonly IScheduler _notificationScheduler;
         private readonly IPageStorage<T> _pageStorage;
-        private readonly Subject<Unit> _resetSubject = new Subject<Unit>();
+        private readonly Subject<Unit> _resetSubject = new();
         
         private int _count;
 

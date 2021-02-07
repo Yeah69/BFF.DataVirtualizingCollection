@@ -16,11 +16,11 @@ namespace BFF.DataVirtualizingCollection
 
         public bool IsSynchronized => false;
         
-        public object SyncRoot { get; } = new object();
+        public object SyncRoot { get; } = new();
         
         public abstract int Count { get; }
         
-        protected readonly CompositeDisposable CompositeDisposable = new CompositeDisposable();
+        protected readonly CompositeDisposable CompositeDisposable = new();
 
         int ICollection<T>.Count => GetCountInner();
 

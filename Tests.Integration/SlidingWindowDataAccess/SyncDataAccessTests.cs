@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Reactive.Testing;
 using MoreLinq.Extensions;
 using Xunit;
 
@@ -27,6 +28,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowDataAcce
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
@@ -35,7 +37,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowDataAcce
                 6969,
                 100,
                 10,
-                0);
+                0,
+                scheduler);
 
             // Act + Assert
             Assert.Equal(0, collection[0]);
@@ -50,6 +53,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowDataAcce
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
@@ -58,7 +62,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowDataAcce
                 6969,
                 100,
                 10,
-                60);
+                60,
+                scheduler);
 
             // Act + Assert
             Assert.Equal(69, collection[9]);
@@ -73,6 +78,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowDataAcce
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
@@ -81,7 +87,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowDataAcce
                 6969,
                 100,
                 10,
-                120);
+                120,
+                scheduler);
 
             // Act + Assert
             Assert.Equal(123, collection[3]);
@@ -96,6 +103,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowDataAcce
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
@@ -104,7 +112,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowDataAcce
                 6969,
                 100,
                 10,
-                6000);
+                6000,
+                scheduler);
 
             // Act + Assert
             Assert.Equal(6000, collection[0]);
@@ -119,6 +128,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowDataAcce
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
@@ -127,7 +137,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowDataAcce
                 6969,
                 100,
                 10,
-                6959);
+                6959,
+                scheduler);
 
             // Act + Assert
             Assert.Equal(6968, collection[9]);
@@ -142,6 +153,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowDataAcce
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
@@ -150,7 +162,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowDataAcce
                 6969,
                 100,
                 10,
-                6959);
+                6959,
+                scheduler);
 
             // Act + Assert
             Assert.Throws<IndexOutOfRangeException>(() => collection[10]);
@@ -165,6 +178,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowDataAcce
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
@@ -173,7 +187,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowDataAcce
                 6969,
                 100,
                 10,
-                6959);
+                6959,
+                scheduler);
 
             // Act + Assert
             Assert.Throws<IndexOutOfRangeException>(() => collection[-1]);
@@ -188,6 +203,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowDataAcce
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalIntegerWhereFetchersIgnorePageSize(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
@@ -196,7 +212,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowDataAcce
                 6969,
                 23,
                 10,
-                60);
+                60,
+                scheduler);
 
             // Act + Assert
             Assert.Equal(69, collection[9]);

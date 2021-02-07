@@ -15,9 +15,13 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration
             FetchersKind fetchersKind,
             IndexAccessBehavior indexAccessBehavior,
             int count,
-            int pageSize)
+            int pageSize,
+            IScheduler scheduler)
         {
-            var pageLoadingBehaviorCollectionBuilder = DataVirtualizingCollectionBuilder.Build<int>(pageSize, new EventLoopScheduler());
+            var pageLoadingBehaviorCollectionBuilder = DataVirtualizingCollectionBuilder.Build<int>(
+                pageSize, 
+                scheduler,
+                scheduler);
             var pageHoldingBehaviorCollectionBuilder =
                 StandardPageHoldingBehaviorCollectionBuilder(
                     pageLoadingBehaviorCollectionBuilder, 
@@ -52,9 +56,13 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration
             FetchersKind fetchersKind,
             IndexAccessBehavior indexAccessBehavior,
             int count,
-            int pageSize)
+            int pageSize,
+            IScheduler scheduler)
         {
-            var pageLoadingBehaviorCollectionBuilder = DataVirtualizingCollectionBuilder.Build<int>(pageSize, new EventLoopScheduler());
+            var pageLoadingBehaviorCollectionBuilder = DataVirtualizingCollectionBuilder.Build<int>(
+                pageSize, 
+                scheduler,
+                scheduler);
             var pageHoldingBehaviorCollectionBuilder =
                 StandardPageHoldingBehaviorCollectionBuilder(
                     pageLoadingBehaviorCollectionBuilder, 
@@ -92,9 +100,13 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration
             int count,
             int pageSize,
             Func<int, int, T[]> pageFetchingLogic,
-            T placeholder)
+            T placeholder,
+            IScheduler scheduler)
         {
-            var pageLoadingBehaviorCollectionBuilder = DataVirtualizingCollectionBuilder.Build<T>(pageSize, new EventLoopScheduler());
+            var pageLoadingBehaviorCollectionBuilder = DataVirtualizingCollectionBuilder.Build<T>(
+                pageSize,
+                scheduler,
+                scheduler);
             var pageHoldingBehaviorCollectionBuilder =
                 StandardPageHoldingBehaviorCollectionBuilder(
                     pageLoadingBehaviorCollectionBuilder, 
@@ -131,9 +143,13 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration
             Func<int, int, T[]> pageFetchingLogic,
             T placeholder,
             int pageLimit,
-            int removalCount)
+            int removalCount,
+            IScheduler scheduler)
         {
-            var pageLoadingBehaviorCollectionBuilder = DataVirtualizingCollectionBuilder.Build<T>(pageSize, new EventLoopScheduler());
+            var pageLoadingBehaviorCollectionBuilder = DataVirtualizingCollectionBuilder.Build<T>(
+                pageSize,
+                scheduler,
+                scheduler);
             var pageHoldingBehaviorCollectionBuilder =
                 StandardPageHoldingBehaviorCollectionBuilder(
                     pageLoadingBehaviorCollectionBuilder, 
@@ -202,12 +218,12 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration
                 FetchersKind.TaskBased => fetchersKindCollectionBuilder.TaskBasedFetchers(
                     async (offset, pSize, _) =>
                     {
-                        await Task.Delay(25).ConfigureAwait(false);
+                        await Task.Delay(TimeSpan.FromTicks(1)).ConfigureAwait(false);
                         return pageFetcher(offset, pSize);
                     },
                     async _ =>
                     {
-                        await Task.Delay(25).ConfigureAwait(false);
+                        await Task.Delay(TimeSpan.FromTicks(1)).ConfigureAwait(false);
                         return countFetcher();
                     }),
                 _ => throw new Exception("Test configuration failed!")

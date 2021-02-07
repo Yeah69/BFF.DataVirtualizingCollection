@@ -52,7 +52,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                 (offset, pageSize, _) => new[] { 69 });
 
         internal override SyncNonPreloadingNonTaskBasedPage<int> PageWithFirstEntry69 =>
-            new SyncNonPreloadingNonTaskBasedPage<int>(
+            new(
                 0, 
                 1, 
                 Disposable.Empty, 
@@ -60,7 +60,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
 
         internal override SyncNonPreloadingNonTaskBasedPage<IDisposable> PageWithDisposable(IDisposable disposable)
         {
-            return new SyncNonPreloadingNonTaskBasedPage<IDisposable>(
+            return new(
                 0, 
                 1,
                 Disposable.Empty, 

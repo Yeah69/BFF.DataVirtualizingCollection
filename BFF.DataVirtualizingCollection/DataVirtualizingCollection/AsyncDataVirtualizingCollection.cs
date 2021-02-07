@@ -17,8 +17,8 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
         private readonly IScheduler _notificationScheduler;
         private readonly IScheduler _countBackgroundScheduler;
         private readonly IPageStorage<T> _pageStorage;
-        private readonly Subject<Unit> _resetSubject = new Subject<Unit>();
-        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        private readonly Subject<Unit> _resetSubject = new ();
+        private readonly CancellationTokenSource _cancellationTokenSource = new ();
 
         private int _count;
 
@@ -64,7 +64,7 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
                 .SelectMany(async count =>
                 {
                     _count = count;
-                    await _pageStorage.Reset(_count);
+                    await _pageStorage.Reset(_count).ConfigureAwait(false);
                     return Unit.Default;
                 })
                 .ObserveOn(_notificationScheduler)

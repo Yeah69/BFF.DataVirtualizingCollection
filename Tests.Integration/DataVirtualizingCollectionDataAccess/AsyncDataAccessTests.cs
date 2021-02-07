@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Reactive.Testing;
 using MoreLinq.Extensions;
 using Xunit;
 
@@ -27,19 +28,23 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.DataVirtualizingColle
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                100);
+                100,
+                scheduler);
 
-            await collection.InitializationCompleted;
+            scheduler.AdvanceBy(20);
+            Assert.True(collection.InitializationCompleted.IsCompletedSuccessfully);
 
             // Act
             var placeholder = collection[0];
-            await Task.Delay(50);
+            await Task.Delay(TimeSpan.FromMilliseconds(50)).ConfigureAwait(false);
+            scheduler.AdvanceBy(20);
 
             // Assert
             Assert.Equal(-1, placeholder);
@@ -55,19 +60,23 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.DataVirtualizingColle
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                100);
+                100,
+                scheduler);
 
-            await collection.InitializationCompleted;
+            scheduler.AdvanceBy(20);
+            Assert.True(collection.InitializationCompleted.IsCompletedSuccessfully);
 
             // Act
             var placeholder = collection[69];
-            await Task.Delay(500);
+            await Task.Delay(TimeSpan.FromMilliseconds(50)).ConfigureAwait(false);
+            scheduler.AdvanceBy(20);
 
             // Assert
             Assert.Equal(-1, placeholder);
@@ -83,19 +92,23 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.DataVirtualizingColle
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                100);
+                100,
+                scheduler);
 
-            await collection.InitializationCompleted;
+            scheduler.AdvanceBy(20);
+            Assert.True(collection.InitializationCompleted.IsCompletedSuccessfully);
 
             // Act
             var placeholder = collection[123];
-            await Task.Delay(50);
+            await Task.Delay(TimeSpan.FromMilliseconds(50)).ConfigureAwait(false);
+            scheduler.AdvanceBy(20);
 
             // Assert
             Assert.Equal(-1, placeholder);
@@ -111,19 +124,23 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.DataVirtualizingColle
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                100);
+                100,
+                scheduler);
 
-            await collection.InitializationCompleted;
+            scheduler.AdvanceBy(20);
+            Assert.True(collection.InitializationCompleted.IsCompletedSuccessfully);
 
             // Act
             var placeholder = collection[6000];
-            await Task.Delay(50);
+            await Task.Delay(TimeSpan.FromMilliseconds(50)).ConfigureAwait(false);
+            scheduler.AdvanceBy(20);
 
             // Assert
             Assert.Equal(-1, placeholder);
@@ -139,19 +156,23 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.DataVirtualizingColle
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                100);
+                100,
+                scheduler);
 
-            await collection.InitializationCompleted;
+            scheduler.AdvanceBy(20);
+            Assert.True(collection.InitializationCompleted.IsCompletedSuccessfully);
 
             // Act
             var placeholder = collection[6968];
-            await Task.Delay(50);
+            await Task.Delay(TimeSpan.FromMilliseconds(50)).ConfigureAwait(false);
+            scheduler.AdvanceBy(20);
 
             // Assert
             Assert.Equal(-1, placeholder);
@@ -167,15 +188,18 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.DataVirtualizingColle
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                100);
+                100,
+                scheduler);
 
-            await collection.InitializationCompleted;
+            scheduler.AdvanceBy(20);
+            Assert.True(collection.InitializationCompleted.IsCompletedSuccessfully);
 
             // Act + Assert
             Assert.Throws<IndexOutOfRangeException>(() => collection[6969]);
@@ -190,15 +214,18 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.DataVirtualizingColle
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                100);
+                100,
+                scheduler);
 
-            await collection.InitializationCompleted;
+            scheduler.AdvanceBy(20);
+            Assert.True(collection.InitializationCompleted.IsCompletedSuccessfully);
 
             // Act + Assert
             Assert.Throws<IndexOutOfRangeException>(() => collection[-1]);
@@ -213,19 +240,23 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.DataVirtualizingColle
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalIntegerWhereFetchersIgnorePageSize(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                23);
+                23,
+                scheduler);
 
-            await collection.InitializationCompleted;
+            scheduler.AdvanceBy(20);
+            Assert.True(collection.InitializationCompleted.IsCompletedSuccessfully);
 
             // Act
             var placeholder = collection[69];
-            await Task.Delay(50);
+            await Task.Delay(TimeSpan.FromMilliseconds(50)).ConfigureAwait(false);
+            scheduler.AdvanceBy(20);
 
             // Assert
             Assert.Equal(-1, placeholder);

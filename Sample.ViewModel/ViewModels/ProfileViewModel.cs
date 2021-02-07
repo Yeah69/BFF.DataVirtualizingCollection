@@ -26,14 +26,14 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels
 
     public class EmptyProfileViewModel : IProfileViewModel
     {
-        public static EmptyProfileViewModel Instance { get; } = new EmptyProfileViewModel();
+        public static EmptyProfileViewModel Instance { get; } = new();
         
         private EmptyProfileViewModel(){}
     }
 
     public class PreloadingProfileViewModel : IProfileViewModel
     {
-        public static PreloadingProfileViewModel Instance { get; } = new PreloadingProfileViewModel();
+        public static PreloadingProfileViewModel Instance { get; } = new();
         
         private PreloadingProfileViewModel(){}
     }

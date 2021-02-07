@@ -128,7 +128,7 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
             var countFetcher = CountFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
             
             var dvc = new AsyncDataVirtualizingCollection<TItem>(
-                GenerateTaskBasedAsynchronousPageStorage(pageFetchEvents),
+                GenerateNonTaskBasedAsynchronousPageStorage(pageFetchEvents),
                 ct => Task.FromResult(countFetcher(ct)), 
                 pageFetchEvents.AsObservable(),
                 pageFetchEvents,

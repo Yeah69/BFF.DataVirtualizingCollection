@@ -23,12 +23,11 @@ namespace BFF.DataVirtualizingCollection.PageStorage
     {
         private readonly int _pageSize;
         private readonly Func<int, int, int, IDisposable, IPage<T>> _nonPreloadingPageFactory;
-        private readonly CompositeDisposable _compositeDisposable = new CompositeDisposable();
+        private readonly CompositeDisposable _compositeDisposable = new();
 
-        protected readonly int PageCount;
         protected bool IsDisposed;
-        protected readonly object IsDisposedLock = new object();
-        protected readonly ConcurrentDictionary<int, IPage<T>> Pages = new ConcurrentDictionary<int, IPage<T>>();
+        protected readonly object IsDisposedLock = new();
+        protected readonly ConcurrentDictionary<int, IPage<T>> Pages = new();
         protected readonly ISubject<(int PageKey, int PageIndex)> Requests;
 
         private int _count;
@@ -65,6 +64,8 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                         exception))
                 .CompositeDisposalWith(_compositeDisposable);
         }
+        
+        protected int PageCount { get; private set; }
 
         public T this[int index]
         {
@@ -95,6 +96,9 @@ namespace BFF.DataVirtualizingCollection.PageStorage
         public Task Reset(int newCount)
         {
             _count = newCount;
+            PageCount = _count % _pageSize == 0 
+                            ? _count / _pageSize 
+                            : _count / _pageSize + 1;
 
             return Task.WhenAll(
                 Pages.Values.ToList().Select(p => p.DisposeAsync().AsTask()));

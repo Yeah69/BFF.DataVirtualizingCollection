@@ -67,15 +67,16 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
                 .Subscribe(_ => OnIndexerChanged())
                 .CompositeDisposalWith(CompositeDisposable);
 
-            InitializationCompleted
+            InitializationCompleted = dataVirtualizingCollection
+                .InitializationCompleted
                 .ToObservable()
                 .ObserveOn(notificationScheduler)
-                .Subscribe(_ =>
+                .Do(_ =>
                 {
                     _size = windowSize;
                     JumpTo(offset);
                 })
-                .CompositeDisposalWith(CompositeDisposable);
+                .ToTask();
         }
         
         public int Offset { get; private set; }
@@ -177,7 +178,7 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
 
         public override void Reset() => _dataVirtualizingCollection.Reset();
 
-        public override Task InitializationCompleted => _dataVirtualizingCollection.InitializationCompleted;
+        public override Task InitializationCompleted { get; }
 
         public override async ValueTask DisposeAsync()
         {

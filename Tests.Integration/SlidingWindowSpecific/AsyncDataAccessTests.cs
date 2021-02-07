@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Reactive.Testing;
 using MoreLinq.Extensions;
 using Xunit;
 
@@ -27,6 +28,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
@@ -35,7 +37,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
                 6969,
                 10,
                 10,
-                69);
+                69,
+                scheduler);
             
             await collection.InitializationCompleted;
 
@@ -57,6 +60,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
@@ -65,7 +69,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
                 6969,
                 10,
                 10,
-                0);
+                0,
+                scheduler);
 
             await collection.InitializationCompleted;
 
@@ -87,6 +92,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
@@ -95,7 +101,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
                 6969,
                 10,
                 10,
-                69);
+                69,
+                scheduler);
 
             await collection.InitializationCompleted;
 
@@ -117,6 +124,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
@@ -125,7 +133,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
                 6969,
                 10,
                 10,
-                6959);
+                6959,
+                scheduler);
 
             await collection.InitializationCompleted;
 
@@ -147,6 +156,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
@@ -155,7 +165,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
                 6969,
                 10,
                 10,
-                69);
+                69,
+                scheduler);
 
             await collection.InitializationCompleted;
 
@@ -177,6 +188,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
@@ -185,7 +197,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
                 6969,
                 10,
                 10,
-                69);
+                69,
+                scheduler);
 
             await collection.InitializationCompleted;
 
@@ -207,6 +220,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
@@ -215,7 +229,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
                 6969,
                 10,
                 10,
-                69);
+                69,
+                scheduler);
 
             await collection.InitializationCompleted;
 
@@ -237,6 +252,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
@@ -245,7 +261,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
                 6969,
                 10,
                 10,
-                69);
+                69,
+                scheduler);
 
             await collection.InitializationCompleted;
 
@@ -268,6 +285,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
@@ -276,7 +294,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
                 6969,
                 10,
                 10,
-                69);
+                69,
+                scheduler);
 
             await collection.InitializationCompleted;
 
@@ -299,6 +318,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
@@ -307,7 +327,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
                 6969,
                 10,
                 10,
-                6959);
+                6959,
+                scheduler);
 
             await collection.InitializationCompleted;
 
@@ -330,6 +351,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
@@ -338,7 +360,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
                 6969,
                 10,
                 10,
-                69);
+                69,
+                scheduler);
 
             await collection.InitializationCompleted;
 
@@ -362,6 +385,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
@@ -370,7 +394,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
                 6969,
                 10,
                 10,
-                69);
+                69,
+                scheduler);
 
             await collection.InitializationCompleted;
 
@@ -394,6 +419,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = SlidingWindowFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
@@ -402,7 +428,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
                 6969,
                 10,
                 10,
-                69);
+                69,
+                scheduler);
 
             await collection.InitializationCompleted;
             
@@ -428,6 +455,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             bool switched = false;
 
             int[] PageFetcher(int offset, int size) =>
@@ -445,7 +473,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
                 10,
                 69,
                 PageFetcher,
-                -1);
+                -1,
+                scheduler);
 
             await collection.InitializationCompleted;
             
@@ -472,6 +501,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             bool switched = false;
 
             int CountFetcher() =>
@@ -487,7 +517,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
                 CountFetcher,
                 10,
                 10,
-                69);
+                69,
+                scheduler);
 
             await collection.InitializationCompleted;
             
@@ -514,6 +545,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             bool switched = false;
 
             int CountFetcher() =>
@@ -529,7 +561,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.SlidingWindowSpecific
                 CountFetcher,
                 10,
                 10,
-                69);
+                69,
+                scheduler);
 
             await collection.InitializationCompleted;
             

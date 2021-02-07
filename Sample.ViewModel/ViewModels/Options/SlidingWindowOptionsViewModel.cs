@@ -6,7 +6,7 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Options
 
     public class SpecificOptionsViewModel : ObservableObject, ISpecificOptionsViewModel
     {
-        public static SpecificOptionsViewModel Empty = new SpecificOptionsViewModel();
+        public static SpecificOptionsViewModel Empty = new();
         
         protected SpecificOptionsViewModel()
         {}

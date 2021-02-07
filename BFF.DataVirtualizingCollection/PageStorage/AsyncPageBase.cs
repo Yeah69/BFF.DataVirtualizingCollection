@@ -14,7 +14,7 @@ namespace BFF.DataVirtualizingCollection.PageStorage
     {
         private readonly int _pageSize;
         private readonly IDisposable _onDisposalAfterFetchCompleted;
-        protected readonly CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
+        protected readonly CancellationTokenSource CancellationTokenSource = new();
         protected T[] Page;
         protected bool IsDisposed;
 

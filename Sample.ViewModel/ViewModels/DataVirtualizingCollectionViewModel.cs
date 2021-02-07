@@ -37,7 +37,7 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels
         private readonly IGetSchedulers _getSchedulers;
         private IVirtualizationBase? _items;
         private readonly SerialDisposable _serialItems;
-        private readonly CompositeDisposable _compositeDisposable = new CompositeDisposable();
+        private readonly CompositeDisposable _compositeDisposable = new();
 
         protected DataVirtualizingCollectionViewModelBaseBase(
             // parameters

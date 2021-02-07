@@ -10,7 +10,7 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Functions
 
     public class SpecificFunctionsViewModel : ObservableObject, ISpecificFunctionsViewModel
     {
-        public static SpecificFunctionsViewModel Empty = new SpecificFunctionsViewModel();
+        public static SpecificFunctionsViewModel Empty = new();
         
         protected SpecificFunctionsViewModel()
         {}

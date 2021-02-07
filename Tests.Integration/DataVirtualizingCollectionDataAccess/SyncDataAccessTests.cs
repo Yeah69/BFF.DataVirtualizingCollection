@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Reactive.Testing;
 using MoreLinq.Extensions;
 using Xunit;
 
@@ -27,13 +28,15 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.DataVirtualizingColle
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                100);
+                100,
+                scheduler);
 
             // Act + Assert
             Assert.Equal(0, collection[0]);
@@ -48,13 +51,15 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.DataVirtualizingColle
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                100);
+                100,
+                scheduler);
 
             // Act + Assert
             Assert.Equal(69, collection[69]);
@@ -69,13 +74,15 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.DataVirtualizingColle
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                100);
+                100,
+                scheduler);
 
             // Act + Assert
             Assert.Equal(123, collection[123]);
@@ -90,13 +97,15 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.DataVirtualizingColle
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                100);
+                100,
+                scheduler);
 
             // Act + Assert
             Assert.Equal(6000, collection[6000]);
@@ -111,13 +120,15 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.DataVirtualizingColle
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                100);
+                100,
+                scheduler);
 
             // Act + Assert
             Assert.Equal(6968, collection[6968]);
@@ -132,13 +143,15 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.DataVirtualizingColle
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                100);
+                100,
+                scheduler);
 
             // Act + Assert
             Assert.Throws<IndexOutOfRangeException>(() => collection[6969]);
@@ -153,13 +166,15 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.DataVirtualizingColle
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalInteger(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                100);
+                100,
+                scheduler);
 
             // Act + Assert
             Assert.Throws<IndexOutOfRangeException>(() => collection[-1]);
@@ -174,13 +189,15 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.DataVirtualizingColle
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithIncrementalIntegerWhereFetchersIgnorePageSize(
                 pageLoadingBehavior,
                 pageRemovalBehavior,
                 fetchersKind,
                 indexAccessBehavior,
                 6969,
-                23);
+                23,
+                scheduler);
 
             // Act + Assert
             Assert.Equal(69, collection[69]);

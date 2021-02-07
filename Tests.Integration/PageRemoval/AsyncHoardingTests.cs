@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Threading.Tasks;
+using Microsoft.Reactive.Testing;
 using MoreLinq.Extensions;
 using Xunit;
 
@@ -27,6 +28,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.PageRemoval
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             var set = new ConcurrentBag<int>();
             await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogic(
                 pageLoadingBehavior,
@@ -40,16 +42,19 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.PageRemoval
                         .Range(offset, pSize)
                         .Select(i => Disposable.Create(() => set.Add(i)))
                         .ToArray(),
-                Disposable.Empty);
+                Disposable.Empty,
+                scheduler);
 
-            await collection.InitializationCompleted;
+            scheduler.AdvanceBy(20);
+            Assert.True(collection.InitializationCompleted.IsCompletedSuccessfully);
 
             // Act
             for (var i = 0; i <= 6900; i += 100)
             {
                 var _ = collection[i];
             }
-            await Task.Delay(500);
+            await Task.Delay(TimeSpan.FromMilliseconds(50)).ConfigureAwait(false);
+            scheduler.AdvanceBy(20);
 
             // Assert
             Assert.Empty(set);
@@ -64,6 +69,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.PageRemoval
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             const int expected = 69;
             var set = new ConcurrentBag<int>();
             var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogic(
@@ -78,18 +84,22 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.PageRemoval
                         .Range(offset, pSize)
                         .Select(i => Disposable.Create(() => set.Add(i)))
                         .ToArray(),
-                Disposable.Empty);
+                Disposable.Empty,
+                scheduler);
 
-            await collection.InitializationCompleted;
+            scheduler.AdvanceBy(20);
+            Assert.True(collection.InitializationCompleted.IsCompletedSuccessfully);
 
             // Act
             for (var i = 0; i <= expected; i += 10)
             {
                 var _ = collection[i];
-                await Task.Delay(50);
+                await Task.Delay(TimeSpan.FromMilliseconds(50)).ConfigureAwait(false);
+                scheduler.AdvanceBy(20);
             }
             await collection.DisposeAsync();
-            await Task.Delay(50);
+            await Task.Delay(TimeSpan.FromMilliseconds(50)).ConfigureAwait(false);
+            scheduler.AdvanceBy(20);
 
             // Assert
             Assert.Equal(expected, set.Count);

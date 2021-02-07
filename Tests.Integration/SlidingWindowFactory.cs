@@ -17,13 +17,15 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration
             int count,
             int pageSize,
             int initialWindowSize,
-            int initialWindowOffset)
+            int initialWindowOffset,
+            IScheduler scheduler)
         {
             var pageLoadingBehaviorCollectionBuilder = SlidingWindowBuilder.Build<int>(
                 initialWindowSize, 
                 initialWindowOffset,
                 pageSize, 
-                new EventLoopScheduler());
+                scheduler,
+                scheduler);
             var pageHoldingBehaviorCollectionBuilder =
                 StandardPageHoldingBehaviorCollectionBuilder(
                     pageLoadingBehaviorCollectionBuilder, 
@@ -60,13 +62,15 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration
             int count,
             int pageSize,
             int initialWindowSize,
-            int initialWindowOffset)
+            int initialWindowOffset,
+            IScheduler scheduler)
         {
             var pageLoadingBehaviorCollectionBuilder = SlidingWindowBuilder.Build<int>(
                 initialWindowSize, 
                 initialWindowOffset, 
                 pageSize,
-                new EventLoopScheduler());
+                scheduler,
+                scheduler);
             var pageHoldingBehaviorCollectionBuilder =
                 StandardPageHoldingBehaviorCollectionBuilder(
                     pageLoadingBehaviorCollectionBuilder, 
@@ -106,13 +110,15 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration
             int initialWindowSize,
             int initialWindowOffset,
             Func<int, int, T[]> pageFetchingLogic,
-            T placeholder)
+            T placeholder,
+            IScheduler scheduler)
         {
             var pageLoadingBehaviorCollectionBuilder = SlidingWindowBuilder.Build<T>(
                 initialWindowSize, 
                 initialWindowOffset, 
                 pageSize, 
-                new EventLoopScheduler());
+                scheduler,
+                scheduler);
             var pageHoldingBehaviorCollectionBuilder =
                 StandardPageHoldingBehaviorCollectionBuilder(
                     pageLoadingBehaviorCollectionBuilder, 
@@ -151,13 +157,15 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration
             Func<int, int, T[]> pageFetchingLogic,
             T placeholder,
             int pageLimit,
-            int removalCount)
+            int removalCount,
+            IScheduler scheduler)
         {
             var pageLoadingBehaviorCollectionBuilder = SlidingWindowBuilder.Build<T>(
                 initialWindowSize,
                 initialWindowOffset,
                 pageSize,
-                new EventLoopScheduler());
+                scheduler,
+                scheduler);
             var pageHoldingBehaviorCollectionBuilder =
                 StandardPageHoldingBehaviorCollectionBuilder(
                     pageLoadingBehaviorCollectionBuilder,
@@ -192,12 +200,14 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration
             Func<int> countFetcher,
             int pageSize,
             int initialWindowSize,
-            int initialWindowOffset)
+            int initialWindowOffset,
+            IScheduler scheduler)
         {
             var pageLoadingBehaviorCollectionBuilder = SlidingWindowBuilder.Build<int>(
                 initialWindowSize, 
                 initialWindowOffset, pageSize, 
-                new EventLoopScheduler());
+                scheduler,
+                scheduler);
             var pageHoldingBehaviorCollectionBuilder =
                 StandardPageHoldingBehaviorCollectionBuilder(
                     pageLoadingBehaviorCollectionBuilder, 
@@ -269,12 +279,12 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration
                 FetchersKind.TaskBased => fetchersKindCollectionBuilder.TaskBasedFetchers(
                     async (offset, pSize, _) =>
                     {
-                        await Task.Delay(25).ConfigureAwait(false);
+                        await Task.Delay(TimeSpan.FromTicks(1)).ConfigureAwait(false);
                         return pageFetcher(offset, pSize);
                     },
                     async _ =>
                     {
-                        await Task.Delay(25).ConfigureAwait(false);
+                        await Task.Delay(TimeSpan.FromTicks(1)).ConfigureAwait(false);
                         return countFetcher();
                     }),
                 _ => throw new Exception("Test configuration failed!")

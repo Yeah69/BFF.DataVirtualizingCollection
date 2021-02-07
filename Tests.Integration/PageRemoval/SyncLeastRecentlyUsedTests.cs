@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Reactive.Testing;
 using MoreLinq.Extensions;
 using Xunit;
 
@@ -41,6 +42,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.PageRemoval
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             var set = new ConcurrentBag<int>();
             await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
                 pageLoadingBehavior,
@@ -56,7 +58,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.PageRemoval
                         .ToArray(),
                 Disposable.Empty,
                 10,
-                1);
+                1,
+                scheduler);
 
             // Act
             for (var i = 0; i <= 900; i += 100)
@@ -77,6 +80,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.PageRemoval
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             var set = new ConcurrentBag<int>();
             await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
                 pageLoadingBehavior,
@@ -92,7 +96,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.PageRemoval
                         .ToArray(),
                 Disposable.Empty,
                 10,
-                1);
+                1,
+                scheduler);
 
             // Act
             for (var i = 0; i <= 800; i += 100)
@@ -113,6 +118,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.PageRemoval
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             var set = new ConcurrentBag<int>();
             await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
                 pageLoadingBehavior,
@@ -128,7 +134,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.PageRemoval
                         .ToArray(),
                 Disposable.Empty,
                 10,
-                1);
+                1,
+                scheduler);
 
             // Act
             for (var i = 0; i <= 900; i += 100)
@@ -153,6 +160,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.PageRemoval
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             var set = new ConcurrentBag<int>();
             await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
                 pageLoadingBehavior,
@@ -168,7 +176,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.PageRemoval
                         .ToArray(),
                 Disposable.Empty,
                 10,
-                1);
+                1,
+                scheduler);
 
             // Act
             for (var i = 0; i <= 800; i += 100)
@@ -193,6 +202,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.PageRemoval
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             int[] expected = Enumerable.Range(0, 100).ToArray();
             var set = new ConcurrentBag<int>();
             await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
@@ -209,7 +219,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.PageRemoval
                         .ToArray(),
                 Disposable.Empty,
                 10,
-                1);
+                1,
+                scheduler);
 
             // Act
             for (var i = 0; i <= 1000; i += 100)
@@ -232,6 +243,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.PageRemoval
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             int[] expected = Enumerable.Range(0, 100).ToArray();
             var set = new ConcurrentBag<int>();
             await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
@@ -248,7 +260,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.PageRemoval
                         .ToArray(),
                 Disposable.Empty,
                 10,
-                1);
+                1,
+                scheduler);
 
             // Act
             for (var i = 0; i <= 900; i += 100)
@@ -271,6 +284,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.PageRemoval
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             int[] expected = Enumerable.Range(0, 300).ToArray();
             var set = new ConcurrentBag<int>();
             await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
@@ -287,7 +301,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.PageRemoval
                         .ToArray(),
                 Disposable.Empty,
                 10,
-                3);
+                3,
+                scheduler);
 
             // Act
             for (var i = 0; i <= 1000; i += 100)
@@ -312,6 +327,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.PageRemoval
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             int[] expected = Enumerable.Range(0, 100).ToArray();
             var set = new ConcurrentBag<int>();
             await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
@@ -328,7 +344,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.PageRemoval
                         .ToArray(),
                 Disposable.Empty,
                 1,
-                1);
+                1,
+                scheduler);
 
             // Act
             for (var i = 0; i <= 300; i += 100)
@@ -351,6 +368,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.PageRemoval
             IndexAccessBehavior indexAccessBehavior)
         {
             // Arrange
+            var scheduler = new TestScheduler();
             int[] expected = Enumerable.Range(0, 100).ToArray();
             var set = new ConcurrentBag<int>();
             await using var collection = DataVirtualizingCollectionFactory.CreateCollectionWithCustomPageFetchingLogicAndCustomLeastRecentlyUsed(
@@ -367,7 +385,8 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration.PageRemoval
                         .ToArray(),
                 Disposable.Empty,
                 4,
-                3);
+                3,
+                scheduler);
 
             // Act
             for (var i = 0; i <= 300; i += 100)
