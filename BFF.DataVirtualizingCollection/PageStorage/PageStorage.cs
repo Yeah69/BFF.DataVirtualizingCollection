@@ -40,9 +40,7 @@ namespace BFF.DataVirtualizingCollection.PageStorage
         {
             _pageSize = pageSize;
             _count = count;
-            PageCount = count % pageSize == 0 
-                ? count / pageSize 
-                : count / pageSize + 1;
+            PageCount = CalculateCurrentPageCount();
             _nonPreloadingPageFactory = nonPreloadingPageFactory;
             Requests = new Subject<(int PageKey, int PageIndex)>().CompositeDisposalWith(_compositeDisposable);
             pageReplacementStrategyFactory(Requests)
@@ -96,9 +94,7 @@ namespace BFF.DataVirtualizingCollection.PageStorage
         public Task Reset(int newCount)
         {
             _count = newCount;
-            PageCount = _count % _pageSize == 0 
-                            ? _count / _pageSize 
-                            : _count / _pageSize + 1;
+            PageCount = CalculateCurrentPageCount();
 
             return Task.WhenAll(
                 Pages.Values.ToList().Select(p => p.DisposeAsync().AsTask()));
@@ -130,5 +126,9 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                 IsDisposed = true;
             }
         }
+        
+        private int CalculateCurrentPageCount() => _count % _pageSize == 0 
+                                                       ? _count / _pageSize 
+                                                       : _count / _pageSize + 1;
     }
 }

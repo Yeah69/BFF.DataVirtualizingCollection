@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
@@ -89,6 +90,103 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
 
             // Assert
             await page.Received(Quantity.Exactly(2)).DisposeAsync();
+        }
+
+        [Fact]
+        public async Task PageCount_Initially0_0()
+        {
+            // Arrange
+            var page = Substitute.For<IPage<int>>();
+            page.ReturnsForAll(69);
+            var subject = new Subject<IReadOnlyList<int>>();
+            await using var sut = new PageStorageSpy(
+                10,
+                0,
+                (_, __, ___, ____) => page,
+                _ => subject);
+
+            // Act
+            var result = sut.PageCountDisclosure;
+
+            // Assert
+            Assert.Equal(0, result);
+        }
+
+        [Fact]
+        public async Task PageCount_InitiallyCount10000_1000()
+        {
+            // Arrange
+            var page = Substitute.For<IPage<int>>();
+            page.ReturnsForAll(69);
+            var subject = new Subject<IReadOnlyList<int>>();
+            await using var sut = new PageStorageSpy(
+                10,
+                10000,
+                (_, __, ___, ____) => page,
+                _ => subject);
+
+            // Act
+            var result = sut.PageCountDisclosure;
+
+            // Assert
+            Assert.Equal(1000, result);
+        }
+
+        [Fact]
+        public async Task PageCount_InitiallyCount0ThenResetCountTo10000_1000()
+        {
+            // Arrange
+            var page = Substitute.For<IPage<int>>();
+            page.ReturnsForAll(69);
+            var subject = new Subject<IReadOnlyList<int>>();
+            await using var sut = new PageStorageSpy(
+                10,
+                0,
+                (_, __, ___, ____) => page,
+                _ => subject);
+
+            await sut.Reset(10000).ConfigureAwait(false);
+
+            // Act
+            var result = sut.PageCountDisclosure;
+
+            // Assert
+            Assert.Equal(1000, result);
+        }
+
+        [Fact]
+        public async Task PageCount_InitiallyCount0ThenResetCountTo10001_1001()
+        {
+            // Arrange
+            var page = Substitute.For<IPage<int>>();
+            page.ReturnsForAll(69);
+            var subject = new Subject<IReadOnlyList<int>>();
+            await using var sut = new PageStorageSpy(
+                10,
+                0,
+                (_, __, ___, ____) => page,
+                _ => subject);
+
+            await sut.Reset(10001).ConfigureAwait(false);
+
+            // Act
+            var result = sut.PageCountDisclosure;
+
+            // Assert
+            Assert.Equal(1001, result);
+        }
+
+        private class PageStorageSpy : PageStorage<int>
+        {
+            internal PageStorageSpy(
+                int pageSize,
+                int count,
+                Func<int, int, int, IDisposable, IPage<int>> nonPreloadingPageFactory,
+                Func<IObservable<(int PageKey, int PageIndex)>, IObservable<IReadOnlyList<int>>>
+                    pageReplacementStrategyFactory)
+                : base(pageSize, count, nonPreloadingPageFactory, pageReplacementStrategyFactory) { }
+
+            internal int PageCountDisclosure => PageCount;
         }
     }
 }
