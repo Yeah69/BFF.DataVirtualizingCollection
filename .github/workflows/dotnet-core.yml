@@ -16,7 +16,7 @@ jobs:
 
     env:
       Solution_Name: BFF.DataVirtualizingCollection.sln                        # Replace with your solution name, i.e. MyWpfApp.sln.
-      Test_Project_Path: BFF.DataVirtualizingCollection.UnitTests\BFF.DataVirtualizingCollection.UnitTests.csproj                # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
+      Test_Project_Path: Tests.Unit\Tests.Unit.csproj                # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
       
     steps:
     - uses: actions/checkout@v2
@@ -32,4 +32,4 @@ jobs:
     - name: Build
       run: dotnet build .\BFF.DataVirtualizingCollection.sln --configuration Release --no-restore
     - name: Test
-      run: dotnet test .\BFF.DataVirtualizingCollection.UnitTests\BFF.DataVirtualizingCollection.UnitTests.csproj --no-restore --verbosity normal
+      run: dotnet test .\Tests.Unit\Tests.Unit.csproj --no-restore --verbosity normal
