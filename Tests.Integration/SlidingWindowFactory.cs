@@ -24,7 +24,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration
                 initialWindowSize, 
                 initialWindowOffset,
                 pageSize, 
-                scheduler,
+                new EventLoopScheduler(),
                 scheduler);
             var pageHoldingBehaviorCollectionBuilder =
                 StandardPageHoldingBehaviorCollectionBuilder(
@@ -69,7 +69,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration
                 initialWindowSize, 
                 initialWindowOffset, 
                 pageSize,
-                scheduler,
+                new EventLoopScheduler(),
                 scheduler);
             var pageHoldingBehaviorCollectionBuilder =
                 StandardPageHoldingBehaviorCollectionBuilder(
@@ -117,7 +117,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration
                 initialWindowSize, 
                 initialWindowOffset, 
                 pageSize, 
-                scheduler,
+                new EventLoopScheduler(),
                 scheduler);
             var pageHoldingBehaviorCollectionBuilder =
                 StandardPageHoldingBehaviorCollectionBuilder(
@@ -164,7 +164,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration
                 initialWindowSize,
                 initialWindowOffset,
                 pageSize,
-                scheduler,
+                new EventLoopScheduler(),
                 scheduler);
             var pageHoldingBehaviorCollectionBuilder =
                 StandardPageHoldingBehaviorCollectionBuilder(
@@ -206,7 +206,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration
             var pageLoadingBehaviorCollectionBuilder = SlidingWindowBuilder.Build<int>(
                 initialWindowSize, 
                 initialWindowOffset, pageSize, 
-                scheduler,
+                new EventLoopScheduler(),
                 scheduler);
             var pageHoldingBehaviorCollectionBuilder =
                 StandardPageHoldingBehaviorCollectionBuilder(

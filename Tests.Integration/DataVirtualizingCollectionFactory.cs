@@ -20,7 +20,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration
         {
             var pageLoadingBehaviorCollectionBuilder = DataVirtualizingCollectionBuilder.Build<int>(
                 pageSize, 
-                scheduler,
+                new EventLoopScheduler(),
                 scheduler);
             var pageHoldingBehaviorCollectionBuilder =
                 StandardPageHoldingBehaviorCollectionBuilder(
@@ -61,7 +61,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration
         {
             var pageLoadingBehaviorCollectionBuilder = DataVirtualizingCollectionBuilder.Build<int>(
                 pageSize, 
-                scheduler,
+                new EventLoopScheduler(),
                 scheduler);
             var pageHoldingBehaviorCollectionBuilder =
                 StandardPageHoldingBehaviorCollectionBuilder(
@@ -105,7 +105,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration
         {
             var pageLoadingBehaviorCollectionBuilder = DataVirtualizingCollectionBuilder.Build<T>(
                 pageSize,
-                scheduler,
+                new EventLoopScheduler(),
                 scheduler);
             var pageHoldingBehaviorCollectionBuilder =
                 StandardPageHoldingBehaviorCollectionBuilder(
@@ -148,7 +148,7 @@ namespace BFF.DataVirtualizingCollection.Tests.Integration
         {
             var pageLoadingBehaviorCollectionBuilder = DataVirtualizingCollectionBuilder.Build<T>(
                 pageSize,
-                scheduler,
+                new EventLoopScheduler(),
                 scheduler);
             var pageHoldingBehaviorCollectionBuilder =
                 StandardPageHoldingBehaviorCollectionBuilder(

@@ -40,7 +40,7 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
                     {
                         case NotifyCollectionChangedAction.Replace:
                             var index = e.EventArgs.NewStartingIndex - Offset;
-                            if (index > _size) return;
+                            if (index < 0 || index >= _size) return;
                             OnCollectionChangedReplace((T) e.EventArgs.NewItems[0], (T) e.EventArgs.OldItems[0], index);
                             break;
                         case NotifyCollectionChangedAction.Reset:
@@ -76,6 +76,7 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
                     _size = windowSize;
                     JumpTo(offset);
                 })
+                .FirstAsync()
                 .ToTask();
         }
         
@@ -174,7 +175,9 @@ namespace BFF.DataVirtualizingCollection.SlidingWindow
         public override int Count => _size;
 
         protected override T IndexerInnerGet(int index) =>
-            _dataVirtualizingCollection[Offset + index];
+            index < 0 || index >= Count
+                ? throw new IndexOutOfRangeException()
+                : _dataVirtualizingCollection[Offset + index];
 
         public override void Reset() => _dataVirtualizingCollection.Reset();
 
