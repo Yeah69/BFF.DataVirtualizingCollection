@@ -29,6 +29,7 @@ namespace BFF.DataVirtualizingCollection.PageStorage
             
             // dependencies
             Func<int, int, T> placeholderFactory,
+            IAsyncPageFetchScheduler asyncPageFetchScheduler,
             IScheduler pageBackgroundScheduler,
             IObserver<(int Offset, int PageSize, T[] PreviousPage, T[] Page)> pageArrivalObservations)
         {
@@ -41,11 +42,17 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                 .Select(pageIndex => placeholderFactory(pageKey, pageIndex))
                 .ToArray();
             PageFetchCompletion = Observable
-                .StartAsync(OnPageFetch, pageBackgroundScheduler)
+                .StartAsync(FetchPage, pageBackgroundScheduler)
                 .ToTask(_cancellationTokenSource.Token);
+            
+            async Task FetchPage(CancellationToken ct)
+            {
+                await asyncPageFetchScheduler.Schedule(ct).ConfigureAwait(false);
+                await FetchPageInner(ct).ConfigureAwait(false);
+            }
         }
 
-        protected abstract Task OnPageFetch(CancellationToken ct);
+        protected abstract Task FetchPageInner(CancellationToken ct);
 
         public Task PageFetchCompletion { get; }
 
@@ -98,6 +105,7 @@ namespace BFF.DataVirtualizingCollection.PageStorage
             // dependencies
             Func<int, int, CancellationToken, T[]> pageFetcher,
             Func<int, int, T> placeholderFactory,
+            IAsyncPageFetchScheduler asyncPageFetchScheduler,
             IScheduler pageBackgroundScheduler,
             IObserver<(int Offset, int PageSize, T[] PreviousPage, T[] Page)> pageArrivalObservations) 
             : base(
@@ -106,11 +114,12 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                 pageSize,
                 onDisposalAfterFetchCompleted, 
                 placeholderFactory,
+                asyncPageFetchScheduler,
                 pageBackgroundScheduler,
                 pageArrivalObservations) =>
             _pageFetcher = pageFetcher;
 
-        protected override async Task OnPageFetch(CancellationToken ct)
+        protected override async Task FetchPageInner(CancellationToken ct)
         {
             var previousPage = Page;
             await Task.Delay(1, ct).ConfigureAwait(false);
@@ -137,6 +146,7 @@ namespace BFF.DataVirtualizingCollection.PageStorage
             // dependencies
             Func<int, int, CancellationToken, Task<T[]>> pageFetcher,
             Func<int, int, T> placeholderFactory,
+            IAsyncPageFetchScheduler asyncPageFetchScheduler,
             IScheduler pageBackgroundScheduler,
             IObserver<(int Offset, int PageSize, T[] PreviousPage, T[] Page)> pageArrivalObservations)
             : base(
@@ -145,11 +155,12 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                 pageSize,
                 onDisposalAfterFetchCompleted, 
                 placeholderFactory,
+                asyncPageFetchScheduler,
                 pageBackgroundScheduler,
                 pageArrivalObservations) =>
             _pageFetcher = pageFetcher;
 
-        protected override async Task OnPageFetch(CancellationToken ct)
+        protected override async Task FetchPageInner(CancellationToken ct)
         {
             var previousPage = Page;
             await Task.Delay(1, ct).ConfigureAwait(false);
@@ -176,6 +187,7 @@ namespace BFF.DataVirtualizingCollection.PageStorage
             // dependencies
             Func<int, int, CancellationToken, IAsyncEnumerable<T>> pageFetcher,
             Func<int, int, T> placeholderFactory,
+            IAsyncPageFetchScheduler asyncPageFetchScheduler,
             IScheduler pageBackgroundScheduler,
             IObserver<(int Offset, int PageSize, T[] PreviousPage, T[] Page)> pageArrivalObservations)
             : base(
@@ -184,12 +196,14 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                 pageSize,
                 onDisposalAfterFetchCompleted, 
                 placeholderFactory,
+                asyncPageFetchScheduler,
                 pageBackgroundScheduler,
                 pageArrivalObservations) =>
             _pageFetcher = pageFetcher;
 
-        protected override async Task OnPageFetch(CancellationToken ct)
+        protected override async Task FetchPageInner(CancellationToken ct)
         {
+            await Task.Delay(1, ct).ConfigureAwait(false);
             var i = 0;
             await foreach (var item in _pageFetcher(Offset, PageSize, ct))
             {

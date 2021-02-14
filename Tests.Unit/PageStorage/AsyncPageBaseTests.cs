@@ -92,6 +92,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                     return new[] { 69 };
                 }, 
                 (_, __) => 23, 
+                new ImmediateAsyncPageFetchScheduler(),
                 DefaultScheduler.Instance, 
                 Observer.Create<(int Offset, int PageSize, int[] PreviousPage, int[] Page)>(_ => { }));
 
@@ -107,6 +108,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                     return new[] {69};
                 },
                 (_, __) => 23,
+                new ImmediateAsyncPageFetchScheduler(),
                 DefaultScheduler.Instance,
                 Observer.Create<(int Offset, int PageSize, int[] PreviousPage, int[] Page)>(_ => { }));
 
@@ -124,6 +126,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                         return new[] { disposable };
                     },
                     (_, __) => Disposable.Empty,
+                    new ImmediateAsyncPageFetchScheduler(),
                     DefaultScheduler.Instance,
                     Observer.Create<(int Offset, int PageSize, IDisposable[] PreviousPage, IDisposable[] Page)>(_ => { }));
         }
@@ -142,6 +145,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                         return new []{ Disposable.Empty };
                     },
                     (_, __) => disposable,
+                    new ImmediateAsyncPageFetchScheduler(),
                     DefaultScheduler.Instance,
                     Observer.Create<(int Offset, int PageSize, IDisposable[] PreviousPage, IDisposable[] Page)>(_ => { }));
         }
@@ -162,6 +166,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                     return new[] { 69 };
                 },
                 (_, __) => 23,
+                new ImmediateAsyncPageFetchScheduler(),
                 DefaultScheduler.Instance,
                 Observer.Create<(int Offset, int PageSize, int[] PreviousPage, int[] Page)>(_ => { }));
 
@@ -177,6 +182,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                     return new[] {69};
                 },
                 (_, __) => 23,
+                new ImmediateAsyncPageFetchScheduler(),
                 DefaultScheduler.Instance,
                 Observer.Create<(int Offset, int PageSize, int[] PreviousPage, int[] Page)>(_ => { }));
 
@@ -194,6 +200,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                         return new[] { disposable };
                     },
                     (_, __) => Disposable.Empty,
+                    new ImmediateAsyncPageFetchScheduler(),
                     DefaultScheduler.Instance,
                     Observer.Create<(int Offset, int PageSize, IDisposable[] PreviousPage, IDisposable[] Page)>(_ => { }));
         }
@@ -212,6 +219,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                         return new[] { Disposable.Empty };
                     },
                     (_, __) => disposable,
+                    new ImmediateAsyncPageFetchScheduler(),
                     DefaultScheduler.Instance,
                     Observer.Create<(int Offset, int PageSize, IDisposable[] PreviousPage, IDisposable[] Page)>(_ => { }));
         }
