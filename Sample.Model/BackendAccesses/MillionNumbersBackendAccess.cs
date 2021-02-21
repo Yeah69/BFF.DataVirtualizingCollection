@@ -1,3 +1,4 @@
+using System;
 using BFF.DataVirtualizingCollection.Sample.Model.PersistenceLink;
 
 namespace BFF.DataVirtualizingCollection.Sample.Model.BackendAccesses
@@ -20,6 +21,7 @@ namespace BFF.DataVirtualizingCollection.Sample.Model.BackendAccesses
 
         public long[] PageFetch(int pageOffset, int pageSize)
         {
+            Console.WriteLine(pageOffset);
             return _fetchMillionNumbersFromBackend.FetchPage(pageOffset, pageSize);
         }
 

@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using BFF.DataVirtualizingCollection.Sample.Model.Models;
 
@@ -14,6 +15,7 @@ namespace BFF.DataVirtualizingCollection.Sample.Model.BackendAccesses
     
         public IProfile[] PageFetch(int pageOffset, int pageSize)
         {
+            Console.WriteLine(pageOffset);
             return Enumerable
                 .Range(pageOffset, pageSize)
                 .Select(i => ProfileStatic.ProfilePool[i % ProfileStatic.ProfilePool.Count])

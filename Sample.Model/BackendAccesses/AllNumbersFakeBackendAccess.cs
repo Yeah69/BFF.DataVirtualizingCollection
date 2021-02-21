@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 
 namespace BFF.DataVirtualizingCollection.Sample.Model.BackendAccesses
@@ -6,12 +7,13 @@ namespace BFF.DataVirtualizingCollection.Sample.Model.BackendAccesses
     {
     }
 
-    internal class AllNumbersFakeFakeBackendAccess : IAllNumbersFakeBackendAccess
+    internal class AllNumbersFakeBackendAccess : IAllNumbersFakeBackendAccess
     {
         public string Name => "All Positive Numbers";
 
         public int[] PageFetch(int pageOffset, int pageSize)
         {
+            Console.WriteLine(pageOffset);
             return Enumerable.Range(pageOffset, pageSize).ToArray();
         }
 

@@ -68,7 +68,7 @@
         </sample:BackendAccessDataTemplateSelector.HighWorkloadTemplate>
         <sample:BackendAccessDataTemplateSelector.MillionNumbersTemplate>
             <DataTemplate DataType="{x:Type viewModels:IDataVirtualizingCollectionViewModelBase}">
-                <DataGrid ScrollViewer.IsDeferredScrollingEnabled="True"
+                <DataGrid 
                           AutoGenerateColumns="False"
                           ItemsSource="{Binding Items}"
                           SelectedIndex="{Binding Items.SelectedIndex}">
@@ -89,7 +89,7 @@
         </sample:BackendAccessDataTemplateSelector.MillionNumbersTemplate>
         <sample:BackendAccessDataTemplateSelector.AllNumbersTemplate>
             <DataTemplate DataType="{x:Type viewModels:IDataVirtualizingCollectionViewModelBase}">
-                <DataGrid ScrollViewer.IsDeferredScrollingEnabled="True"
+                <DataGrid 
                           AutoGenerateColumns="False"
                           ItemsSource="{Binding Items}"
                           SelectedIndex="{Binding Items.SelectedIndex}">

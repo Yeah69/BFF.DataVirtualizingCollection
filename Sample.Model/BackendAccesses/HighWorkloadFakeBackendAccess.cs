@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using BFF.DataVirtualizingCollection.Sample.Model.Models;
 
@@ -17,6 +18,7 @@ namespace BFF.DataVirtualizingCollection.Sample.Model.BackendAccesses
 
         public ISomeWorkloadObject[] PageFetch(int pageOffset, int pageSize)
         {
+            Console.WriteLine(pageOffset);
             return Enumerable
                 .Range(pageOffset, pageSize)
                 .Select(i => (ISomeWorkloadObject) new HighWorkloadObject(i))

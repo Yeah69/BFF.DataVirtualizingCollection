@@ -5,6 +5,6 @@ namespace BFF.DataVirtualizingCollection.PageStorage
 {
     internal class ImmediateAsyncPageFetchScheduler : IAsyncPageFetchScheduler
     {
-        public Task Schedule(CancellationToken ct) => Task.CompletedTask;
+        public Task Schedule(int offset, CancellationToken ct) => Task.CompletedTask;
     }
 }

@@ -151,7 +151,7 @@ namespace BFF.DataVirtualizingCollection
         {
             _indexAccessBehavior = IndexAccessBehavior.Asynchronous;
             _placeholderFactory = placeholderFactory;
-            _asyncPageFetchScheduler = new ImmediateAsyncPageFetchScheduler();
+            _asyncPageFetchScheduler = new LifoAsyncPageFetchScheduler();
             return GenerateCollection();
         }
 

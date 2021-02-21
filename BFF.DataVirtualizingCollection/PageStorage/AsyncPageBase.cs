@@ -47,7 +47,9 @@ namespace BFF.DataVirtualizingCollection.PageStorage
             
             async Task FetchPage(CancellationToken ct)
             {
-                await asyncPageFetchScheduler.Schedule(ct).ConfigureAwait(false);
+                await Task.Delay(1, ct);
+                await asyncPageFetchScheduler.Schedule(offset, ct);
+                ct.ThrowIfCancellationRequested();
                 await FetchPageInner(ct).ConfigureAwait(false);
             }
         }
@@ -122,7 +124,6 @@ namespace BFF.DataVirtualizingCollection.PageStorage
         protected override async Task FetchPageInner(CancellationToken ct)
         {
             var previousPage = Page;
-            await Task.Delay(1, ct).ConfigureAwait(false);
             Page = _pageFetcher(Offset, PageSize, ct);
             await DisposePageItems(previousPage).ConfigureAwait(false);
             if (!IsDisposed)
@@ -163,7 +164,6 @@ namespace BFF.DataVirtualizingCollection.PageStorage
         protected override async Task FetchPageInner(CancellationToken ct)
         {
             var previousPage = Page;
-            await Task.Delay(1, ct).ConfigureAwait(false);
             Page = await _pageFetcher(Offset, PageSize, ct).ConfigureAwait(false);
             await DisposePageItems(previousPage).ConfigureAwait(false);
             if (!IsDisposed)
@@ -203,7 +203,6 @@ namespace BFF.DataVirtualizingCollection.PageStorage
 
         protected override async Task FetchPageInner(CancellationToken ct)
         {
-            await Task.Delay(1, ct).ConfigureAwait(false);
             var i = 0;
             await foreach (var item in _pageFetcher(Offset, PageSize, ct))
             {
