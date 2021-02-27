@@ -146,12 +146,36 @@ namespace BFF.DataVirtualizingCollection
             return GenerateCollection();
         }
 
+        public IAsyncOnlyIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> ImmediatePageRequests()
+        {
+            _asyncPageFetchScheduler = new ImmediateAsyncPageFetchScheduler();
+            return this;
+        }
+
+        public IAsyncOnlyIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> ThrottledLifoPageRequests() =>
+            ThrottledLifoPageRequests(_pageBackgroundScheduler);
+
+        public IAsyncOnlyIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> ThrottledLifoPageRequests(
+            TimeSpan throttleDueTime) =>
+            ThrottledLifoPageRequests(throttleDueTime, _pageBackgroundScheduler);
+
+        public IAsyncOnlyIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> ThrottledLifoPageRequests(
+            IScheduler pageRequestBackgroundScheduler) =>
+            ThrottledLifoPageRequests(TimeSpan.FromMilliseconds(200), pageRequestBackgroundScheduler);
+
+        public IAsyncOnlyIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> ThrottledLifoPageRequests(
+            TimeSpan throttleDueTime,
+            IScheduler pageRequestBackgroundScheduler)
+        {
+            _asyncPageFetchScheduler = new LifoAsyncPageFetchScheduler(throttleDueTime, pageRequestBackgroundScheduler);
+            return this;
+        }
+
         public TVirtualizationKind AsyncIndexAccess(
             Func<int, int, TItem> placeholderFactory)
         {
             _indexAccessBehavior = IndexAccessBehavior.Asynchronous;
             _placeholderFactory = placeholderFactory;
-            _asyncPageFetchScheduler = new LifoAsyncPageFetchScheduler();
             return GenerateCollection();
         }
 
@@ -275,7 +299,7 @@ namespace BFF.DataVirtualizingCollection
             {
                 var taskBasedPageFetcher = _taskBasedPageFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
                 var placeholderFactory = _placeholderFactory ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
-                var asyncPageFetchScheduler = _asyncPageFetchScheduler ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
+                var asyncPageFetchScheduler = _asyncPageFetchScheduler ?? new ImmediateAsyncPageFetchScheduler();
                 return new AsyncTaskBasedPage<TItem>(
                     pageKey,
                     offset,
@@ -297,7 +321,7 @@ namespace BFF.DataVirtualizingCollection
                 var taskBasedPageFetcher = _taskBasedPageFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
                 var preloadingPlaceholderFactory = _preloadingPlaceholderFactory ??
                                                    throw new NullReferenceException(UninitializedElementsExceptionMessage);
-                var asyncPageFetchScheduler = _asyncPageFetchScheduler ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
+                var asyncPageFetchScheduler = _asyncPageFetchScheduler ?? new ImmediateAsyncPageFetchScheduler();
                 return new AsyncTaskBasedPage<TItem>(
                     pageKey,
                     offset,
@@ -329,7 +353,7 @@ namespace BFF.DataVirtualizingCollection
             {
                 var asyncEnumerableBasedPageFetcher = _asyncEnumerableBasedPageFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
                 var placeholderFactory = _placeholderFactory ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
-                var asyncPageFetchScheduler = _asyncPageFetchScheduler ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
+                var asyncPageFetchScheduler = _asyncPageFetchScheduler ?? new ImmediateAsyncPageFetchScheduler();
                 return new AsyncEnumerableBasedPage<TItem>(
                     pageKey,
                     offset,
@@ -351,7 +375,7 @@ namespace BFF.DataVirtualizingCollection
                 var asyncEnumerableBasedPageFetcher = _asyncEnumerableBasedPageFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
                 var preloadingPlaceholderFactory = _preloadingPlaceholderFactory ??
                                                    throw new NullReferenceException(UninitializedElementsExceptionMessage);
-                var asyncPageFetchScheduler = _asyncPageFetchScheduler ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
+                var asyncPageFetchScheduler = _asyncPageFetchScheduler ?? new ImmediateAsyncPageFetchScheduler();
                 return new AsyncEnumerableBasedPage<TItem>(
                     pageKey,
                     offset,
@@ -383,7 +407,7 @@ namespace BFF.DataVirtualizingCollection
             {
                 var pageFetcher = _pageFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
                 var placeholderFactory = _placeholderFactory ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
-                var asyncPageFetchScheduler = _asyncPageFetchScheduler ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
+                var asyncPageFetchScheduler = _asyncPageFetchScheduler ?? new ImmediateAsyncPageFetchScheduler();
                 return new AsyncNonTaskBasedPage<TItem>(
                     pageKey,
                     offset,
@@ -405,7 +429,7 @@ namespace BFF.DataVirtualizingCollection
                 var pageFetcher = _pageFetcher ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
                 var preloadingPlaceholderFactory = _preloadingPlaceholderFactory ??
                                                    throw new NullReferenceException(UninitializedElementsExceptionMessage);
-                var asyncPageFetchScheduler = _asyncPageFetchScheduler ?? throw new NullReferenceException(UninitializedElementsExceptionMessage);
+                var asyncPageFetchScheduler = _asyncPageFetchScheduler ?? new ImmediateAsyncPageFetchScheduler();
                 return new AsyncNonTaskBasedPage<TItem>(
                     pageKey,
                     offset,

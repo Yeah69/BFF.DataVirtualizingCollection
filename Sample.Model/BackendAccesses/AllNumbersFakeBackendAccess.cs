@@ -11,11 +11,7 @@ namespace BFF.DataVirtualizingCollection.Sample.Model.BackendAccesses
     {
         public string Name => "All Positive Numbers";
 
-        public int[] PageFetch(int pageOffset, int pageSize)
-        {
-            Console.WriteLine(pageOffset);
-            return Enumerable.Range(pageOffset, pageSize).ToArray();
-        }
+        public int[] PageFetch(int pageOffset, int pageSize) => Enumerable.Range(pageOffset, pageSize).ToArray();
 
         public int PlaceholderFetch(int _, int __)
         {

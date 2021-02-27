@@ -13,14 +13,11 @@ namespace BFF.DataVirtualizingCollection.Sample.Model.BackendAccesses
         
         public string Name => "Profiles";
     
-        public IProfile[] PageFetch(int pageOffset, int pageSize)
-        {
-            Console.WriteLine(pageOffset);
-            return Enumerable
+        public IProfile[] PageFetch(int pageOffset, int pageSize) =>
+            Enumerable
                 .Range(pageOffset, pageSize)
                 .Select(i => ProfileStatic.ProfilePool[i % ProfileStatic.ProfilePool.Count])
                 .ToArray();
-        }
 
         public IProfile PlaceholderFetch(int _, int __)
         {

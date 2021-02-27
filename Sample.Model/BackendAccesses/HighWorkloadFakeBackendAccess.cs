@@ -16,15 +16,12 @@ namespace BFF.DataVirtualizingCollection.Sample.Model.BackendAccesses
         
         public string Name => "High Workload Simulation";
 
-        public ISomeWorkloadObject[] PageFetch(int pageOffset, int pageSize)
-        {
-            Console.WriteLine(pageOffset);
-            return Enumerable
+        public ISomeWorkloadObject[] PageFetch(int pageOffset, int pageSize) =>
+            Enumerable
                 .Range(pageOffset, pageSize)
                 .Select(i => (ISomeWorkloadObject) new HighWorkloadObject(i))
                 .ToArray();
-        }
-        
+
         public ISomeWorkloadObject PlaceholderFetch(int _, int __)
         {
             return Placeholder;

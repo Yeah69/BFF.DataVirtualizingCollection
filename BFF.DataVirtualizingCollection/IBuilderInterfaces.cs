@@ -144,6 +144,43 @@ namespace BFF.DataVirtualizingCollection
     public interface IAsyncOnlyIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind>
     {
         /// <summary>
+        /// Page request are triggered right after the generation of the page's placeholders.
+        /// <para/>
+        /// This is the default behavior. You won't need to call it explicitly.
+        /// </summary>
+        IAsyncOnlyIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> ImmediatePageRequests();
+
+        /// <summary>
+        /// Instead of triggering the page requests right away, they are delayed in throttling (Rx) manner and then triggered in Last In First Out (LIFO)/ stack-based manner.
+        /// <para/>
+        /// Default throttling due time is set to 200 ms and default scheduler is the same as for the page requests.
+        /// </summary>
+        IAsyncOnlyIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> ThrottledLifoPageRequests();
+
+        /// <summary>
+        /// Instead of triggering the page requests right away, they are delayed in throttling (Rx) manner and then triggered in Last In First Out (LIFO)/ stack-based manner.
+        /// <para/>
+        /// Default scheduler is the same as for the page requests.
+        /// </summary>
+        /// <param name="throttleDueTime">Time span which has to pass by without new page request until the collected page requests are triggered.</param>
+        IAsyncOnlyIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> ThrottledLifoPageRequests(TimeSpan throttleDueTime);
+
+        /// <summary>
+        /// Instead of triggering the page requests right away, they are delayed in throttling (Rx) manner and then triggered in Last In First Out (LIFO)/ stack-based manner.
+        /// <para/>
+        /// Default throttling due time is set to 200 ms.
+        /// </summary>
+        /// <param name="pageRequestBackgroundScheduler">A scheduler exclusively for page request delaying.</param>
+        IAsyncOnlyIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> ThrottledLifoPageRequests(IScheduler pageRequestBackgroundScheduler);
+
+        /// <summary>
+        /// Instead of triggering the page requests right away, they are delayed in throttling (Rx) manner and then triggered in Last In First Out (LIFO)/ stack-based manner.
+        /// </summary>
+        /// <param name="throttleDueTime">Time span which has to pass by without new page request until the collected page requests are triggered.</param>
+        /// <param name="pageRequestBackgroundScheduler">A scheduler exclusively for page request delaying.</param>
+        IAsyncOnlyIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> ThrottledLifoPageRequests(TimeSpan throttleDueTime, IScheduler pageRequestBackgroundScheduler);
+        
+        /// <summary>
         /// If item of requested index isn't loaded yet the collections will return a placeholder instead and emit a notification as soon as it arrives.
         /// Per default the initially configured background scheduler is taken for page and count fetches.
         /// </summary>

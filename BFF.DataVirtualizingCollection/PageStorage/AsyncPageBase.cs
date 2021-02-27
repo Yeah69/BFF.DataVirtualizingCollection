@@ -47,8 +47,7 @@ namespace BFF.DataVirtualizingCollection.PageStorage
             
             async Task FetchPage(CancellationToken ct)
             {
-                await Task.Delay(1, ct);
-                await asyncPageFetchScheduler.Schedule(offset, ct);
+                await asyncPageFetchScheduler.Schedule().ConfigureAwait(false);
                 ct.ThrowIfCancellationRequested();
                 await FetchPageInner(ct).ConfigureAwait(false);
             }

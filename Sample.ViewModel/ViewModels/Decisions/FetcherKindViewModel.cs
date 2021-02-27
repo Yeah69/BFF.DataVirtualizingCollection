@@ -35,6 +35,7 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions
                 FetcherKind.NonTaskBased => builder.NonTaskBasedFetchers(
                     (offset, size, _) =>
                     {
+                        Console.WriteLine($"Client page fetch: {offset}");
                         Thread.Sleep(DelayPageFetcherInMilliseconds);
                         return backendAccess.PageFetch(offset, size);
                     },
@@ -44,27 +45,29 @@ namespace BFF.DataVirtualizingCollection.Sample.ViewModel.ViewModels.Decisions
                         return backendAccess.CountFetch();
                     }),
                 FetcherKind.TaskBased => builder.TaskBasedFetchers(
-                    async (offset, size, _) =>
+                    async (offset, size, ct) =>
                     {
-                        await Task.Delay(DelayPageFetcherInMilliseconds);
+                        Console.WriteLine($"Client page fetch: {offset}");
+                        await Task.Delay(DelayPageFetcherInMilliseconds, ct);
                         return backendAccess.PageFetch(offset, size);
                     },
-                    async _ =>
+                    async ct =>
                     {
-                        await Task.Delay(DelayCountFetcherInMilliseconds);
+                        await Task.Delay(DelayCountFetcherInMilliseconds, ct);
                         return backendAccess.CountFetch();
                     }),
                 FetcherKind.AsyncEnumerableBased => builder.AsyncEnumerableBasedFetchers(
-                    (offset, size, _) =>
+                    (offset, size, ct) =>
                     {
+                        Console.WriteLine($"Client page fetch: {offset}");
                         var delay = DelayCountFetcherInMilliseconds / size - 1;
                         return Fetch();
 
                         async IAsyncEnumerable<T> Fetch()
                         {
-                            await foreach (var item in backendAccess.AsyncEnumerablePageFetch(offset, size))
+                            await foreach (var item in backendAccess.AsyncEnumerablePageFetch(offset, size).WithCancellation(ct).ConfigureAwait(false))
                             {
-                                await Task.Delay(delay);
+                                await Task.Delay(delay, ct);
                                 yield return item;
                             }
                         }

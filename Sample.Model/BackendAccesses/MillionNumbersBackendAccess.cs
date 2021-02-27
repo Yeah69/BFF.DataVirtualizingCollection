@@ -19,11 +19,7 @@ namespace BFF.DataVirtualizingCollection.Sample.Model.BackendAccesses
         
         public string Name => "A Million Numbers Accessed Through Sqlite";
 
-        public long[] PageFetch(int pageOffset, int pageSize)
-        {
-            Console.WriteLine(pageOffset);
-            return _fetchMillionNumbersFromBackend.FetchPage(pageOffset, pageSize);
-        }
+        public long[] PageFetch(int pageOffset, int pageSize) => _fetchMillionNumbersFromBackend.FetchPage(pageOffset, pageSize);
 
         public long PlaceholderFetch(int _, int __)
         {
