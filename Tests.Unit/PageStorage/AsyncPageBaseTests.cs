@@ -26,6 +26,7 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
             var isDisposed = new TaskCompletionSource<Unit>();
             var disposable = Disposable.Create(() => isDisposed.SetResult(Unit.Default));
             var sut = PageWithDisposable(disposable);
+            await sut.PageFetchCompletion.ConfigureAwait(false);
 
             // Act
             await sut.DisposeAsync().ConfigureAwait(false);
@@ -86,12 +87,12 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                 0, 
                 1,
                 Disposable.Empty, 
-                (offset, pageSize, _) =>
+                (_, _, _) =>
                 {
                     Thread.Sleep(10);
                     return new[] { 69 };
                 }, 
-                (_, __) => 23, 
+                (_, _) => 23, 
                 new ImmediateAsyncPageFetchScheduler(),
                 DefaultScheduler.Instance, 
                 Observer.Create<(int Offset, int PageSize, int[] PreviousPage, int[] Page)>(_ => { }));
@@ -102,12 +103,12 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                 0,
                 1,
                 Disposable.Empty, 
-                (offset, pageSize, _) =>
+                (_, _, _) =>
                 {
-                    Thread.Sleep(10);
+                    Thread.Sleep(1000);
                     return new[] {69};
                 },
-                (_, __) => 23,
+                (_, _) => 23,
                 new ImmediateAsyncPageFetchScheduler(),
                 DefaultScheduler.Instance,
                 Observer.Create<(int Offset, int PageSize, int[] PreviousPage, int[] Page)>(_ => { }));
@@ -120,12 +121,12 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                     0,
                     1,
                     Disposable.Empty, 
-                    (offset, pageSize, _) =>
+                    (_, _, _) =>
                     {
                         Thread.Sleep(10);
                         return new[] { disposable };
                     },
-                    (_, __) => Disposable.Empty,
+                    (_, _) => Disposable.Empty,
                     new ImmediateAsyncPageFetchScheduler(),
                     DefaultScheduler.Instance,
                     Observer.Create<(int Offset, int PageSize, IDisposable[] PreviousPage, IDisposable[] Page)>(_ => { }));
@@ -139,12 +140,12 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                     0,
                     1,
                     Disposable.Empty, 
-                    (offset, pageSize, _) =>
+                    (_, _, _) =>
                     {
                         Thread.Sleep(10);
                         return new []{ Disposable.Empty };
                     },
-                    (_, __) => disposable,
+                    (_, _) => disposable,
                     new ImmediateAsyncPageFetchScheduler(),
                     DefaultScheduler.Instance,
                     Observer.Create<(int Offset, int PageSize, IDisposable[] PreviousPage, IDisposable[] Page)>(_ => { }));
@@ -160,12 +161,12 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                 0,
                 1,
                 Disposable.Empty, 
-                async (offset, pageSize, _) =>
+                async (_, _, ct) =>
                 {
-                    await Task.Delay(10);
+                    await Task.Delay(10, ct).ConfigureAwait(false);
                     return new[] { 69 };
                 },
-                (_, __) => 23,
+                (_, _) => 23,
                 new ImmediateAsyncPageFetchScheduler(),
                 DefaultScheduler.Instance,
                 Observer.Create<(int Offset, int PageSize, int[] PreviousPage, int[] Page)>(_ => { }));
@@ -176,12 +177,12 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                 0,
                 1,
                 Disposable.Empty, 
-                async (offset, pageSize, _) =>
+                async (_, _, ct) =>
                 {
-                    await Task.Delay(10);
+                    await Task.Delay(10, ct).ConfigureAwait(false);
                     return new[] {69};
                 },
-                (_, __) => 23,
+                (_, _) => 23,
                 new ImmediateAsyncPageFetchScheduler(),
                 DefaultScheduler.Instance,
                 Observer.Create<(int Offset, int PageSize, int[] PreviousPage, int[] Page)>(_ => { }));
@@ -194,12 +195,12 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                     0,
                     1,
                     Disposable.Empty, 
-                    async (offset, pageSize, _) =>
+                    async (_, _, ct) =>
                     {
-                        await Task.Delay(10).ConfigureAwait(false);
+                        await Task.Delay(10, ct).ConfigureAwait(false);
                         return new[] { disposable };
                     },
-                    (_, __) => Disposable.Empty,
+                    (_, _) => Disposable.Empty,
                     new ImmediateAsyncPageFetchScheduler(),
                     DefaultScheduler.Instance,
                     Observer.Create<(int Offset, int PageSize, IDisposable[] PreviousPage, IDisposable[] Page)>(_ => { }));
@@ -213,12 +214,12 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                     0,
                     1,
                     Disposable.Empty, 
-                    async (offset, pageSize, _) =>
+                    async (_, _, ct) =>
                     {
-                        await Task.Delay(10);
+                        await Task.Delay(10, ct).ConfigureAwait(false);
                         return new[] { Disposable.Empty };
                     },
-                    (_, __) => disposable,
+                    (_, _) => disposable,
                     new ImmediateAsyncPageFetchScheduler(),
                     DefaultScheduler.Instance,
                     Observer.Create<(int Offset, int PageSize, IDisposable[] PreviousPage, IDisposable[] Page)>(_ => { }));

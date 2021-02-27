@@ -15,8 +15,9 @@ namespace BFF.DataVirtualizingCollection.PageStorage
         protected readonly int Offset;
         protected readonly int PageSize;
         private readonly IDisposable _onDisposalAfterFetchCompleted;
+        private readonly IAsyncPageFetchScheduler _asyncPageFetchScheduler;
         protected readonly IObserver<(int Offset, int PageSize, T[] PreviousPage, T[] Page)> PageArrivalObservations;
-        private readonly CancellationTokenSource _cancellationTokenSource = new();
+        protected readonly CancellationTokenSource CancellationTokenSource = new();
         protected T[] Page;
         protected bool IsDisposed;
 
@@ -30,32 +31,29 @@ namespace BFF.DataVirtualizingCollection.PageStorage
             // dependencies
             Func<int, int, T> placeholderFactory,
             IAsyncPageFetchScheduler asyncPageFetchScheduler,
-            IScheduler pageBackgroundScheduler,
             IObserver<(int Offset, int PageSize, T[] PreviousPage, T[] Page)> pageArrivalObservations)
         {
             Offset = offset;
             PageSize = pageSize;
             _onDisposalAfterFetchCompleted = onDisposalAfterFetchCompleted;
+            _asyncPageFetchScheduler = asyncPageFetchScheduler;
             PageArrivalObservations = pageArrivalObservations;
             Page = Enumerable
                 .Range(0, pageSize)
                 .Select(pageIndex => placeholderFactory(pageKey, pageIndex))
                 .ToArray();
-            PageFetchCompletion = Observable
-                .StartAsync(FetchPage, pageBackgroundScheduler)
-                .ToTask(_cancellationTokenSource.Token);
+        }
             
-            async Task FetchPage(CancellationToken ct)
-            {
-                await asyncPageFetchScheduler.Schedule().ConfigureAwait(false);
-                ct.ThrowIfCancellationRequested();
-                await FetchPageInner(ct).ConfigureAwait(false);
-            }
+        protected async Task FetchPage(CancellationToken ct)
+        {
+            await _asyncPageFetchScheduler.Schedule().ConfigureAwait(false);
+            ct.ThrowIfCancellationRequested();
+            await FetchPageInner(ct).ConfigureAwait(false);
         }
 
         protected abstract Task FetchPageInner(CancellationToken ct);
 
-        public Task PageFetchCompletion { get; }
+        public abstract Task PageFetchCompletion { get; }
 
         public T this[int index] =>
             index >= PageSize || index < 0
@@ -76,7 +74,7 @@ namespace BFF.DataVirtualizingCollection.PageStorage
             IsDisposed = true;
             try
             {
-                _cancellationTokenSource.Cancel();
+                CancellationTokenSource.Cancel();
                 await PageFetchCompletion.ConfigureAwait(false);
             }
             catch (OperationCanceledException)
@@ -116,12 +114,17 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                 onDisposalAfterFetchCompleted, 
                 placeholderFactory,
                 asyncPageFetchScheduler,
-                pageBackgroundScheduler,
-                pageArrivalObservations) =>
+                pageArrivalObservations)
+        {
             _pageFetcher = pageFetcher;
+            PageFetchCompletion = Observable
+                .StartAsync(FetchPage, pageBackgroundScheduler)
+                .ToTask(CancellationTokenSource.Token);
+        }
 
         protected override async Task FetchPageInner(CancellationToken ct)
         {
+            await Task.Delay(1, ct).ConfigureAwait(false);
             var previousPage = Page;
             Page = _pageFetcher(Offset, PageSize, ct);
             await DisposePageItems(previousPage).ConfigureAwait(false);
@@ -130,6 +133,8 @@ namespace BFF.DataVirtualizingCollection.PageStorage
             else
                 await DisposePageItems(Page).ConfigureAwait(false);
         }
+
+        public override Task PageFetchCompletion { get; }
     }
     
     internal sealed class AsyncTaskBasedPage<T> : AsyncPageBase<T>
@@ -156,9 +161,13 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                 onDisposalAfterFetchCompleted, 
                 placeholderFactory,
                 asyncPageFetchScheduler,
-                pageBackgroundScheduler,
-                pageArrivalObservations) =>
+                pageArrivalObservations)
+        {
             _pageFetcher = pageFetcher;
+            PageFetchCompletion = Observable
+                .StartAsync(FetchPage, pageBackgroundScheduler)
+                .ToTask(CancellationTokenSource.Token);
+        }
 
         protected override async Task FetchPageInner(CancellationToken ct)
         {
@@ -170,6 +179,8 @@ namespace BFF.DataVirtualizingCollection.PageStorage
             else
                 await DisposePageItems(Page).ConfigureAwait(false);
         }
+
+        public override Task PageFetchCompletion { get; }
     }
     
     internal sealed class AsyncEnumerableBasedPage<T> : AsyncPageBase<T>
@@ -196,9 +207,13 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                 onDisposalAfterFetchCompleted, 
                 placeholderFactory,
                 asyncPageFetchScheduler,
-                pageBackgroundScheduler,
-                pageArrivalObservations) =>
+                pageArrivalObservations)
+        {
             _pageFetcher = pageFetcher;
+            PageFetchCompletion = Observable
+                .StartAsync(FetchPage, pageBackgroundScheduler)
+                .ToTask(CancellationTokenSource.Token);
+        }
 
         protected override async Task FetchPageInner(CancellationToken ct)
         {
@@ -216,5 +231,7 @@ namespace BFF.DataVirtualizingCollection.PageStorage
                 i++;
             }
         }
+
+        public override Task PageFetchCompletion { get; }
     }
 }
