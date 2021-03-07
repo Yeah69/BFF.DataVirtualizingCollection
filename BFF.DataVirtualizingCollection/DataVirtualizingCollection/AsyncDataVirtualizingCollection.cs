@@ -41,43 +41,49 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
 
             _pageStorage = pageStoreFactory(0);
             
-            var cancellationDisposable = new CancellationDisposable();
-            _pendingCountRequestCancellation.Disposable = cancellationDisposable;
-            InitializationCompleted = ResetInner(cancellationDisposable.Token);
-
-            InitializationCompleted
-                .ToObservable()
-                .Merge(
-                    _resetSubject
-                        .SelectMany(async ct =>
-                        {
-                            await ResetInner(ct).ConfigureAwait(false);
-                            return Unit.Default;
-                        }))
-                .Subscribe(_ => {});
+            InitializationCompleted = _resetSubject.FirstAsync().ToTask();
+            
+            _resetSubject
+                .SelectMany(async ct =>
+                {
+                    await ResetInner(ct).ConfigureAwait(false);
+                    return Unit.Default;
+                })
+                .Subscribe(_ => {})
+                .CompositeDisposalWith(CompositeDisposable);
+            
+            Reset();
         }
 
         public override int Count => _count;
 
         protected override T GetItemInner(int index) => _pageStorage[index];
 
-        private Task ResetInner(CancellationToken ct)
+        private async Task ResetInner(CancellationToken ct)
         {
-            return Observable.FromAsync(_countFetcher, _countBackgroundScheduler)
-                .SelectMany(async count =>
-                {
-                    _count = count;
-                    await _pageStorage.Reset(_count).ConfigureAwait(false);
-                    return Unit.Default;
-                })
-                .ObserveOn(_notificationScheduler)
-                .Do(_ =>
-                {
-                    OnPropertyChanged(nameof(Count));
-                    OnCollectionChangedReset();
-                    OnIndexerChanged();
-                })
-                .ToTask(ct);
+            try
+            {
+                await Observable.FromAsync(_countFetcher, _countBackgroundScheduler)
+                    .SelectMany(async count =>
+                    {
+                        _count = count;
+                        await _pageStorage.Reset(_count).ConfigureAwait(false);
+                        return Unit.Default;
+                    })
+                    .ObserveOn(_notificationScheduler)
+                    .Do(_ =>
+                    {
+                        OnPropertyChanged(nameof(Count));
+                        OnCollectionChangedReset();
+                        OnIndexerChanged();
+                    })
+                    .ToTask(ct)
+                    .ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                // ignore cancellation from now on
+            }
         }
 
         public override void Reset()
