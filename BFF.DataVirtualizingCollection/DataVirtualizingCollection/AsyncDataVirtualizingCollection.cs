@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reactive;
 using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
@@ -17,8 +18,8 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
         private readonly IScheduler _notificationScheduler;
         private readonly IScheduler _countBackgroundScheduler;
         private readonly IPageStorage<T> _pageStorage;
-        private readonly Subject<Unit> _resetSubject = new ();
-        private readonly CancellationTokenSource _cancellationTokenSource = new ();
+        private readonly Subject<CancellationToken> _resetSubject = new ();
+        private readonly SerialDisposable _pendingCountRequestCancellation = new ();
 
         private int _count;
 
@@ -40,25 +41,27 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
 
             _pageStorage = pageStoreFactory(0);
             
-            InitializationCompleted = ResetInner(_cancellationTokenSource.Token);
+            var cancellationDisposable = new CancellationDisposable();
+            _pendingCountRequestCancellation.Disposable = cancellationDisposable;
+            InitializationCompleted = ResetInner(cancellationDisposable.Token);
 
             InitializationCompleted
                 .ToObservable()
-                .Concat(
+                .Merge(
                     _resetSubject
-                        .SelectMany(async (_, ct) =>
+                        .SelectMany(async ct =>
                         {
                             await ResetInner(ct).ConfigureAwait(false);
                             return Unit.Default;
                         }))
-                .Subscribe(_ => {}, _cancellationTokenSource.Token);
+                .Subscribe(_ => {});
         }
 
         public override int Count => _count;
 
         protected override T GetItemInner(int index) => _pageStorage[index];
 
-        private Task ResetInner(CancellationToken cancellationToken)
+        private Task ResetInner(CancellationToken ct)
         {
             return Observable.FromAsync(_countFetcher, _countBackgroundScheduler)
                 .SelectMany(async count =>
@@ -74,16 +77,21 @@ namespace BFF.DataVirtualizingCollection.DataVirtualizingCollection
                     OnCollectionChangedReset();
                     OnIndexerChanged();
                 })
-                .ToTask(cancellationToken);
+                .ToTask(ct);
         }
 
-        public override void Reset() => _resetSubject.OnNext(Unit.Default);
+        public override void Reset()
+        {
+            var cancellationDisposable = new CancellationDisposable();
+            _pendingCountRequestCancellation.Disposable = cancellationDisposable;
+            _resetSubject.OnNext(cancellationDisposable.Token);
+        }
 
         public override Task InitializationCompleted { get; }
 
         public override async ValueTask DisposeAsync()
         {
-            _cancellationTokenSource.Cancel();
+            _pendingCountRequestCancellation.Dispose();
             await base.DisposeAsync().ConfigureAwait(false);
             await _pageStorage.DisposeAsync().ConfigureAwait(false);
         }
