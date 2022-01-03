@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net6.0-windows</TargetFramework>
+        <Nullable>enable</Nullable>
+        <UseWPF>true</UseWPF>
+        <RootNamespace>BFF.DataVirtualizingCollection.Sample.GettingStarted</RootNamespace>
+        <AssemblyName>BFF.DataVirtualizingCollection.Sample.GettingStarted</AssemblyName>
+        <LangVersion>10</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="BFF.DataVirtualizingCollection" Version="3.3.5" />
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,79 @@
+@startuml
+!theme cyborg-outline
+class BFF.DataVirtualizingCollection.DataVirtualizingCollection.DataVirtualizingCollectionBuilder {
++BFF.DataVirtualizingCollection.IPageLoadingBehaviorCollectionBuilder<TItem, BFF.DataVirtualizingCollection.DataVirtualizingCollection.IDataVirtualizingCollection<TItem>> Build(System.Reactive.Concurrency.IScheduler System.Reactive.Concurrency.IScheduler)
++BFF.DataVirtualizingCollection.IPageLoadingBehaviorCollectionBuilder<TItem, BFF.DataVirtualizingCollection.DataVirtualizingCollection.IDataVirtualizingCollection<TItem>> Build(System.Int32 System.Int32, System.Reactive.Concurrency.IScheduler System.Reactive.Concurrency.IScheduler)
++BFF.DataVirtualizingCollection.IPageLoadingBehaviorCollectionBuilder<TItem, BFF.DataVirtualizingCollection.DataVirtualizingCollection.IDataVirtualizingCollection<TItem>> Build(System.Int32 System.Int32, System.Reactive.Concurrency.IScheduler System.Reactive.Concurrency.IScheduler, System.Reactive.Concurrency.IScheduler System.Reactive.Concurrency.IScheduler)
+}
+interface BFF.DataVirtualizingCollection.DataVirtualizingCollection.IDataVirtualizingCollection {
+}
+interface BFF.DataVirtualizingCollection.DataVirtualizingCollection.IDataVirtualizingCollection implements BFF.DataVirtualizingCollection.IVirtualizationBase
+interface BFF.DataVirtualizingCollection.DataVirtualizingCollection.IDataVirtualizingCollection<T> {
+}
+interface BFF.DataVirtualizingCollection.DataVirtualizingCollection.IDataVirtualizingCollection<T> implements BFF.DataVirtualizingCollection.DataVirtualizingCollection.IDataVirtualizingCollection
+interface BFF.DataVirtualizingCollection.IPageLoadingBehaviorCollectionBuilder<TItem, TVirtualizationKind> {
++BFF.DataVirtualizingCollection.IPageHoldingBehaviorCollectionBuilder<TItem, TVirtualizationKind> NonPreloading()
++BFF.DataVirtualizingCollection.IPageHoldingBehaviorCollectionBuilder<TItem, TVirtualizationKind> Preloading(System.Func<System.Int32, System.Int32, TItem> System.Func<System.Int32, System.Int32, TItem>)
++BFF.DataVirtualizingCollection.IPageHoldingBehaviorCollectionBuilder<TItem, TVirtualizationKind> Preloading(System.Func<System.Int32, System.Int32, TItem> System.Func<System.Int32, System.Int32, TItem>, System.Reactive.Concurrency.IScheduler System.Reactive.Concurrency.IScheduler)
+}
+interface BFF.DataVirtualizingCollection.IPageHoldingBehaviorCollectionBuilder<TItem, TVirtualizationKind> {
++BFF.DataVirtualizingCollection.IFetchersKindCollectionBuilder<TItem, TVirtualizationKind> Hoarding()
++BFF.DataVirtualizingCollection.IFetchersKindCollectionBuilder<TItem, TVirtualizationKind> LeastRecentlyUsed(System.Int32 System.Int32)
++BFF.DataVirtualizingCollection.IFetchersKindCollectionBuilder<TItem, TVirtualizationKind> LeastRecentlyUsed(System.Int32 System.Int32, System.Int32 System.Int32)
++BFF.DataVirtualizingCollection.IFetchersKindCollectionBuilder<TItem, TVirtualizationKind> CustomPageRemovalStrategy(System.Func<System.IObservable<(System.Int32 PageKey, System.Int32 PageIndex)>, System.IObservable<System.Collections.Generic.IReadOnlyList<System.Int32>>> System.Func<System.IObservable<(System.Int32 PageKey, System.Int32 PageIndex)>, System.IObservable<System.Collections.Generic.IReadOnlyList<System.Int32>>>)
+}
+interface BFF.DataVirtualizingCollection.IFetchersKindCollectionBuilder<TItem, TVirtualizationKind> {
++BFF.DataVirtualizingCollection.IIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> NonTaskBasedFetchers(System.Func<System.Int32, System.Int32, TItem[]> System.Func<System.Int32, System.Int32, TItem[]>, System.Func<System.Int32> System.Func<System.Int32>)
++BFF.DataVirtualizingCollection.IAsyncOnlyIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> TaskBasedFetchers(System.Func<System.Int32, System.Int32, System.Threading.Tasks.Task<TItem[]>> System.Func<System.Int32, System.Int32, System.Threading.Tasks.Task<TItem[]>>, System.Func<System.Threading.Tasks.Task<System.Int32>> System.Func<System.Threading.Tasks.Task<System.Int32>>)
++BFF.DataVirtualizingCollection.IIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> NonTaskBasedFetchers(System.Func<System.Int32, System.Int32, System.Threading.CancellationToken, TItem[]> System.Func<System.Int32, System.Int32, System.Threading.CancellationToken, TItem[]>, System.Func<System.Threading.CancellationToken, System.Int32> System.Func<System.Threading.CancellationToken, System.Int32>)
++BFF.DataVirtualizingCollection.IAsyncOnlyIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> TaskBasedFetchers(System.Func<System.Int32, System.Int32, System.Threading.CancellationToken, System.Threading.Tasks.Task<TItem[]>> System.Func<System.Int32, System.Int32, System.Threading.CancellationToken, System.Threading.Tasks.Task<TItem[]>>, System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task<System.Int32>> System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task<System.Int32>>)
++BFF.DataVirtualizingCollection.IAsyncOnlyIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> AsyncEnumerableBasedFetchers(System.Func<System.Int32, System.Int32, System.Threading.CancellationToken, System.Collections.Generic.IAsyncEnumerable<TItem>> System.Func<System.Int32, System.Int32, System.Threading.CancellationToken, System.Collections.Generic.IAsyncEnumerable<TItem>>, System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task<System.Int32>> System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task<System.Int32>>)
+}
+interface BFF.DataVirtualizingCollection.IAsyncOnlyIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> {
++BFF.DataVirtualizingCollection.IAsyncOnlyIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> ImmediatePageRequests()
++BFF.DataVirtualizingCollection.IAsyncOnlyIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> ThrottledLifoPageRequests()
++BFF.DataVirtualizingCollection.IAsyncOnlyIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> ThrottledLifoPageRequests(System.TimeSpan System.TimeSpan)
++BFF.DataVirtualizingCollection.IAsyncOnlyIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> ThrottledLifoPageRequests(System.Reactive.Concurrency.IScheduler System.Reactive.Concurrency.IScheduler)
++BFF.DataVirtualizingCollection.IAsyncOnlyIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> ThrottledLifoPageRequests(System.TimeSpan System.TimeSpan, System.Reactive.Concurrency.IScheduler System.Reactive.Concurrency.IScheduler)
++TVirtualizationKind AsyncIndexAccess(System.Func<System.Int32, System.Int32, TItem> System.Func<System.Int32, System.Int32, TItem>)
++TVirtualizationKind AsyncIndexAccess(System.Func<System.Int32, System.Int32, TItem> System.Func<System.Int32, System.Int32, TItem>, System.Reactive.Concurrency.IScheduler System.Reactive.Concurrency.IScheduler)
++TVirtualizationKind AsyncIndexAccess(System.Func<System.Int32, System.Int32, TItem> System.Func<System.Int32, System.Int32, TItem>, System.Reactive.Concurrency.IScheduler System.Reactive.Concurrency.IScheduler, System.Reactive.Concurrency.IScheduler System.Reactive.Concurrency.IScheduler)
+}
+interface BFF.DataVirtualizingCollection.IIndexAccessBehaviorCollectionBuilder<TItem, TVirtualizationKind> {
++TVirtualizationKind SyncIndexAccess()
+}
+interface BFF.DataVirtualizingCollection.IVirtualizationBase {
++System.Threading.Tasks.Task InitializationCompleted <font color=darkgreen>==></font>
++System.Int32 SelectedIndex <font color=darkred><==</font> <font color=darkgreen>==></font>
++void Reset()
+}
+interface BFF.DataVirtualizingCollection.IVirtualizationBase<T> {
++System.Int32 Count <font color=darkgreen>==></font>
++T this[] <font color=darkgreen>==></font>
+}
+interface BFF.DataVirtualizingCollection.IVirtualizationBase<T> implements BFF.DataVirtualizingCollection.IVirtualizationBase
+class BFF.DataVirtualizingCollection.PageRemoval.PageReplacementStrategyException {
+}
+interface BFF.DataVirtualizingCollection.SlidingWindow.ISlidingWindow {
++System.Int32 Offset <font color=darkgreen>==></font>
++System.Int32 MaximumOffset <font color=darkgreen>==></font>
++void SlideLeft()
++void SlideRight()
++void JumpTo(System.Int32 System.Int32)
++void IncreaseWindowSize()
++void DecreaseWindowSize()
++void IncreaseWindowSizeBy(System.Int32 System.Int32)
++void DecreaseWindowSizeBy(System.Int32 System.Int32)
++void SetWindowSizeTo(System.Int32 System.Int32)
+}
+interface BFF.DataVirtualizingCollection.SlidingWindow.ISlidingWindow implements BFF.DataVirtualizingCollection.IVirtualizationBase
+interface BFF.DataVirtualizingCollection.SlidingWindow.ISlidingWindow<T> {
+}
+interface BFF.DataVirtualizingCollection.SlidingWindow.ISlidingWindow<T> implements BFF.DataVirtualizingCollection.SlidingWindow.ISlidingWindow
+class BFF.DataVirtualizingCollection.SlidingWindow.SlidingWindowBuilder {
++BFF.DataVirtualizingCollection.IPageLoadingBehaviorCollectionBuilder<TItem, BFF.DataVirtualizingCollection.SlidingWindow.ISlidingWindow<TItem>> Build(System.Int32 System.Int32, System.Int32 System.Int32, System.Reactive.Concurrency.IScheduler System.Reactive.Concurrency.IScheduler)
++BFF.DataVirtualizingCollection.IPageLoadingBehaviorCollectionBuilder<TItem, BFF.DataVirtualizingCollection.SlidingWindow.ISlidingWindow<TItem>> Build(System.Int32 System.Int32, System.Int32 System.Int32, System.Int32 System.Int32, System.Reactive.Concurrency.IScheduler System.Reactive.Concurrency.IScheduler)
++BFF.DataVirtualizingCollection.IPageLoadingBehaviorCollectionBuilder<TItem, BFF.DataVirtualizingCollection.SlidingWindow.ISlidingWindow<TItem>> Build(System.Int32 System.Int32, System.Int32 System.Int32, System.Int32 System.Int32, System.Reactive.Concurrency.IScheduler System.Reactive.Concurrency.IScheduler, System.Reactive.Concurrency.IScheduler System.Reactive.Concurrency.IScheduler)
+}
+
+@enduml

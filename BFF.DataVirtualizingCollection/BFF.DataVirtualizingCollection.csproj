@@ -19,6 +19,8 @@
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <PackageIconUrl>../Icon/Yeah69_256.png</PackageIconUrl>
     <Title>BFF.DataVirtualizingCollection</Title>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)\GeneratedFiles</CompilerGeneratedFilesOutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -39,6 +41,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="MrMeeseeks.PlantUMLGenerator" Version="69.0.4" />
     <PackageReference Include="MrMeeseeks.Reactive" Version="69.0.17" />
     <PackageReference Include="System.Reactive" Version="5.0.0" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />

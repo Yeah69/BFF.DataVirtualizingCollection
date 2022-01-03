@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
@@ -199,6 +200,95 @@ namespace BFF.DataVirtualizingCollection.Test.PageStorage
                     {
                         await Task.Delay(10, ct).ConfigureAwait(false);
                         return new[] { disposable };
+                    },
+                    (_, _) => Disposable.Empty,
+                    new ImmediateAsyncPageFetchScheduler(),
+                    DefaultScheduler.Instance,
+                    Observer.Create<(int Offset, int PageSize, IDisposable[] PreviousPage, IDisposable[] Page)>(_ => { }));
+        }
+
+        internal override AsyncPageBase<IDisposable> PageWithDisposablePlaceholder(IDisposable disposable)
+        {
+            return
+                new AsyncTaskBasedPage<IDisposable>(
+                    0,
+                    0,
+                    1,
+                    Disposable.Empty, 
+                    async (_, _, ct) =>
+                    {
+                        await Task.Delay(10, ct).ConfigureAwait(false);
+                        return new[] { Disposable.Empty };
+                    },
+                    (_, _) => disposable,
+                    new ImmediateAsyncPageFetchScheduler(),
+                    DefaultScheduler.Instance,
+                    Observer.Create<(int Offset, int PageSize, IDisposable[] PreviousPage, IDisposable[] Page)>(_ => { }));
+        }
+    }
+
+    // ReSharper disable once UnusedMember.Global
+    public class AsyncEnumerableBasedPageTests : AsyncPageBaseTestsBase
+    {
+        internal override IPage<int> PageWithPageSizeOne =>
+            new AsyncEnumerableBasedPage<int>(
+                0,
+                0,
+                1,
+                Disposable.Empty, 
+                (_, _, ct) =>
+                {
+                    return Inner();
+
+                    async IAsyncEnumerable<int> Inner()
+                    {
+                        await Task.Delay(10, ct).ConfigureAwait(false);
+                        yield return 69;
+                    }
+                },
+                (_, _) => 23,
+                new ImmediateAsyncPageFetchScheduler(),
+                DefaultScheduler.Instance,
+                Observer.Create<(int Offset, int PageSize, int[] PreviousPage, int[] Page)>(_ => { }));
+
+        internal override AsyncPageBase<int> PageWithFirstEntry69AndPlaceholder23 =>
+            new AsyncEnumerableBasedPage<int>(
+                0,
+                0,
+                1,
+                Disposable.Empty, 
+                (_, _, ct) =>
+                {
+                    return Inner();
+
+                    async IAsyncEnumerable<int> Inner()
+                    {
+                        await Task.Delay(10, ct).ConfigureAwait(false);
+                        yield return 69;
+                    }
+                },
+                (_, _) => 23,
+                new ImmediateAsyncPageFetchScheduler(),
+                DefaultScheduler.Instance,
+                Observer.Create<(int Offset, int PageSize, int[] PreviousPage, int[] Page)>(_ => { }));
+
+        internal override AsyncPageBase<IDisposable> PageWithDisposable(IDisposable disposable)
+        {
+            return
+                new AsyncEnumerableBasedPage<IDisposable>(
+                    0,
+                    0,
+                    1,
+                    Disposable.Empty, 
+                    (_, _, ct) =>
+                    {
+                        return Inner();
+
+                        async IAsyncEnumerable<IDisposable> Inner()
+                        {
+                            await Task.Delay(10, ct).ConfigureAwait(false);
+                            yield return disposable;
+                        }
                     },
                     (_, _) => Disposable.Empty,
                     new ImmediateAsyncPageFetchScheduler(),
